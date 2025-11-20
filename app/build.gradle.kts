@@ -31,6 +31,9 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+    buildToolsVersion = "36.0.0"
+    ndkVersion = "27.0.12077973"
+
 }
 
 dependencies {
@@ -43,6 +46,17 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
 
-    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+    implementation(libs.workmanager)  // WorkManager aus Version Catalog
 
+    implementation(libs.room.runtime)
+    annotationProcessor(libs.room.compiler) // 🔹 Use annotationProcessor instead of kapt
+
+    implementation(libs.room.ktx) // Optional for coroutines support
+    implementation(libs.room.paging) // Optional for Paging integration
+
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+    implementation("com.squareup.okhttp3:okhttp:3.14.9")
+    implementation("com.squareup.okhttp3:logging-interceptor:3.14.9")
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 }

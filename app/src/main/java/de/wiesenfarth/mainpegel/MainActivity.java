@@ -3,6 +3,7 @@ package de.wiesenfarth.mainpegel;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,6 +17,10 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /*******************************************************
  * Programm:  MainPegel
@@ -34,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences prefs;
     private  int intervalMinutes;
 
+    private TextView textViewPegelstand;
     private Button buttonAktualisieren;
 
     @Override
@@ -41,6 +47,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
+
+        //ToDo: Test
+        Log.e("NET", "INTERNET PERMISSION: " +
+                (checkSelfPermission(android.Manifest.permission.INTERNET) == 0));
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -62,13 +72,18 @@ public class MainActivity extends AppCompatActivity {
         updateWithLocality(localityGuid, intervalMinutes);
 
 
+        textViewPegelstand = findViewById(R.id.textViewPegelstand);
 
         //Button Werte aktualliesieren
         buttonAktualisieren = findViewById(R.id.buttonAktualisieren);
+
+        //Lade Pegel
+        ladePegelstand();
+
         buttonAktualisieren.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //ToDo: ladePegelstand();
+                ladePegelstand();
             }
         });
 
@@ -148,28 +163,53 @@ public class MainActivity extends AppCompatActivity {
      * @Autor:     Bollog
      * @Datum:     2025-11-17
      *******************************************************/
-/*ToDo    private void ladePegelstand() {
+    private void ladePegelstand() {
+
         PegelApiService apiService = RetrofitClient.getApiService();
+
         //Call<PegelResponse> call = apiService.getPegelstand("WUERZBURG");
         Call<PegelResponse> call = apiService.getPegelstand(CONST.WUERZBURG);
+        System.out.println("Retrofit URL: " + call.request().url());
 
+        Log.e("PEGEL", "CALL = " + call);
         call.enqueue(new Callback<PegelResponse>() {
+          {
+            Log.e("PEGEL", "===> Callback wurde initialisiert");
+          }
             @Override
             public void onResponse(Call<PegelResponse> call, Response<PegelResponse> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    PegelResponse pegel = response.body();
-                    textViewPegelstand.setText("Pegelstand: " + pegel.getValue() + " cm " + pegel.getUnit());
-                } else {
-                    textViewPegelstand.setText("Fehler beim Laden.");
+
+                if (!response.isSuccessful()) {
+                    Log.e("PEGEL", "HTTP Fehler: " + response.code());
+                    textViewPegelstand.setText("Fehler: " + response.code());
+                    return;
                 }
+
+                PegelResponse m = response.body();
+                if (m != null) {
+                    textViewPegelstand.setText(
+                            "Pegel: " + m.getValue() + " cm\n" +
+                            "Status MNW/MHW: " + m.getStateMnwMhw() + "\n" +
+                            "Status NSW/HSW: " + m.getStateMnwMhw() + "\n" +
+                            "Zeit: " + m.getTimestamp()
+                    );
+                }
+
+                Log.d("PEGEL", "Value = " + m.getValue());
+                Log.d("PEGEL", "Timestamp = " + m.getTimestamp());
+                Log.d("PEGEL", "MNW/MHW = " + m.getStateMnwMhw());
+                Log.d("PEGEL", "NSW/HSW = " + m.getStateNswHsw());
+
             }
 
             @Override
             public void onFailure(Call<PegelResponse> call, Throwable t) {
-                textViewPegelstand.setText("Keine Verbindung.");
-                Toast.makeText(MainActivity.this, "Fehler: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                t.printStackTrace();
+                textViewPegelstand.setText("Netzwerkfehler!");
             }
         });
+
+
+        System.out.println("Retrofit URL: " + call.request().url());
     }
-*/
 }

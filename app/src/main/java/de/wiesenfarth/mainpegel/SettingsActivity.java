@@ -182,7 +182,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         //spinnerInterval.setSelection(prefs.getInt("interval", 0));
         int storedValue = prefs.getInt("interval_minutes", 15); // Default: 15
-// Werte-Array laden
+        // Werte-Array laden
         String[] values = getResources().getStringArray(R.array.interval_values);
 
         // Default -> Index bestimmen

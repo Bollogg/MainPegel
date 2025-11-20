@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Main Pegel</string>
+    <string name="title_activity_settings">Settings Activity</string>
+
+    <!-- Preference Titles -->
+    <string name="messages_header">Messages</string>
+    <string name="sync_header">Sync</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails</string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+
+    <!-- Menu items -->
+    <string name="menu_settings">Settings</string>
+    <string name="menu_about">About</string>
+
+    <!-- Toast messages -->
+    <string name="toast_settings">Settings selected</string>
+    <string name="toast_about">About selected</string>
+
+    <string name="water_level_location">Water level location:</string>
+    <string name="reads_water_levels">Reads water levels:</string>
+    <string name="wave_detection">Wave detection threshold [cm]:</string>
+    <string name="vibration_alarm">Vibration alarm</string>
+    <string name="beep">Beep</string>
+
+    <string name="level_is_loading">Level is loading...</string>
+    <string name="to_update">Update</string>
+
+    <string name="min_15">15 Minutes</string>
+    <string name="min_30">30 Minutes</string>
+    <string name="min_45">45 Minutes</string>
+    <string name="min_60">60 Minutes</string>
+    <string name="min_75">75 Minutes</string>
+    <string name="min_90">90 Minutes</string>
+
+</resources>

@@ -1,0 +1,39 @@
+<resources>
+	<!-- Reply Preference -->
+	<string-array name="reply_entries">
+		<item>Reply</item>
+		<item>Reply to all</item>
+	</string-array>
+
+	<string-array name="reply_values">
+		<item>reply</item>
+		<item>reply_all</item>
+	</string-array>
+
+	<string-array name="interval_options">
+		<item>15</item>
+		<item>30</item>
+		<item>45</item>
+		<item>60</item>
+	</string-array>
+
+	<string-array name="locality_options">
+		<item>FRANKFURT_OSTHAFEN</item>
+		<item>HANAU_BRUECKE_DFH</item>
+		<item>AUHEIM_BRUECKE_DFH</item>
+		<item>KROTZENBURG</item>
+		<item>MAINFLINGEN</item>
+		<item>KLEINOSTHEIM_WUK</item>
+		<item>OBERNAU</item>
+		<item>KLEINHEUBACH</item>
+		<item>FAULBACH</item>
+		<item>WERTHEIM</item>
+		<item>STEINBACH</item>
+		<item>WUERZBURG</item>
+		<item>ASTHEIM</item>
+		<item>SCHWEINFURT_NEUER_HAFEN</item>
+		<item>TRUNSTADT</item>
+		<item>BAMBERG</item>
+		<item>RIEDENBURG_UP</item>
+	</string-array>
+</resources>

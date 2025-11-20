@@ -1,0 +1,33 @@
+<resources>
+    <!-- Reply Preference -->
+    <string-array name="reply_entries">
+        <item>Reply</item>
+        <item>Reply to all</item>
+    </string-array>
+
+    <string-array name="reply_values">
+        <item>reply</item>
+        <item>reply_all</item>
+    </string-array>
+
+    <!-- Anzeige im Spinner -->
+    <string-array name="interval_display">
+        <item>@string/min_15</item>
+        <item>@string/min_30</item>
+        <item>@string/min_45</item>
+        <item>@string/min_60</item>
+        <item>@string/min_75</item>
+        <item>@string/min_90</item>
+    </string-array>
+
+    <!-- Tatsächliche Werte, die gespeichert werden -->
+    <string-array name="interval_values">
+        <item>15</item>
+        <item>30</item>
+        <item>45</item>
+        <item>60</item>
+        <item>75</item>
+        <item>90</item>
+    </string-array>
+
+</resources>

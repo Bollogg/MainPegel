@@ -18,6 +18,19 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -35,12 +48,14 @@ import retrofit2.Response;
  * @Version:   2025.11
  *******************************************************/
 public class MainActivity extends AppCompatActivity {
-    private String localityGuid;
-    private SharedPreferences prefs;
-    private  int intervalMinutes;
+  private String localityGuid;
+  private SharedPreferences prefs;
+  private  int intervalMinutes;
 
-    private TextView textViewPegelstand;
-    private Button buttonAktualisieren;
+  private TextView textViewPegelstand;
+  private Button buttonAktualisieren;
+
+  private LineChart lineChart; //Graph
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,39 +65,41 @@ public class MainActivity extends AppCompatActivity {
 
         //ToDo: Test
         Log.e("NET", "INTERNET PERMISSION: " +
-                (checkSelfPermission(android.Manifest.permission.INTERNET) == 0));
+        (checkSelfPermission(android.Manifest.permission.INTERNET) == 0));
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+        Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+        v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+        return insets;
+      });
 
 
-        prefs = getSharedPreferences("settings", MODE_PRIVATE);
-        localityGuid = prefs.getString("locality_guid", CONST.WUERZBURG);
+      prefs = getSharedPreferences("settings", MODE_PRIVATE);
+      localityGuid = prefs.getString("locality_guid", CONST.WUERZBURG);
 
-        prefs = getSharedPreferences("settings", MODE_PRIVATE);
-        intervalMinutes = prefs.getInt("interval_minutes", 15);
+      prefs = getSharedPreferences("settings", MODE_PRIVATE);
+      intervalMinutes = prefs.getInt("interval_minutes", 15);
 
-        // Falls du den Wert weiterverarbeiten musst:
-        updateWithLocality(localityGuid, intervalMinutes);
+      // Falls du den Wert weiterverarbeiten musst:
+      updateWithLocality(localityGuid, intervalMinutes);
 
 
-        textViewPegelstand = findViewById(R.id.textViewPegelstand);
+      textViewPegelstand = findViewById(R.id.textViewPegelstand);
 
-        //Button Werte aktualliesieren
-        buttonAktualisieren = findViewById(R.id.buttonAktualisieren);
+      //Button Werte aktualliesieren
+      buttonAktualisieren = findViewById(R.id.buttonAktualisieren);
+      // Line Graph verbinden
+      lineChart = findViewById(R.id.lineChart);
 
         //Lade Pegel
         ladePegelstand();
 
         buttonAktualisieren.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+          @Override
+          public void onClick(View v) {
                 ladePegelstand();
             }
         });
@@ -165,19 +182,22 @@ public class MainActivity extends AppCompatActivity {
      *******************************************************/
     private void ladePegelstand() {
 
-        PegelApiService apiService = RetrofitClient.getApiService();
+      prefs = getSharedPreferences("settings", MODE_PRIVATE);
+      localityGuid = prefs.getString("locality_guid", CONST.WUERZBURG);
 
-        //Call<PegelResponse> call = apiService.getPegelstand("WUERZBURG");
-        Call<PegelResponse> call = apiService.getPegelstand(CONST.WUERZBURG);
-        System.out.println("Retrofit URL: " + call.request().url());
+      PegelApiService apiService = RetrofitClient.getApiService();
+
+      //ToDo: Löschen Call<List<PegelResponse>> call = apiService.getPegelstand(CONST.WUERZBURG);
+      Call<List<PegelResponse>> call = apiService.getPegelstand(localityGuid);
+      System.out.println("Retrofit URL: " + call.request().url());
 
         Log.e("PEGEL", "CALL = " + call);
-        call.enqueue(new Callback<PegelResponse>() {
+        call.enqueue(new Callback<List<PegelResponse>>() {
           {
             Log.e("PEGEL", "===> Callback wurde initialisiert");
           }
             @Override
-            public void onResponse(Call<PegelResponse> call, Response<PegelResponse> response) {
+            public void onResponse(Call<List<PegelResponse>> call, Response<List<PegelResponse>> response) {
 
                 if (!response.isSuccessful()) {
                     Log.e("PEGEL", "HTTP Fehler: " + response.code());
@@ -185,25 +205,34 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
 
-                PegelResponse m = response.body();
-                if (m != null) {
-                    textViewPegelstand.setText(
-                            "Pegel: " + m.getValue() + " cm\n" +
-                            "Status MNW/MHW: " + m.getStateMnwMhw() + "\n" +
-                            "Status NSW/HSW: " + m.getStateMnwMhw() + "\n" +
-                            "Zeit: " + m.getTimestamp()
-                    );
-                }
+              // Liste empfangen
+              List<PegelResponse> list = response.body();
+              if (list == null || list.isEmpty()) {
+                textViewPegelstand.setText("Keine Messwerte!");
+                return;
+              }
 
-                Log.d("PEGEL", "Value = " + m.getValue());
-                Log.d("PEGEL", "Timestamp = " + m.getTimestamp());
-                Log.d("PEGEL", "MNW/MHW = " + m.getStateMnwMhw());
-                Log.d("PEGEL", "NSW/HSW = " + m.getStateNswHsw());
+              // Letzter Wert (aktuellster)
+              PegelResponse last = list.get(list.size() - 1);
 
-            }
+              textViewPegelstand.setText(
+                  "Pegel: " + last.getValue() + " cm\n" +
+                  "Zeit: " + last.getTimestamp()
+              );
+
+              Log.d("PEGEL", "Value = " + last.getValue());
+              Log.d("PEGEL", "Timestamp = " + last.getTimestamp());
+
+              // +++ LOGGEN aller Werte +++
+              for (PegelResponse p : list) {
+                Log.d("PEGEL", p.getTimestamp() + " -> " + p.getValue());
+              }
+              // Chart aktualisieren
+              aktualisiereGraph(list);
+          }
 
             @Override
-            public void onFailure(Call<PegelResponse> call, Throwable t) {
+            public void onFailure(Call<List<PegelResponse>> call, Throwable t) {
                 t.printStackTrace();
                 textViewPegelstand.setText("Netzwerkfehler!");
             }
@@ -212,4 +241,64 @@ public class MainActivity extends AppCompatActivity {
 
         System.out.println("Retrofit URL: " + call.request().url());
     }
+
+  /*******************************************************
+   * Programm:  aktualisiereGraph
+   *
+   * Beschreibung:
+   *  Aktuallieseire Groph
+   *
+   *
+   * @Autor:     Bollog
+   * @Datum:     2025-11-21
+   *******************************************************/
+  private void aktualisiereGraph(List<PegelResponse> daten) {
+
+    List<Entry> entries = new ArrayList<>();
+
+    // Zeitformat für die API-Zeitstempel
+    SimpleDateFormat apiFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.GERMANY);
+    SimpleDateFormat displayFormat = new SimpleDateFormat("HH:mm", Locale.GERMANY);
+
+    List<String> xLabels = new ArrayList<>();
+
+    for (int i = 0; i < daten.size(); i++) {
+      PegelResponse m = daten.get(i);
+
+      try {
+        Date d = apiFormat.parse(m.getTimestamp());
+        long x = i;   // wir benutzen Index als X-Wert
+        entries.add(new Entry(x, m.getValue()));
+
+        // Label hinzufügen
+        xLabels.add(displayFormat.format(d));
+
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    }
+
+    LineDataSet dataSet = new LineDataSet(entries, "Pegelverlauf (4h)");
+    dataSet.setLineWidth(2f);
+    dataSet.setDrawCircles(false);
+    dataSet.setDrawValues(false);
+
+    LineData lineData = new LineData(dataSet);
+    lineChart.setData(lineData);
+
+    // X-Achse anpassen → Zeitlabels
+    XAxis xAxis = lineChart.getXAxis();
+    xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+    xAxis.setGranularity(1f);
+    xAxis.setLabelRotationAngle(-45f);
+
+    // ← HIER verwenden wir IndexAxisValueFormatter
+    xAxis.setValueFormatter(new IndexAxisValueFormatter(xLabels));
+
+    lineChart.getAxisRight().setEnabled(false);   // Y-Achse links einschalten, rechts aus
+    lineChart.getDescription().setEnabled(false);
+    lineChart.invalidate();                       // Chart aktualisieren
+
+  }
+
 }

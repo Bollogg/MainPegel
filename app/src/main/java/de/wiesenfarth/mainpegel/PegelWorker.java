@@ -5,14 +5,17 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
+
+import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.Response;
 /*******************************************************
  * Programm:  PegelWorker
  *
  * Beschreibung:
- *  Begelstand wird alle 15 min aufgerufen
- *
+ *  Pegelstand wird alle 15 min aufgerufen
+ *  ToDo: Konstante für Würzburg ändern
  *
  * @Autor:     Bollog
  * @Datum:     2025-11-20
@@ -28,13 +31,16 @@ public class PegelWorker extends Worker {
     @Override
     public Result doWork() {
         PegelApiService apiService = RetrofitClient.getApiService();
-        Call<PegelResponse> call = apiService.getPegelstand(CONST.WUERZBURG);
+        Call<List<PegelResponse>> call = apiService.getPegelstand(CONST.WUERZBURG);
 
         try {
-            Response<PegelResponse> response = call.execute();
-            if (response.isSuccessful() && response.body() != null) {
+            Response<List<PegelResponse>> response = call.execute();
+            if (response.body() != null && !response.body().isEmpty()) {
 
-                PegelResponse pegel = response.body();
+                // letzter Wert = aktueller Messwert
+                List<PegelResponse> list = response.body();
+                PegelResponse pegel = list.get(list.size() - 1);
+
                 Log.d("PegelWorker", "Neuer Pegelstand: " + pegel.getValue() + " " + pegel.getTimestamp());
                 return Result.success();
             } else {

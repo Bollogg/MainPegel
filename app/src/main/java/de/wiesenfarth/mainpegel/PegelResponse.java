@@ -4,26 +4,33 @@ package de.wiesenfarth.mainpegel;
  * Programm:  PegelResponse
  *
  * Beschreibung:
- *  getter von API Daten
+ *  API Daten-Struktur in Json Format
+ *  Getter und Setter
  *
  *
  * @Autor:     Bollog
- * @Datum:     2025-11-20
+ * @Datum:     2025-11-21
  *******************************************************/
 
 public class PegelResponse {
     private String timestamp;
-    private double value;
-    private String stateMnwMhw;
-    private String stateNswHsw;
+    private int value;
 
-    public String getTimestamp() { return timestamp; }
-    public double getValue() { return value; }
-    public String getStateMnwMhw() { return stateMnwMhw; }
-    public String getStateNswHsw() { return stateNswHsw; }
+    public PegelResponse() {}
 
-    public void setTimestamp(String timestamp) { this.timestamp = timestamp; }
-    public void setValue(double value) { this.value = value; }
-    public void setStateMnwMhw(String stateMnwMhw) { this.stateMnwMhw = stateMnwMhw; }
-    public void setStateNswHsw(String stateNswHsw) { this.stateNswHsw = stateNswHsw; }
+    public String getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(String timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public int getValue() {
+        return value;
+    }
+
+    public void setValue(int value) {
+        this.value = value;
+    }
 }

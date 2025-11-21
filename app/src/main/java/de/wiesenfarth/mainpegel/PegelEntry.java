@@ -2,7 +2,16 @@ package de.wiesenfarth.mainpegel;
 
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
-
+/*******************************************************
+ * Programm:  PegelEntry
+ *
+ * Beschreibung:
+ * Pegel-Daten Bereitstellung
+ *
+ *
+ * @Autor:     Bollog
+ * @Datum:     2025-11-20
+ *******************************************************/
 @Entity(tableName = "pegel_table")
 public class PegelEntry {
     @PrimaryKey(autoGenerate = true)

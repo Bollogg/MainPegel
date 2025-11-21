@@ -17,7 +17,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * @Autor:     Bollog
  * @Datum:     2025-11-20
  *******************************************************/
-
 public class RetrofitClient {
     private static Retrofit retrofit = null;
 
@@ -28,10 +27,10 @@ public class RetrofitClient {
                     .baseUrl("https://www.pegelonline.wsv.de/webservices/rest-api/v2/")
                     .addConverterFactory(GsonConverterFactory.create())
                     .client(new OkHttpClient.Builder()
-                            .addInterceptor(new HttpLoggingInterceptor(
-                                    msg -> Log.e("HTTP", msg))
-                                    .setLevel(HttpLoggingInterceptor.Level.BODY)
-                            )
+                          .addInterceptor(new HttpLoggingInterceptor(
+                          msg -> Log.e("HTTP", msg))
+                                      .setLevel(HttpLoggingInterceptor.Level.BODY)
+                              )
                             .build()
                     )
                     .build();

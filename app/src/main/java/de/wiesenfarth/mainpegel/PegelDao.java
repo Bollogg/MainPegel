@@ -5,7 +5,16 @@ import androidx.room.Insert;
 import androidx.room.Query;
 
 import java.util.List;
-
+/*******************************************************
+ * Programm:  PegelDao
+ *
+ * Beschreibung:
+ *  ToDo.....?????
+ *
+ *
+ * @Autor:     Bollog
+ * @Datum:     2025-11-20
+ *******************************************************/
 @Dao
 public interface PegelDao {
     @Insert

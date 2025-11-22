@@ -29,6 +29,8 @@ public class SettingsActivity extends AppCompatActivity {
     private EditText waveThreshold;
     private Switch switchVibration, switchBeep;
 
+    private Spinner spinnerMeasure; //Spinner für Stunden Graph
+
     private SharedPreferences prefs;
 
     private String[] localityNames = {
@@ -78,7 +80,6 @@ public class SettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.settings_activity);
 
-
         // Toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -101,6 +102,26 @@ public class SettingsActivity extends AppCompatActivity {
 
         switchVibration = findViewById(R.id.switch_vibration);
         switchBeep = findViewById(R.id.switch_beep);
+
+        // ------------------------------------------------------
+        // 🔥 NEU: Spinner für 1–29 Stunden
+        // ------------------------------------------------------
+        spinnerMeasure = findViewById(R.id.spinner_Measure);
+
+        // Array 1–29 als Strings
+        String[] hourLabels = new String[29];
+        for (int i = 0; i < 29; i++) {
+            hourLabels[i] = (i + 1) + " Stunden";
+        }
+
+        ArrayAdapter<String> adapterHours = new ArrayAdapter<>(
+            this,
+            android.R.layout.simple_spinner_item,
+            hourLabels
+        );
+        adapterHours.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerMeasure.setAdapter(adapterHours);
+        // ------------------------------------------------------
 
         // Auswahl der Pegelmessstelle
         ArrayAdapter<String> adapterLocality = new ArrayAdapter<>(
@@ -170,6 +191,12 @@ public class SettingsActivity extends AppCompatActivity {
         editor.putBoolean("vibration", switchVibration.isChecked());
         editor.putBoolean("beep", switchBeep.isChecked());
 
+        // ------------------------------------------------------
+        // Stunden speichern
+        // spinner pos 0=1h → +1
+        editor.putInt("graph_hours", spinnerMeasure.getSelectedItemPosition() + 1);
+        // ------------------------------------------------------
+
         editor.apply();
     }
 
@@ -197,5 +224,12 @@ public class SettingsActivity extends AppCompatActivity {
 
         switchVibration.setChecked(prefs.getBoolean("vibration", false));
         switchBeep.setChecked(prefs.getBoolean("beep", false));
+
+        // ------------------------------------------------------
+        // Stunden einstellen
+        int storedHours = prefs.getInt("graph_hours", 6); // Default 6
+        spinnerMeasure.setSelection(storedHours - 1);
+        // ------------------------------------------------------
+
     }
 }

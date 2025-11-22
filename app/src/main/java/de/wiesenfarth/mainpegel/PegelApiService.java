@@ -5,6 +5,8 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
+
 /*******************************************************
  * Programm:  PegelApiService
  *
@@ -18,6 +20,9 @@ import retrofit2.http.Path;
  *******************************************************/
 public interface PegelApiService {
 
-    @GET("stations/{station}/W/measurements.json?start=PT4H")
-    Call<List<PegelResponse>> getPegelstand(@Path("station") String station);
+    @GET("stations/{station}/W/measurements.json")
+    Call<List<PegelResponse>> getPegelstand(
+        @Path("station") String station,
+        @Query("start") String start   // z.B. "PT6H"
+    );
 }

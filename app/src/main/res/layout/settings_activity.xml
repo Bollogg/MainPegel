@@ -5,101 +5,115 @@
     android:padding="16dp">
 
     <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="vertical">
 
         <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?attr/colorPrimary"
-            android:minHeight="?attr/actionBarSize"
-            android:theme="?attr/actionBarTheme" />
+          android:id="@+id/toolbar"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:background="?attr/colorPrimary"
+          android:minHeight="?attr/actionBarSize"
+          android:theme="?attr/actionBarTheme" />
 
         <!-- Pegelstände Ort -->
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/water_level_location"
-            android:textSize="30dp"
-            android:paddingTop="8dp"/>
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:paddingTop="8dp"
+          android:text="@string/water_level_location"
+          android:textSize="30dp" />
 
         <Spinner
-            android:id="@+id/spinner_locality"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:spinnerMode="dropdown" />
+          android:id="@+id/spinner_locality"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:spinnerMode="dropdown" />
 
         <!-- Pegelstände Intervall -->
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/reads_water_levels"
-            android:textSize="16sp"
-            android:paddingTop="8dp"/>
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:paddingTop="8dp"
+          android:text="@string/reads_water_levels"
+          android:textSize="16sp" />
 
         <Spinner
-            android:id="@+id/spinner_interval"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:spinnerMode="dropdown" />
+          android:id="@+id/spinner_interval"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:spinnerMode="dropdown" />
 
         <!-- Wellenerkennung -->
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/wave_detection"
-            android:textSize="16sp"
-            android:paddingTop="16dp"/>
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:paddingTop="16dp"
+          android:text="@string/wave_detection"
+          android:textSize="16sp" />
 
         <EditText
-            android:id="@+id/wave_threshold"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="number"
-            android:hint="z.B. 15" />
+          android:id="@+id/wave_threshold"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:hint="z.B. 15"
+          android:inputType="number" />
+
+        <!-- Grph anzahl Messwerte -->
+        <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:paddingTop="8dp"
+          android:text="@string/level_measur_houer"
+          android:textSize="16sp" />
+
+        <Spinner
+          android:id="@+id/spinner_Measure"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:spinnerMode="dropdown" />
 
         <!-- Vibrationsalarm -->
         <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:paddingTop="16dp">
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_weight="1"
+          android:orientation="horizontal"
+          android:paddingTop="16dp">
 
             <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/vibration_alarm"
-                android:textSize="16sp" />
+              android:layout_width="0dp"
+              android:layout_height="wrap_content"
+              android:layout_weight="1"
+              android:text="@string/vibration_alarm"
+              android:textSize="16sp" />
 
             <Switch
-                android:id="@+id/switch_vibration"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+              android:id="@+id/switch_vibration"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content" />
         </LinearLayout>
 
         <!-- Piepton -->
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="horizontal"
-            android:paddingTop="8dp">
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_weight="1"
+          android:orientation="horizontal"
+          android:paddingTop="8dp">
 
             <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/beep"
-                android:textSize="16sp" />
+              android:layout_width="0dp"
+              android:layout_height="wrap_content"
+              android:layout_weight="1"
+              android:text="@string/beep"
+              android:textSize="16sp" />
 
             <Switch
-                android:id="@+id/switch_beep"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+              android:id="@+id/switch_beep"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content" />
         </LinearLayout>
 
     </LinearLayout>

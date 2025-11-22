@@ -29,6 +29,41 @@
     <string name="wave_detection">Wellenerkennungsschwelle [cm]:</string>
     <string name="vibration_alarm">Vibrationsalarm</string>
     <string name="beep">Piepton</string>
+    <string name="hour">Stunde</string>
+
+    <string name="level_measur_houer">Messungszeitraum in Stunden:</string>
+
+    <string-array name="hours_array">
+        <item>1 Stunde</item>
+        <item>2 Stunden</item>
+        <item>3 Stunden</item>
+        <item>4 Stunden</item>
+        <item>5 Stunden</item>
+        <item>6 Stunden</item>
+        <item>7 Stunden</item>
+        <item>8 Stunden</item>
+        <item>9 Stunden</item>
+        <item>10 Stunden</item>
+        <item>11 Stunden</item>
+        <item>12 Stunden</item>
+        <item>13 Stunden</item>
+        <item>14 Stunden</item>
+        <item>15 Stunden</item>
+        <item>16 Stunden</item>
+        <item>17 Stunden</item>
+        <item>18 Stunden</item>
+        <item>19 Stunden</item>
+        <item>20 Stunden</item>
+        <item>21 Stunden</item>
+        <item>22 Stunden</item>
+        <item>23 Stunden</item>
+        <item>24 Stunden</item>
+        <item>25 Stunden</item>
+        <item>26 Stunden</item>
+        <item>27 Stunden</item>
+        <item>28 Stunden</item>
+        <item>29 Stunden</item>
+    </string-array>
 
     <string name="level_is_loading">Pegelstand wird geladen...</string>
     <string name="to_update">Aktualisieren</string>

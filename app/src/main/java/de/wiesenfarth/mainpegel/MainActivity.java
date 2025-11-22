@@ -182,65 +182,74 @@ public class MainActivity extends AppCompatActivity {
      *******************************************************/
     private void ladePegelstand() {
 
+      // Einstellungen laden
       prefs = getSharedPreferences("settings", MODE_PRIVATE);
       localityGuid = prefs.getString("locality_guid", CONST.WUERZBURG);
 
+      int hours = prefs.getInt("graph_hours", 4);  // Standard: 4h
+      String startParam = "PT" + hours + "H";
+
+
+      // API Service
       PegelApiService apiService = RetrofitClient.getApiService();
+      // Dynamischer Retrofit-Aufruf
+      Call<List<PegelResponse>> call = apiService.getPegelstand(localityGuid, startParam);
 
-      //ToDo: Löschen Call<List<PegelResponse>> call = apiService.getPegelstand(CONST.WUERZBURG);
-      Call<List<PegelResponse>> call = apiService.getPegelstand(localityGuid);
-      System.out.println("Retrofit URL: " + call.request().url());
+      Log.d("PEGEL", "GUID: " + localityGuid);
+      Log.d("PEGEL", "Start-Parameter: " + startParam);
 
-        Log.e("PEGEL", "CALL = " + call);
-        call.enqueue(new Callback<List<PegelResponse>>() {
-          {
-            Log.e("PEGEL", "===> Callback wurde initialisiert");
-          }
-            @Override
-            public void onResponse(Call<List<PegelResponse>> call, Response<List<PegelResponse>> response) {
+      Log.e("PEGEL", "Retrofit URL: " + call.request().url());
 
-                if (!response.isSuccessful()) {
-                    Log.e("PEGEL", "HTTP Fehler: " + response.code());
-                    textViewPegelstand.setText("Fehler: " + response.code());
-                    return;
-                }
+      call.enqueue(new Callback<List<PegelResponse>>() {
 
-              // Liste empfangen
-              List<PegelResponse> list = response.body();
-              if (list == null || list.isEmpty()) {
-                textViewPegelstand.setText("Keine Messwerte!");
-                return;
-              }
+                     {
+                       Log.e("PEGEL", "===> Callback wurde initialisiert");
+                     }
 
-              // Letzter Wert (aktuellster)
-              PegelResponse last = list.get(list.size() - 1);
 
-              textViewPegelstand.setText(
-                  "Pegel: " + last.getValue() + " cm\n" +
-                  "Zeit: " + last.getTimestamp()
-              );
-
-              Log.d("PEGEL", "Value = " + last.getValue());
-              Log.d("PEGEL", "Timestamp = " + last.getTimestamp());
-
-              // +++ LOGGEN aller Werte +++
-              for (PegelResponse p : list) {
-                Log.d("PEGEL", p.getTimestamp() + " -> " + p.getValue());
-              }
-              // Chart aktualisieren
-              aktualisiereGraph(list);
+      @Override
+      public void onResponse(Call<List<PegelResponse>> call, Response<List<PegelResponse>> response) {
+          if (!response.isSuccessful()) {
+              Log.e("PEGEL", "HTTP Fehler: " + response.code());
+              textViewPegelstand.setText("Fehler: " + response.code());
+              return;
           }
 
-            @Override
-            public void onFailure(Call<List<PegelResponse>> call, Throwable t) {
-                t.printStackTrace();
-                textViewPegelstand.setText("Netzwerkfehler!");
-            }
-        });
+        // Liste empfangen
+        List<PegelResponse> list = response.body();
+        if (list == null || list.isEmpty()) {
+          textViewPegelstand.setText("Keine Messwerte!");
+          return;
+        }
 
+        // Letzter Wert (aktuellster)
+        PegelResponse last = list.get(list.size() - 1);
 
-        System.out.println("Retrofit URL: " + call.request().url());
+        textViewPegelstand.setText(
+            "Pegel: " + last.getValue() + " cm\n" +
+            "Zeit: " + last.getTimestamp()
+        );
+
+        Log.d("PEGEL", "Neuster Wert: " + last.getTimestamp() + " -> " + last.getValue());
+
+        // +++ LOGGEN aller Werte +++
+        for (PegelResponse p : list) {
+          Log.d("PEGEL", p.getTimestamp() + " -> " + p.getValue());
+        }
+        // Chart aktualisieren
+        aktualisiereGraph(list);
     }
+
+      @Override
+      public void onFailure(Call<List<PegelResponse>> call, Throwable t) {
+          t.printStackTrace();
+          textViewPegelstand.setText("Netzwerkfehler!");
+      }
+  });
+
+
+    System.out.println("Retrofit URL: " + call.request().url());
+}
 
   /*******************************************************
    * Programm:  aktualisiereGraph

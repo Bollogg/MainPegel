@@ -34,4 +34,35 @@ public class CONST {
     //Max. Stellen bei Wellenerkennungsschwelle
     public static final int WAVE_THERESHOLD_MAX        = 4;
 
+    // Messtabellen fuer Graphische anzeige in h 1 bis 29
+    public static final int HOURS_1                         = 1;
+    public static final int HOURS_2                         = 2;
+    public static final int HOURS_3                         = 3;
+    public static final int HOURS_4                         = 4;
+    public static final int HOURS_5                         = 5;
+    public static final int HOURS_6                         = 6;
+    public static final int HOURS_7                         = 7;
+    public static final int HOURS_8                         = 8;
+    public static final int HOURS_9                         = 9;
+    public static final int HOURS_10                        = 10;
+    public static final int HOURS_11                        = 11;
+    public static final int HOURS_12                        = 12;
+    public static final int HOURS_13                        = 13;
+    public static final int HOURS_14                        = 14;
+    public static final int HOURS_15                        = 15;
+    public static final int HOURS_16                        = 16;
+    public static final int HOURS_17                        = 17;
+    public static final int HOURS_18                        = 18;
+    public static final int HOURS_19                        = 19;
+    public static final int HOURS_20                        = 20;
+    public static final int HOURS_21                        = 21;
+    public static final int HOURS_22                        = 22;
+    public static final int HOURS_23                        = 23;
+    public static final int HOURS_24                        = 24;
+    public static final int HOURS_25                        = 25;
+    public static final int HOURS_26                        = 26;
+    public static final int HOURS_27                        = 27;
+    public static final int HOURS_28                        = 28;
+    public static final int HOURS_29                        = 29;
+
 }

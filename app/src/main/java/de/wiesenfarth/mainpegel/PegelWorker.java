@@ -30,9 +30,19 @@ public class PegelWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
-        PegelApiService apiService = RetrofitClient.getApiService();
-        Call<List<PegelResponse>> call = apiService.getPegelstand(CONST.WUERZBURG);
 
+        // API-Service holen
+        PegelApiService apiService = RetrofitClient.getApiService();
+
+        // Standard: 4 Stunden
+        int hours = CONST.HOURS_4;
+
+        // API verlangt String: "PT4H"
+        String startParam = "PT" + hours + "H";
+
+        // Aufruf mit station + start
+        Call<List<PegelResponse>> call =
+            apiService.getPegelstand(CONST.WUERZBURG, startParam);
         try {
             Response<List<PegelResponse>> response = call.execute();
             if (response.body() != null && !response.body().isEmpty()) {

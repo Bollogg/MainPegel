@@ -2,6 +2,7 @@ package de.wiesenfarth.mainpegel;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -14,12 +15,14 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.data.Entry;
@@ -108,16 +111,19 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-        super.onResume();
+      super.onResume();
 
-        prefs = getSharedPreferences("settings", MODE_PRIVATE);
-        localityGuid = prefs.getString("locality_guid", CONST.WUERZBURG);
+      prefs = getSharedPreferences("settings", MODE_PRIVATE);
+      localityGuid = prefs.getString("locality_guid", CONST.WUERZBURG);
 
-        prefs = getSharedPreferences("settings", MODE_PRIVATE);
-        intervalMinutes = prefs.getInt("interval_minutes", 15);
+      prefs = getSharedPreferences("settings", MODE_PRIVATE);
+      intervalMinutes = prefs.getInt("interval_minutes", 15);
 
-        // Falls du den Wert weiterverarbeiten musst:
-        updateWithLocality(localityGuid, intervalMinutes);
+      //Lade Pegel nach beenden der SettingsActivity
+      ladePegelstand();
+
+      // Falls du den Wert weiterverarbeiten musst:
+      updateWithLocality(localityGuid, intervalMinutes);
 
     }
 
@@ -237,7 +243,7 @@ public class MainActivity extends AppCompatActivity {
           Log.d("PEGEL", p.getTimestamp() + " -> " + p.getValue());
         }
         // Chart aktualisieren
-        aktualisiereGraph(list);
+        aktualisiereGraph(list,hours);
     }
 
       @Override
@@ -261,7 +267,31 @@ public class MainActivity extends AppCompatActivity {
    * @Autor:     Bollog
    * @Datum:     2025-11-21
    *******************************************************/
-  private void aktualisiereGraph(List<PegelResponse> daten) {
+  private void aktualisiereGraph(List<PegelResponse> daten, int hours) {
+
+    // --- Farben auswählen aus res/values/color/color.xml /day|nigth ---
+    //     ContextCompat.getColor(this, R.color.lineColor);
+ // --- Y-Achse ---
+    YAxis left = lineChart.getAxisLeft();
+    left.setTextColor(ContextCompat.getColor(this, R.color.textColor));
+    left.setAxisLineColor(ContextCompat.getColor(this, R.color.axisColor));
+    left.setGridColor(ContextCompat.getColor(this, R.color.gridColor));
+
+    lineChart.getAxisRight().setEnabled(false);
+
+// --- Hintergrund ---
+    lineChart.setBackgroundColor(ContextCompat.getColor(this, R.color.backgroundColor));
+    lineChart.setGridBackgroundColor(ContextCompat.getColor(this, R.color.backgroundColor));
+    lineChart.setDrawGridBackground(false);
+
+// --- Legende ---
+    lineChart.getLegend().setTextColor(ContextCompat.getColor(this, R.color.legendTextColor));
+
+// --- Beschreibung ---
+    lineChart.getDescription().setEnabled(false);
+
+// Aktualisieren
+    lineChart.invalidate();
 
     List<Entry> entries = new ArrayList<>();
 
@@ -287,10 +317,15 @@ public class MainActivity extends AppCompatActivity {
       }
     }
 
-    LineDataSet dataSet = new LineDataSet(entries, "Pegelverlauf (4h)");
+    LineDataSet dataSet = new LineDataSet(entries, "Pegelverlauf ("+String.valueOf(hours) +"h)");
     dataSet.setLineWidth(2f);
     dataSet.setDrawCircles(false);
     dataSet.setDrawValues(false);
+
+// --- LineDataset ---
+    dataSet.setColor(ContextCompat.getColor(this, R.color.lineColor));
+    dataSet.setDrawFilled(true);
+    dataSet.setFillColor(ContextCompat.getColor(this, R.color.fillColor));
 
     LineData lineData = new LineData(dataSet);
     lineChart.setData(lineData);
@@ -301,6 +336,11 @@ public class MainActivity extends AppCompatActivity {
     xAxis.setGranularity(1f);
     xAxis.setLabelRotationAngle(-45f);
 
+// --- X-Achse ---
+    xAxis.setTextColor(ContextCompat.getColor(this, R.color.textColor));
+    xAxis.setAxisLineColor(ContextCompat.getColor(this, R.color.axisColor));
+    xAxis.setGridColor(ContextCompat.getColor(this, R.color.gridColor));
+
     // ← HIER verwenden wir IndexAxisValueFormatter
     xAxis.setValueFormatter(new IndexAxisValueFormatter(xLabels));
 
@@ -309,5 +349,4 @@ public class MainActivity extends AppCompatActivity {
     lineChart.invalidate();                       // Chart aktualisieren
 
   }
-
 }

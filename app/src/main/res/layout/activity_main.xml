@@ -10,12 +10,16 @@
 
     <!-- Toolbar ganz oben -->
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary"
-        android:minHeight="?attr/actionBarSize"
-        android:theme="?attr/actionBarTheme" />
+      android:id="@+id/toolbar"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:background="?attr/colorPrimary"
+      android:longClickable="false"
+      android:minHeight="?attr/actionBarSize"
+      android:theme="?attr/actionBarTheme"
+      app:logo="@drawable/ic_launcher_foreground"
+      app:title="@string/app_name"
+      app:titleTextColor="@color/white" />
 
     <!-- Chart -->
     <com.github.mikephil.charting.charts.LineChart
@@ -40,11 +44,12 @@
             android:textStyle="bold" />
 
         <Button
-            android:id="@+id/buttonAktualisieren"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="60dp"
-            android:text="@string/to_update" />
+          android:id="@+id/buttonAktualisieren"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="60dp"
+          android:text="@string/to_update"
+          android:textColor="@color/white" />
     </LinearLayout>
 
 </LinearLayout>

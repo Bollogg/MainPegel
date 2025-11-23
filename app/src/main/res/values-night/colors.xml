@@ -1,3 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+  <color name="black">#FFFFFFFF</color>
+  <color name="white">#FF000000</color>
+
+  <color name="colorBackground">#121212</color>
+  <color name="colorTextPrimary">#FFFFFF</color>
+  <color name="colorToolbar">#0A84FF</color>
+  <color name="colorButton">#ff6750a4</color>
+
+  <color name="lineColor">#00FFFF</color>                 <!-- Cyan -->
+  <color name="fillColor">#5000FFFF</color>               <!-- halbtransparent -->
+  <color name="textColor">#FFFFFF</color>
+  <color name="axisColor">#DDDDDD</color>
+  <color name="gridColor">#444444</color>
+  <color name="backgroundColor">#000000</color>
+  <color name="legendTextColor">#FFFFFF</color>
 </resources>

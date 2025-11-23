@@ -231,9 +231,23 @@ public class MainActivity extends AppCompatActivity {
         // Letzter Wert (aktuellster)
         PegelResponse last = list.get(list.size() - 1);
 
+        // --- ZEIT FORMATIERUNG ---
+        String formattedTime = last.getTimestamp(); // Fallback
+
+        try {
+          SimpleDateFormat apiFormat     = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.GERMANY);
+          SimpleDateFormat displayFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.GERMANY);
+
+          Date date = apiFormat.parse(last.getTimestamp());
+          formattedTime = displayFormat.format(date);
+
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+
         textViewPegelstand.setText(
             "Pegel: " + last.getValue() + " cm\n" +
-            "Zeit: " + last.getTimestamp()
+                "Zeit: " + formattedTime
         );
 
         Log.d("PEGEL", "Neuster Wert: " + last.getTimestamp() + " -> " + last.getValue());

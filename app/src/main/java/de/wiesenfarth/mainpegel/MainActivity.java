@@ -317,7 +317,7 @@ public class MainActivity extends AppCompatActivity {
       }
     }
 
-    LineDataSet dataSet = new LineDataSet(entries, "Pegelverlauf ("+String.valueOf(hours) +"h)");
+    LineDataSet dataSet = new LineDataSet(entries, getString(R.string.level_curve) + " ("+String.valueOf(hours) +"h)");
     dataSet.setLineWidth(2f);
     dataSet.setDrawCircles(false);
     dataSet.setDrawValues(false);

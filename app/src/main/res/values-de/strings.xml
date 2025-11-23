@@ -26,6 +26,8 @@
 
     <string name="water_level_location">Pegelstand Ort:</string>
     <string name="reads_water_levels">Pegelstände lesen:</string>
+    <string name="level_curve">Pegelverlauf</string>
+
     <string name="wave_detection">Wellenerkennungsschwelle [cm]:</string>
     <string name="vibration_alarm">Vibrationsalarm</string>
     <string name="beep">Piepton</string>

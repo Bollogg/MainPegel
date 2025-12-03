@@ -15,4 +15,7 @@
   <color name="gridColor">#444444</color>
   <color name="backgroundColor">#000000</color>
   <color name="legendTextColor">#FFFFFF</color>
+
+  <color name="widget_background">#FF000000</color> <!-- schwarz -->
+
 </resources>

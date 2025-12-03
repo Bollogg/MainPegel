@@ -30,7 +30,7 @@
 
     <string name="wave_detection">Wellenerkennungsschwelle [cm]:</string>
     <string name="vibration_alarm">Vibrationsalarm</string>
-    <string name="beep">Piepton</string>
+    <string name="beep">Benachritigungsalarm</string>
     <string name="hour">Stunde</string>
 
     <string name="level_measur_houer">Messungszeitraum in Stunden:</string>

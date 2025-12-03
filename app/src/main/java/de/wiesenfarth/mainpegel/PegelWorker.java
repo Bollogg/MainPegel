@@ -1,7 +1,6 @@
 package de.wiesenfarth.mainpegel;
 
 import android.content.Context;
-import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
@@ -10,55 +9,68 @@ import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Response;
+
 /*******************************************************
- * Programm:  PegelWorker
+ * Klasse:      PegelWorker
  *
  * Beschreibung:
- *  Pegelstand wird alle 15 min aufgerufen
- *  ToDo: Konstante für Würzburg ändern
+ *   Worker für die Android WorkManager-API.
  *
- * @Autor:     Bollog
- * @Datum:     2025-11-20
+ *   Dieser Worker wird (falls aktiviert) regelmäßig
+ *   ausgeführt und ruft die PegelLogic auf, die den
+ *   aktuellen Wasserstand über die API abfragt.
+ *
+ *   WorkManager wird in diesem Projekt als Alternative
+ *   zum AlarmManager genutzt — aktuell ruft der Worker
+ *   nur PegelLogic.run() auf.
+ *
+ * Ablauf:
+ *   WorkManager → PegelWorker.doWork()
+ *              → PegelLogic.run(Context)
+ *              → true  → Result.success()
+ *              → false → Result.retry()
+ *
+ * Vorteil:
+ *   WorkManager verarbeitet:
+ *     - Doze Mode
+ *     - Akkuoptimierungen
+ *     - App-Neustarts
+ *     - Netzverfügbarkeit (falls definiert)
+ *
+ * Autor:        Bollog
+ * Datum:        2025-11-20
  *******************************************************/
-
 public class PegelWorker extends Worker {
 
+    /**
+     * Standard-Konstruktor für WorkManager.
+     *
+     * @param context  App- oder Worker-Kontext
+     * @param params   Worker-Konfiguration (vom System)
+     */
     public PegelWorker(@NonNull Context context, @NonNull WorkerParameters params) {
         super(context, params);
     }
 
+    /**
+     * Hauptmethode des Workers.
+     * Wird auf einem Hintergrund-Thread vom WorkManager ausgeführt.
+     *
+     * Rückgabe:
+     *   SUCCESS → Job abgeschlossen
+     *   RETRY   → WorkManager versucht es später erneut
+     */
     @NonNull
     @Override
     public Result doWork() {
 
-        // API-Service holen
-        PegelApiService apiService = RetrofitClient.getApiService();
+      // Startet die Logik, welche den Pegelstand per API holt
+      boolean ok = PegelLogic.run(getApplicationContext());
+      PegelLogic.run(getApplicationContext());
 
-        // Standard: 4 Stunden
-        int hours = CONST.HOURS_4;
-
-        // API verlangt String: "PT4H"
-        String startParam = "PT" + hours + "H";
-
-        // Aufruf mit station + start
-        Call<List<PegelResponse>> call =
-            apiService.getPegelstand(CONST.WUERZBURG, startParam);
-        try {
-            Response<List<PegelResponse>> response = call.execute();
-            if (response.body() != null && !response.body().isEmpty()) {
-
-                // letzter Wert = aktueller Messwert
-                List<PegelResponse> list = response.body();
-                PegelResponse pegel = list.get(list.size() - 1);
-
-                Log.d("PegelWorker", "Neuer Pegelstand: " + pegel.getValue() + " " + pegel.getTimestamp());
-                return Result.success();
-            } else {
-                return Result.retry();
-            }
-        } catch (Exception e) {
-            Log.e("PegelWorker", "Fehler beim Abrufen der Daten", e);
-            return Result.retry();
-        }
+      // Neuer Arlarm für den nächsten Durchlauf
+      PegelScheduler.schedule(getApplicationContext());
+      // Ergebnis für WorkManager zurückgeben
+      return ok ? Result.success() : Result.retry();
     }
 }

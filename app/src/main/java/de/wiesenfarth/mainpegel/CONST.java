@@ -1,16 +1,20 @@
 package de.wiesenfarth.mainpegel;
+
 /*******************************************************
  * Programm:  CONST
  *
  * Beschreibung:
- *  Konstanten
+ *  Sammlung aller zentralen Konstanten für Pegel-Messstellen,
+ *  Schwellwerte und graphische Einstellungen.
  *
- *
- * @Autor:     Bollog
- * @Datum:     2025-11-17
+ * Autor:     Bollog
+ * Datum:     2025-11-17
  *******************************************************/
-
 public class CONST {
+
+    // ----------------------------------------------------
+    // GUIDs der Pegelmessstellen (fest definierte IDs)
+    // ----------------------------------------------------
     public static final String RAUNHEIM                = "db1684c1-7ffc-4e8a-b8cf-8240a0d03519";
     public static final String FRANKFURT_OSTHAFEN      = "66ff3eb4-513b-478b-abd2-2f5126ea66fd";
     public static final String HANAU_BRUECKE_DFH       = "07374faf-2039-4430-ae6d-adc0e0784c4b";
@@ -27,42 +31,50 @@ public class CONST {
     public static final String ASTHEIM                 = "3de69bf8-dcbb-4afb-a15b-a8683a6a689c";
     public static final String SCHWEINFURT_NEUER_HAFEN = "42ecae60-eeb3-4b41-9721-46b3f12d04b8";
     public static final String TRUNSTADT               = "a77aad00-caa0-44a2-95cb-8afd9c4ff00c";
-    // Main Donau Kanal
+
+    // Main-Donau-Kanal
     public static final String BAMBERG                 = "ff02f181-491c-4925-ad13-07edd2ddb3f1";
     public static final String RIEDENBURG_UP           = "4a69e82e-97a3-4573-8aeb-b695c1eaa0b1";
 
-    //Max. Stellen bei Wellenerkennungsschwelle
+    // ----------------------------------------------------
+    // Maximal zulässige Anzahl Stellen für Schwellwert-Eingabe
+    // (z.B. 4 → erlaubt 0000 bis 9999)
+    // ----------------------------------------------------
     public static final int WAVE_THERESHOLD_MAX        = 4;
 
-    // Messtabellen fuer Graphische anzeige in h 1 bis 29
-    public static final int HOURS_1                         = 1;
-    public static final int HOURS_2                         = 2;
-    public static final int HOURS_3                         = 3;
-    public static final int HOURS_4                         = 4;
-    public static final int HOURS_5                         = 5;
-    public static final int HOURS_6                         = 6;
-    public static final int HOURS_7                         = 7;
-    public static final int HOURS_8                         = 8;
-    public static final int HOURS_9                         = 9;
-    public static final int HOURS_10                        = 10;
-    public static final int HOURS_11                        = 11;
-    public static final int HOURS_12                        = 12;
-    public static final int HOURS_13                        = 13;
-    public static final int HOURS_14                        = 14;
-    public static final int HOURS_15                        = 15;
-    public static final int HOURS_16                        = 16;
-    public static final int HOURS_17                        = 17;
-    public static final int HOURS_18                        = 18;
-    public static final int HOURS_19                        = 19;
-    public static final int HOURS_20                        = 20;
-    public static final int HOURS_21                        = 21;
-    public static final int HOURS_22                        = 22;
-    public static final int HOURS_23                        = 23;
-    public static final int HOURS_24                        = 24;
-    public static final int HOURS_25                        = 25;
-    public static final int HOURS_26                        = 26;
-    public static final int HOURS_27                        = 27;
-    public static final int HOURS_28                        = 28;
-    public static final int HOURS_29                        = 29;
+    // ----------------------------------------------------
+    // Stundenbereiche für die Darstellung im Pegelgraphen.
+    // Jede Konstante repräsentiert die Anzahl Stunden.
+    // (1 bis 29 Stunden auswählbar)
+    // ----------------------------------------------------
+    public static final int HOURS_1  = 1;
+    public static final int HOURS_2  = 2;
+    public static final int HOURS_3  = 3;
+    public static final int HOURS_4  = 4;
+    public static final int HOURS_5  = 5;
+    public static final int HOURS_6  = 6;
+    public static final int HOURS_7  = 7;
+    public static final int HOURS_8  = 8;
+    public static final int HOURS_9  = 9;
+    public static final int HOURS_10 = 10;
+    public static final int HOURS_11 = 11;
+    public static final int HOURS_12 = 12;
+    public static final int HOURS_13 = 13;
+    public static final int HOURS_14 = 14;
+    public static final int HOURS_15 = 15;
+    public static final int HOURS_16 = 16;
+    public static final int HOURS_17 = 17;
+    public static final int HOURS_18 = 18;
+    public static final int HOURS_19 = 19;
+    public static final int HOURS_20 = 20;
+    public static final int HOURS_21 = 21;
+    public static final int HOURS_22 = 22;
+    public static final int HOURS_23 = 23;
+    public static final int HOURS_24 = 24;
+    public static final int HOURS_25 = 25;
+    public static final int HOURS_26 = 26;
+    public static final int HOURS_27 = 27;
+    public static final int HOURS_28 = 28;
+    public static final int HOURS_29 = 29;
 
 }

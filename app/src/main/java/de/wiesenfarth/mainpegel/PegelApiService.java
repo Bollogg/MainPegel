@@ -11,18 +11,31 @@ import retrofit2.http.Query;
  * Programm:  PegelApiService
  *
  * Beschreibung:
- *  Daten von API laden für 6 Stunden
- *  für Station (Konstante)
+ *  Retrofit-Interface zum Abrufen von Pegeldaten.
+ *  Lädt die Messwerte einer bestimmten Station für einen
+ *  angegebenen Zeitraum (z. B. letzte 6 Stunden).
  *
+ *  Wird vom PegelForegroundService genutzt, um die
+ *  aktuellen Daten aus der Pegel-API zu laden.
  *
  * @Autor:     Bollog
  * @Datum:     2025-11-20
  *******************************************************/
 public interface PegelApiService {
 
+    /**
+     * Ruft Messwerte einer Pegelstation ab.
+     *
+     * Beispiel-URL (schematisch):
+     *   stations/123456/W/measurements.json?start=PT6H
+     *
+     * @param station  Stations-ID, wird dynamisch in die URL eingesetzt
+     * @param start    Zeitraum, z. B. "PT6H" für letzte 6 Stunden
+     * @return         Liste von PegelResponse-Objekten als Retrofit-Call
+     */
     @GET("stations/{station}/W/measurements.json")
     Call<List<PegelResponse>> getPegelstand(
-        @Path("station") String station,
-        @Query("start") String start   // z.B. "PT6H"
+        @Path("station") String station,  // Platzhalter in der URL
+        @Query("start") String start      // Query-Parameter für Zeitintervall
     );
 }

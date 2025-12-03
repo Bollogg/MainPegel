@@ -1,36 +1,45 @@
 package de.wiesenfarth.mainpegel;
 
 /*******************************************************
- * Programm:  PegelResponse
- *
+ * Klasse:      PegelResponse
  * Beschreibung:
- *  API Daten-Struktur in Json Format
- *  Getter und Setter
- *
- *
- * @Autor:     Bollog
- * @Datum:     2025-11-21
+ *   Datenmodell für die JSON-Antwort der Pegel-API.
  *******************************************************/
-
 public class PegelResponse {
-    private String timestamp;
-    private int value;
 
-    public PegelResponse() {}
+  // ISO-Zeitstempel, z.B. "2025-11-21T08:45:00+01:00"
+  private String timestamp;
 
-    public String getTimestamp() {
-        return timestamp;
-    }
+  // Pegelwert in Zentimetern
+  private int value;
 
-    public void setTimestamp(String timestamp) {
-        this.timestamp = timestamp;
-    }
+  /**
+   * Leerer Konstruktor (erforderlich für Gson/Retrofit)
+   */
+  public PegelResponse() {
+  }
 
-    public int getValue() {
-        return value;
-    }
+  /**
+   * Bequemer Konstruktor für manuelle Erstellung
+   */
+  public PegelResponse(String timestamp, int value) {
+    this.timestamp = timestamp;
+    this.value = value;
+  }
 
-    public void setValue(int value) {
-        this.value = value;
-    }
+  public String getTimestamp() {
+    return timestamp;
+  }
+
+  public void setTimestamp(String timestamp) {
+    this.timestamp = timestamp;
+  }
+
+  public int getValue() {
+    return value;
+  }
+
+  public void setValue(int value) {
+    this.value = value;
+  }
 }

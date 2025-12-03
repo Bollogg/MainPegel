@@ -16,4 +16,6 @@
     <color name="backgroundColor">#FFFFFF</color>
     <color name="legendTextColor">#000000</color>
 
+    <color name="widget_background">#FF000000</color> <!-- weiß -->
+
 </resources>

@@ -1,7 +1,9 @@
 package de.wiesenfarth.mainpegel;
 
 import android.app.AlarmManager;
+import android.appwidget.AppWidgetManager;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -178,7 +180,10 @@ public class MainActivity extends AppCompatActivity {
     ladePegelstand();
 
     // Button: manuelles Aktualisieren
-    buttonAktualisieren.setOnClickListener(v -> ladePegelstand());
+    buttonAktualisieren.setOnClickListener(v -> {
+      ladePegelstand();     // App aktualisieren
+      forceWidgetUpdate();  // Widget sofort aktualisieren
+    });
 
     // Broadcast empfangen (vom Widget / Service)
     pegelReceiver = new BroadcastReceiver() {
@@ -495,4 +500,23 @@ public class MainActivity extends AppCompatActivity {
       return v;
     }
   }
+
+  private void forceWidgetUpdate() {
+    try {
+      AppWidgetManager manager = AppWidgetManager.getInstance(this);
+      ComponentName widget = new ComponentName(this, PegelWidget.class);
+
+      // Trigger dein vorhandenes Widget-Update (Broadcast)
+      Intent intent = new Intent(this, PegelWidget.class);
+      intent.setAction(PegelWidget.UPDATE_ACTION);
+
+      sendBroadcast(intent);
+
+      Log.i("WIDGET", "🚀 Widget-Update manuell ausgelöst");
+
+    } catch (Exception e) {
+      Log.e("WIDGET", "Fehler beim erzwungenen Widget-Update", e);
+    }
+  }
+
 }

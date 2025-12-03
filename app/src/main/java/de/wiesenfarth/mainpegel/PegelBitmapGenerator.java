@@ -35,6 +35,7 @@ public class PegelBitmapGenerator {
     for (int i = 0; i < count; i++) {
       int raw = prefs.getInt("value_" + i, -1);
       if (raw >= 0) values.add((float) raw);   // -1 ignorieren
+      String time = prefs.getString("Time_" + i, "No time");
     }
 
 /* ToDo:   for (int i = 0; i < count; i++) {

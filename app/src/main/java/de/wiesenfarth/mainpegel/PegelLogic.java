@@ -143,10 +143,6 @@ public class PegelLogic {
     Intent bc = new Intent(PegelWidget.UPDATE_ACTION);
     c.sendBroadcast(bc);
   }
-  private static void ToDosendUpdateBroadcast(Context c) {
-    Intent bc = new Intent(MainActivity.ACTION_PEGEL_UPDATE);
-    c.sendBroadcast(bc);
-  }
   private static void vibrateDevice(Context ctx) {
 
     Vibrator vibrator = null;
@@ -177,30 +173,6 @@ public class PegelLogic {
     }
   }
 
-  private static void ToDo_vibrateDevice(Context ctx) {
-
-    Vibrator vibrator;
-
-    // Android 12+ → VibratorManager
-    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-      VibratorManager vm =
-          (VibratorManager) ctx.getSystemService(Context.VIBRATOR_MANAGER_SERVICE);
-      vibrator = vm != null ? vm.getDefaultVibrator() : null;
-
-    } else {
-      // Vor Android 12
-      vibrator = (Vibrator) ctx.getSystemService(Context.VIBRATOR_SERVICE);
-    }
-
-    if (vibrator != null && vibrator.hasVibrator()) {
-      vibrator.vibrate(
-          VibrationEffect.createOneShot(
-              800,  // Dauer
-              VibrationEffect.DEFAULT_AMPLITUDE
-          )
-      );
-    }
-  }
   private static void playSystemNotificationSound(Context ctx) {
     try {
       Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);

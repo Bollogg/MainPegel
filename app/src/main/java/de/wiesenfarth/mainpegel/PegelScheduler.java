@@ -24,6 +24,7 @@ public class PegelScheduler {
     AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
     Intent intent = new Intent(context, AlarmReceiver.class);
+    // Wird im Prg. AlarmReceiver abgefragt "RUN_FGS"
     intent.setAction("de.wiesenfarth.mainpegel.RUN_FGS");
 
     PendingIntent pi = PendingIntent.getBroadcast(

@@ -40,8 +40,10 @@ public class AlarmReceiver extends BroadcastReceiver {
     // Pegel laden
     PegelLogic.run(context);
 
-    // NÄCHSTEN ALARM SOFORT setzen
+
+    // NÄCHSTEN ALARM SOFORT setzen (15min.)
     PegelScheduler.scheduleNext(context);
+
 
   }
 }

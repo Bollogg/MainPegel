@@ -31,8 +31,8 @@ android {
         targetSdk = 36  // Optimiert für Android 15
 
         // Versionsangaben für Google Play
-        versionCode = 20251202
-        versionName = "2025.12.2"
+        versionCode = 20251203
+        versionName = "2025.12.3"
 
         // Test Runner
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

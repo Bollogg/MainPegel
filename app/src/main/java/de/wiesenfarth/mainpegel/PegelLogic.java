@@ -19,10 +19,16 @@ import retrofit2.Response;
 public class PegelLogic {
 
   private static int lastValue = -1;
+  private static boolean isRunning = false;
   public static final String CHANNEL_ID = "pegel_alarm";
 
   public static boolean run(Context context) {
 
+    if (isRunning) {
+      Log.w("LOGIC", "⛔ Abgebrochen – bereits ein Lauf aktiv");
+      return false;
+    }
+    isRunning = true;
     Log.i("LOGIC", "PegelLogic.run() gestartet");
 
     SharedPreferences prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE);
@@ -39,6 +45,7 @@ public class PegelLogic {
     call.enqueue(new Callback<List<PegelResponse>>() {
       @Override
       public void onResponse(Call<List<PegelResponse>> call, Response<List<PegelResponse>> res) {
+        isRunning = false;
 
         if (!res.isSuccessful()) {
           storeErrorState(context);
@@ -55,7 +62,7 @@ public class PegelLogic {
         }
 
         // letzter Wert
-        PegelResponse last = list.get(list.size() - 1);
+         PegelResponse last = list.get(list.size() - 1);
 
         // Zeit formatieren
         String formattedTime = last.getTimestamp();
@@ -86,12 +93,13 @@ public class PegelLogic {
 
       @Override
       public void onFailure(Call<List<PegelResponse>> call, Throwable t) {
+        isRunning = false;
+
         storeErrorState(context);
         sendUpdateBroadcast(context);
         Log.e("LOGIC", "API Fehler: " + t.getMessage());
       }
     });
-
     return true;
   }
 
@@ -140,8 +148,12 @@ public class PegelLogic {
         .apply();
   }
   private static void sendUpdateBroadcast(Context c) {
-    Intent bc = new Intent(PegelWidget.UPDATE_ACTION);
+    Intent bc = new Intent(c, PegelWidget.class);
+    bc.setAction(PegelWidget.UPDATE_ACTION);
     c.sendBroadcast(bc);
+
+    //ToDo: Intent bc = new Intent(PegelWidget.UPDATE_ACTION);
+    //c.sendBroadcast(bc);
   }
   private static void vibrateDevice(Context ctx) {
 
@@ -172,7 +184,6 @@ public class PegelLogic {
       vibrator.vibrate(pattern, -1);
     }
   }
-
   private static void playSystemNotificationSound(Context ctx) {
     try {
       Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);

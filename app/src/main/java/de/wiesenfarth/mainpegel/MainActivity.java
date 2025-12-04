@@ -101,7 +101,11 @@ public class MainActivity extends AppCompatActivity {
     // Scheduler & API neu starten
     updateWithLocality(localityGuid, intervalMinutes);
     // Nach Rückkehr aus Settings erneut laden
-    ladePegelstand();
+    //ToDo: ladePegelstand();
+    //ToDo: forceWidgetUpdate();  // Widget sofort aktualisieren
+    PegelUiHelper.ladePegelstand(this, textViewPegelstand, lineChart, prefs);
+    //PegelUiHelper.forceWidgetUpdate(this);
+
     // Scheduler starten (Hintergrund-Aktualisierungen)
     PegelScheduler.schedule(this);
 
@@ -177,12 +181,15 @@ public class MainActivity extends AppCompatActivity {
     PegelScheduler.schedule(this);
 
     // Direkt den ersten Pegel laden
-    ladePegelstand();
+    PegelUiHelper.ladePegelstand(this, textViewPegelstand, lineChart, prefs);
+    //PegelUiHelper.forceWidgetUpdate(this);
 
     // Button: manuelles Aktualisieren
     buttonAktualisieren.setOnClickListener(v -> {
-      ladePegelstand();     // App aktualisieren
-      forceWidgetUpdate();  // Widget sofort aktualisieren
+      PegelLogic.run(this);
+      PegelUiHelper.ladePegelstand(this, textViewPegelstand, lineChart, prefs);
+      //PegelUiHelper.forceWidgetUpdate(this);
+
     });
 
     // Broadcast empfangen (vom Widget / Service)
@@ -190,7 +197,9 @@ public class MainActivity extends AppCompatActivity {
       @Override
       public void onReceive(Context context, Intent intent) {
         Log.i("MAIN", "Broadcast empfangen → ladePegelstand()");
-        ladePegelstand();
+        //ToDo: ladePegelstand();
+        PegelUiHelper.ladePegelstand(context, textViewPegelstand, lineChart, prefs);
+        //PegelUiHelper.forceWidgetUpdate(context);
       }
     };
 
@@ -209,8 +218,23 @@ public class MainActivity extends AppCompatActivity {
   }
 
   @Override
+  protected void onPause() {
+    super.onPause();
+    //PegelUiHelper.ladePegelstand(this, textViewPegelstand, lineChart, prefs);
+    //PegelUiHelper.forceWidgetUpdate(this);
+  }
+  @Override
+  protected void onStop() {
+    super.onStop();
+    //PegelUiHelper.ladePegelstand(this, textViewPegelstand, lineChart, prefs);
+    //PegelUiHelper.forceWidgetUpdate(this);
+  }
+  @Override
   protected void onDestroy() {
     super.onDestroy();
+    //ToDo: forceWidgetUpdate();  // Widget sofort aktualisieren
+    PegelUiHelper.ladePegelstand(this, textViewPegelstand, lineChart, prefs);
+    //PegelUiHelper.forceWidgetUpdate(this);
     //if (pegelReceiver != null) {
     //  unregisterReceiver(pegelReceiver);
     //}
@@ -266,147 +290,6 @@ public class MainActivity extends AppCompatActivity {
     // Platzhalter für spätere API-Fortführung
   }
 
-  /*******************************************************
-   * ladePegelstand
-   *
-   * Lädt die Pegeldaten über Retrofit vom Server
-   *******************************************************/
-  private void ladePegelstand() {
-
-    // 1. Anfrage über zentrale Logic
-    boolean ok = PegelLogic.run(this);
-
-    // 2. Cache lesen
-    SharedPreferences cache = getSharedPreferences("pegel_cache", MODE_PRIVATE);
-
-    int value = cache.getInt("last_value", -1);
-    //int value = getIntSafe(prefs,"last_value", -1);
-    String time = cache.getString("last_time", "--:--");
-
-    int count = cache.getInt("count", 0);
-    //int count = getIntSafe(prefs,"count", 0);
-
-    List<PegelResponse> list = new ArrayList<>();
-    for (int i = 0; i < count; i++) {
-      int v = cache.getInt("value_" + i, -1);
-      //int v = getIntSafe(prefs,"value_" + i, -1);
-
-      // Wir müssen die Zeit nachbauen → Dummy Zeitpunkt
-      // (PegelLogic speichert nur Werte – wenn du willst, erweitere ich den Cache)
-      //String ts = "Zeit " + i;
-      //list.add(new PegelResponse(ts, v));
-
-      // Zeitstempel von Speicher  übernehmen
-      String ts = cache.getString("timestamp_" + i, null);
-      if (ts == null) {
-        ts = "--"; // fallback
-      }
-      list.add(new PegelResponse(ts, v));
-    }
-
-    // 3. Anzeige aktualisieren
-    if (value >= 0) {
-      textViewPegelstand.setText("Pegel: " + value + " cm\nZeit: " + formatTime(time));
-    } else {
-      textViewPegelstand.setText("Keine Daten");
-    }
-
-    // 4. Graph zeichnen
-    if (!list.isEmpty()) {
-      //ToDo: aktualisiereGraph(list, prefs.getInt("graph_hours", 4));
-      int graphHours = 4; // default
-
-      try {
-        graphHours = prefs.getInt("graph_hours", 4);
-      } catch (ClassCastException e) {
-        // früher als float gespeichert
-        float old = prefs.getFloat("graph_hours", 4f);
-        graphHours = Math.round(old);
-
-        // korrigiert speichern
-        prefs.edit().putInt("graph_hours", graphHours).apply();
-      }
-
-      aktualisiereGraph(list, graphHours);
-    }
-  }
-
-  /*******************************************************
-   * aktualisiereGraph
-   *
-   * Zeichnet den Verlauf des Pegels als MPAndroidChart
-   *******************************************************/
-  private void aktualisiereGraph(List<PegelResponse> daten, int hours) {
-
-    // Y-Achse links
-    YAxis left = lineChart.getAxisLeft();
-    left.setTextColor(ContextCompat.getColor(this, R.color.textColor));
-    left.setAxisLineColor(ContextCompat.getColor(this, R.color.axisColor));
-    left.setGridColor(ContextCompat.getColor(this, R.color.gridColor));
-    lineChart.getAxisRight().setEnabled(false);
-
-    // Hintergrundfarben
-    lineChart.setBackgroundColor(ContextCompat.getColor(this, R.color.backgroundColor));
-    lineChart.setDrawGridBackground(false);
-
-    // Legende
-    lineChart.getLegend().setTextColor(ContextCompat.getColor(this, R.color.legendTextColor));
-
-    // Beschreibung ausblenden
-    lineChart.getDescription().setEnabled(false);
-
-    // --- Daten vorbereiten ---
-    List<Entry> entries = new ArrayList<>();
-    List<String> xLabels = new ArrayList<>();
-
-    SimpleDateFormat apiFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.GERMANY);
-    SimpleDateFormat displayFormat = new SimpleDateFormat("HH:mm", Locale.GERMANY);
-
-    // Datenpunkte erzeugen
-    for (int i = 0; i < daten.size(); i++) {
-      PegelResponse p = daten.get(i);
-
-      try {
-        Date d = apiFormat.parse(p.getTimestamp());
-        entries.add(new Entry(i, p.getValue()));
-        xLabels.add(displayFormat.format(d));
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-    }
-
-    // Dataset konfigurieren
-    LineDataSet dataSet = new LineDataSet(entries,
-        getString(R.string.level_curve) + " (" + hours + "h)");
-
-    dataSet.setLineWidth(2f);
-    dataSet.setDrawCircles(false);
-    dataSet.setDrawValues(false);
-
-    // Farben aus Ressourcen (Tag/Nacht)
-    dataSet.setColor(ContextCompat.getColor(this, R.color.lineColor));
-    dataSet.setDrawFilled(true);
-    dataSet.setFillColor(ContextCompat.getColor(this, R.color.fillColor));
-
-    // Linien setzen
-    lineChart.setData(new LineData(dataSet));
-
-    // X-Achse konfigurieren
-    XAxis xAxis = lineChart.getXAxis();
-    xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-    xAxis.setGranularity(1f);
-    xAxis.setLabelRotationAngle(-45f);
-
-    xAxis.setTextColor(ContextCompat.getColor(this, R.color.textColor));
-    xAxis.setAxisLineColor(ContextCompat.getColor(this, R.color.axisColor));
-    xAxis.setGridColor(ContextCompat.getColor(this, R.color.gridColor));
-
-    // Zeitlabels verwenden
-    xAxis.setValueFormatter(new IndexAxisValueFormatter(xLabels));
-
-    // Aktualisieren
-    lineChart.invalidate();
-  }
 
   /*******************************************************
    * berechneStartVerzoegerung
@@ -500,23 +383,4 @@ public class MainActivity extends AppCompatActivity {
       return v;
     }
   }
-
-  private void forceWidgetUpdate() {
-    try {
-      AppWidgetManager manager = AppWidgetManager.getInstance(this);
-      ComponentName widget = new ComponentName(this, PegelWidget.class);
-
-      // Trigger dein vorhandenes Widget-Update (Broadcast)
-      Intent intent = new Intent(this, PegelWidget.class);
-      intent.setAction(PegelWidget.UPDATE_ACTION);
-
-      sendBroadcast(intent);
-
-      Log.i("WIDGET", "🚀 Widget-Update manuell ausgelöst");
-
-    } catch (Exception e) {
-      Log.e("WIDGET", "Fehler beim erzwungenen Widget-Update", e);
-    }
-  }
-
 }

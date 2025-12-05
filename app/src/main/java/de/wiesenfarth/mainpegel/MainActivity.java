@@ -270,7 +270,8 @@ public class MainActivity extends AppCompatActivity {
 
       // About
     } else if (id == R.id.action_about) {
-      Toast.makeText(this, getString(R.string.toast_about), Toast.LENGTH_SHORT).show();
+      Toast.makeText(this, getString(R.string.toast_info), Toast.LENGTH_SHORT).show();
+      startActivity((new Intent(this, InfoActivity.class)));
       return true;
     }
 
@@ -352,24 +353,6 @@ public class MainActivity extends AppCompatActivity {
     intent.setData(Uri.parse("package:" + getPackageName()));
 
     startActivity(intent);
-  }
-
-  private String formatTime(String apiTime) {
-    try {
-      // Beispiel apiTime: "2025-12-02T12:15:00+01:00" oder "2025-12-02T12:15:00Z"
-      OffsetDateTime odt = OffsetDateTime.parse(apiTime);
-
-      // In lokale Zeitzone umwandeln (Europe/Berlin oder System-Zeitzone)
-      ZonedDateTime zdt = odt.atZoneSameInstant(ZoneId.systemDefault());
-
-      // Ausgabeformat HH:mm
-      DateTimeFormatter fmt = DateTimeFormatter.ofPattern("HH:mm", Locale.GERMANY);
-      return zdt.format(fmt);
-
-    } catch (Exception e) {
-      e.printStackTrace(); // für Debug
-      return apiTime; // fallback: unverändert anzeigen
-    }
   }
 
   private int getIntSafe(SharedPreferences prefs, String key, int def) {

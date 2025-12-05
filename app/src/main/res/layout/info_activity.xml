@@ -1,6 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+android:fitsSystemWindows="true"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:orientation="vertical"
+  android:padding="16dp">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+  <!-- Toolbar -->
+  <androidx.appcompat.widget.Toolbar
+    android:id="@+id/toolbar"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="?attr/actionBarSize"
+    android:background="?attr/colorPrimary"
+    android:theme="?attr/actionBarTheme"
+    android:layout_marginBottom="16dp" />
+
+  <!-- Hintergrundbild -->
+  <ImageView
+    android:id="@+id/headerImage"
+    android:layout_width="match_parent"
+    android:layout_height="300dp"
+    android:scaleType="centerCrop"
+    android:src="@mipmap/ic_launcher_foreground" />
+
+  <!-- Inhalte -->
+  <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp"
+    android:orientation="vertical">
+
+    <TextView
+      android:id="@+id/txtVersionName"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginBottom="8dp"
+      android:text="Version:  OeTTINGER V2025.12"
+      android:textSize="20dp"
+      android:textStyle="bold" />
+
+    <TextView
+      android:id="@+id/txtVersionCode"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="mail: info@wiesenfarth-net.de"
+      android:textSize="20dp" />
+
+  </LinearLayout>
+</LinearLayout>

@@ -31,8 +31,8 @@ android {
         targetSdk = 36  // Optimiert für Android 15
 
         // Versionsangaben für Google Play
-        versionCode = 20251203
-        versionName = "2025.12.3"
+        versionCode = 20251204
+        versionName = "OeTTINGER V2025.12.04"
 
         // Test Runner
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -71,6 +71,8 @@ dependencies {
     implementation(libs.activity)
     implementation(libs.constraintlayout)
     implementation(libs.preference)
+    implementation(libs.lifecycle.livedata.ktx)
+    implementation(libs.lifecycle.viewmodel.ktx)
 
     // Test-Bibliotheken
     testImplementation(libs.junit)

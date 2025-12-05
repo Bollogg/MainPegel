@@ -11,7 +11,11 @@ package de.wiesenfarth.mainpegel;
  * Datum:     2025-11-17
  *******************************************************/
 public class CONST {
-
+  // ----------------------------------------------------
+  // Versions Code
+  // ----------------------------------------------------
+  public static final String APP_VERSION_NAME = "Oettinger V2025.12.04";
+  public static final int    APP_VERSION_CODE = 20251204;
     // ----------------------------------------------------
     // GUIDs der Pegelmessstellen (fest definierte IDs)
     // ----------------------------------------------------

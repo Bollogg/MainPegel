@@ -10,7 +10,12 @@ import android.os.Vibrator;
 import android.os.VibratorManager;
 import android.util.Log;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -65,8 +70,7 @@ public class PegelLogic {
          PegelResponse last = list.get(list.size() - 1);
 
         // Zeit formatieren
-        String formattedTime = last.getTimestamp();
-
+        String formattedTime = formatTime(last.getTimestamp());
         // Pegelanstieg prüfen
         handleNewPegel(context, last.getValue(), formattedTime);
 
@@ -192,4 +196,23 @@ public class PegelLogic {
       Log.e("LOGIC", "Konnte Systemton nicht abspielen", e);
     }
   }
+
+  private static String formatTime(String apiTime) {
+    try {
+      // Beispiel apiTime: "2025-12-02T12:15:00+01:00" oder "2025-12-02T12:15:00Z"
+      OffsetDateTime odt = OffsetDateTime.parse(apiTime);
+
+      // In lokale Zeitzone umwandeln (Europe/Berlin oder System-Zeitzone)
+      ZonedDateTime zdt = odt.atZoneSameInstant(ZoneId.systemDefault());
+
+      // Ausgabeformat HH:mm
+      DateTimeFormatter fmt = DateTimeFormatter.ofPattern("HH:mm", Locale.GERMANY);
+      return zdt.format(fmt);
+
+    } catch (Exception e) {
+      e.printStackTrace(); // für Debug
+      return apiTime; // fallback: unverändert anzeigen
+    }
+  }
+
 }

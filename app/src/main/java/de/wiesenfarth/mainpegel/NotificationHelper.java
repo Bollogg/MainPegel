@@ -66,7 +66,7 @@ public class NotificationHelper {
     String bigText =
         "Pegel gestiegen um " + delta + " cm\n"
             + "Neuer Pegel: " + value + " cm\n"
-            + "Zeitpunkt: " + time;
+            + "Zeitpunkt: " + time + " Uhr";
 
     NotificationCompat.Builder builder =
         new NotificationCompat.Builder(ctx, CHANNEL_ID)

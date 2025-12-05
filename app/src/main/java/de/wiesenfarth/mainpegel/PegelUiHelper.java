@@ -46,10 +46,11 @@ public class PegelUiHelper {
       String ts = cache.getString("timestamp_" + i, "--");
       list.add(new PegelResponse(ts, v));
     }
-
+    PegelResponse prev = list.get(list.size() - 2);
+    int prevValue = prev.getValue();
     // Text anzeigen
     if (value >= 0) {
-      textView.setText("Pegel: " + value + " cm\nZeit: " + time);
+      textView.setText("Pegel alt:  " + prevValue +  " cm\nPegel neu:  " + value + " cm\nAktuelle Messung um:  " + time + " Uhr");
     } else {
       textView.setText("Keine Daten");
     }

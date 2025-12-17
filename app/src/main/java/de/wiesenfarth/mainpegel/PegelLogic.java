@@ -46,7 +46,7 @@ public class PegelLogic {
     Call<List<PegelResponse>> call = api.getPegelstand(localityGuid, startParam);
 
     Log.d("LOGIC", "API URL: " + call.request().url());
-
+ 
     call.enqueue(new Callback<List<PegelResponse>>() {
       @Override
       public void onResponse(Call<List<PegelResponse>> call, Response<List<PegelResponse>> res) {
@@ -155,9 +155,6 @@ public class PegelLogic {
     Intent bc = new Intent(c, PegelWidget.class);
     bc.setAction(PegelWidget.UPDATE_ACTION);
     c.sendBroadcast(bc);
-
-    //ToDo: Intent bc = new Intent(PegelWidget.UPDATE_ACTION);
-    //c.sendBroadcast(bc);
   }
   private static void vibrateDevice(Context ctx) {
 

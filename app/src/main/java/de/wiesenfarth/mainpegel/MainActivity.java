@@ -1,9 +1,7 @@
 package de.wiesenfarth.mainpegel;
 
 import android.app.AlarmManager;
-import android.appwidget.AppWidgetManager;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -22,7 +20,6 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -32,35 +29,20 @@ import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 
 import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
-
-import java.text.SimpleDateFormat;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 /*******************************************************
  * Programm:  MainPegel
  *
  * Beschreibung:
- *   Zeigt aktuelle Pegelstände am Main für unterschiedliche Messstationen
+ *   Zeigt aktuelle Pegelstände am Main für
+ *   unterschiedliche Messstationen
  *
  * @Website:   https://www.wiesenfarth-net.de
  * @Autor:     Bollog
  * @Datum:     2025-11-17
- * @Version:   2025.11
+ * @Version:   2025.12
  *******************************************************/
 
 public class MainActivity extends AppCompatActivity {
@@ -89,33 +71,6 @@ public class MainActivity extends AppCompatActivity {
   private boolean settingsChanged = true;
 
   @Override
-  protected void onResume() {
-    super.onResume();
-
-//  if (settingsChanged == true) {
-    // Einstellungen neu laden, falls in Settings geändert
-    prefs = getSharedPreferences("settings", MODE_PRIVATE);
-    localityGuid = prefs.getString("locality_guid", CONST.WUERZBURG);
-    intervalMinutes = prefs.getInt("interval_minutes", 15);
-
-    // Scheduler & API neu starten
-    updateWithLocality(localityGuid, intervalMinutes);
-    // Nach Rückkehr aus Settings erneut laden
-    //ToDo: ladePegelstand();
-    //ToDo: forceWidgetUpdate();  // Widget sofort aktualisieren
-    PegelUiHelper.ladePegelstand(this, textViewPegelstand, lineChart, prefs);
-    //PegelUiHelper.forceWidgetUpdate(this);
-
-    // Scheduler starten (Hintergrund-Aktualisierungen)
-    PegelScheduler.schedule(this);
-
-    // Graph aktualisieren
-    updateWithLocality(localityGuid, intervalMinutes);
-    settingsChanged = false;
-//    }
-  }
-
-  @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
@@ -129,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
 
     // Debug: Prüfen, ob INTERNET-Permission gesetzt ist
     Log.e("NET", "INTERNET PERMISSION: " +
-        (checkSelfPermission(android.Manifest.permission.INTERNET) == 0));
+        (checkSelfPermission(android.Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED));
 
     // Toolbar aktivieren
     Toolbar toolbar = findViewById(R.id.toolbar);
@@ -181,12 +136,11 @@ public class MainActivity extends AppCompatActivity {
     PegelScheduler.schedule(this);
 
     // Direkt den ersten Pegel laden
-    PegelUiHelper.ladePegelstand(this, textViewPegelstand, lineChart, prefs);
+    //PegelUiHelper.ladePegelstand(this, textViewPegelstand, lineChart, prefs);
     //PegelUiHelper.forceWidgetUpdate(this);
 
     // Button: manuelles Aktualisieren
     buttonAktualisieren.setOnClickListener(v -> {
-      PegelLogic.run(this);
       PegelUiHelper.ladePegelstand(this, textViewPegelstand, lineChart, prefs);
       //PegelUiHelper.forceWidgetUpdate(this);
 
@@ -197,7 +151,6 @@ public class MainActivity extends AppCompatActivity {
       @Override
       public void onReceive(Context context, Intent intent) {
         Log.i("MAIN", "Broadcast empfangen → ladePegelstand()");
-        //ToDo: ladePegelstand();
         PegelUiHelper.ladePegelstand(context, textViewPegelstand, lineChart, prefs);
         //PegelUiHelper.forceWidgetUpdate(context);
       }
@@ -214,30 +167,51 @@ public class MainActivity extends AppCompatActivity {
       // kleiner Android 13
       registerReceiver(pegelReceiver, filter);
     }
+  }
 
+  @Override
+  protected void onStart() {
+    super.onStart();
+  }
+
+  @Override
+  protected void onResume() {
+    super.onResume();
+
+    // Einstellungen neu laden, falls in Settings geändert
+    prefs = getSharedPreferences("settings", MODE_PRIVATE);
+    localityGuid = prefs.getString("locality_guid", CONST.WUERZBURG);
+    intervalMinutes = prefs.getInt("interval_minutes", 15);
+
+    // Scheduler & API neu starten
+    // updateWithLocality(localityGuid, intervalMinutes);
+    // Nach Rückkehr aus Activity (Settings, Info) erneut laden
+    // Pegel lesen
+    PegelUiHelper.ladePegelstand(this, textViewPegelstand, lineChart, prefs);
+
+    // Scheduler starte Task für Hintergrund-Aktualisierungen
+    PegelScheduler.schedule(this);
+
+    // Graph aktualisieren
+    updateWithLocality(localityGuid, intervalMinutes);
+    settingsChanged = false;
   }
 
   @Override
   protected void onPause() {
     super.onPause();
-    //PegelUiHelper.ladePegelstand(this, textViewPegelstand, lineChart, prefs);
-    //PegelUiHelper.forceWidgetUpdate(this);
   }
+
   @Override
   protected void onStop() {
     super.onStop();
-    //PegelUiHelper.ladePegelstand(this, textViewPegelstand, lineChart, prefs);
-    //PegelUiHelper.forceWidgetUpdate(this);
   }
+
   @Override
   protected void onDestroy() {
     super.onDestroy();
-    //ToDo: forceWidgetUpdate();  // Widget sofort aktualisieren
+    // Pegel lesen
     PegelUiHelper.ladePegelstand(this, textViewPegelstand, lineChart, prefs);
-    //PegelUiHelper.forceWidgetUpdate(this);
-    //if (pegelReceiver != null) {
-    //  unregisterReceiver(pegelReceiver);
-    //}
   }
 
   @Override
@@ -335,7 +309,7 @@ public class MainActivity extends AppCompatActivity {
   private void checkExactAlarmPermission() {
 
     // Nur Android 12 oder neuer benötigt das!
-    if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.S) {
+    if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.S) {
       return;
     }
 

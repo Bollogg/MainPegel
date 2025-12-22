@@ -39,8 +39,8 @@ import java.util.concurrent.TimeUnit;
  *   Zeigt aktuelle Pegelstände am Main für
  *   unterschiedliche Messstationen
  *
- * @Website:   https://www.wiesenfarth-net.de
- * @Autor:     Bollog
+ * @Website:   wiesenfarth-net.de
+ * @Autor:     Bollogg
  * @Datum:     2025-11-17
  * @Version:   2025.12
  *******************************************************/

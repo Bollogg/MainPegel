@@ -1,54 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/main"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  android:id="@+id/main"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:orientation="vertical"
+  android:padding="16dp">
+
+  <!-- Toolbar ganz oben -->
+  <androidx.appcompat.widget.Toolbar
+    android:id="@+id/toolbar"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:layout_height="77dp"
+    android:background="@color/textColor"
+    android:longClickable="false"
+    android:minHeight="?attr/actionBarSize"
+    android:theme="?attr/actionBarTheme"
+    app:logo="@mipmap/ic_launcher_foreground"
+    app:title="@string/app_name"
+    app:titleTextColor="@color/white" />
 
-    <!-- Toolbar ganz oben -->
-    <androidx.appcompat.widget.Toolbar
-      android:id="@+id/toolbar"
-      android:layout_width="match_parent"
+  <!-- Chart -->
+  <com.github.mikephil.charting.charts.LineChart
+    android:id="@+id/lineChart"
+    android:layout_width="match_parent"
+    android:layout_height="300dp" />
+
+  <!-- Zentrierter Bereich -->
+  <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="16dp"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <TextView
+      android:id="@+id/textViewPegelstand"
+      android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:background="?attr/colorPrimary"
-      android:longClickable="false"
-      android:minHeight="?attr/actionBarSize"
-      android:theme="?attr/actionBarTheme"
-      app:logo="@mipmap/ic_launcher_foreground"
-      app:title="@string/app_name"
-      app:titleTextColor="@color/white" />
+      android:text="@string/level_is_loading"
+      android:textSize="18sp"
+      android:textStyle="bold" />
 
-    <!-- Chart -->
-    <com.github.mikephil.charting.charts.LineChart
-        android:id="@+id/lineChart"
-        android:layout_width="match_parent"
-        android:layout_height="300dp" />
-
-    <!-- Zentrierter Bereich -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:layout_marginTop="16dp">
-
-        <TextView
-            android:id="@+id/textViewPegelstand"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/level_is_loading"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-
-        <Button
-          android:id="@+id/buttonAktualisieren"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:layout_marginTop="60dp"
-          android:text="@string/to_update"
-          android:textColor="@color/white" />
-    </LinearLayout>
+    <Button
+      android:id="@+id/buttonAktualisieren"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="60dp"
+      android:backgroundTint="@color/textColor"
+      android:text="@string/to_update"
+      android:textColor="@color/white" />
+  </LinearLayout>
 
 </LinearLayout>

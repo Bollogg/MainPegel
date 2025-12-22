@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-android:fitsSystemWindows="true"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  android:fitsSystemWindows="true"
 android:layout_width="match_parent"
 android:layout_height="match_parent"
 android:orientation="vertical"
@@ -11,10 +12,11 @@ android:orientation="vertical"
     android:id="@+id/toolbar"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginBottom="16dp"
+    android:background="@color/textColor"
     android:minHeight="?attr/actionBarSize"
-    android:background="?attr/colorPrimary"
     android:theme="?attr/actionBarTheme"
-    android:layout_marginBottom="16dp" />
+    app:titleTextColor="@color/white" />
 
   <!-- Hintergrundbild -->
   <ImageView

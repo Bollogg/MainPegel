@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  android:fitsSystemWindows="true"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:orientation="vertical"
+  android:padding="16dp">
+
+  <!-- Toolbar -->
+  <androidx.appcompat.widget.Toolbar
+    android:id="@+id/toolbar"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="16dp"
+    android:background="@color/textColor"
+    android:minHeight="?attr/actionBarSize"
+    android:theme="?attr/actionBarTheme"
+    app:titleTextColor="@color/white" />
+
+  <!-- Hintergrundbild -->
+  <ImageView
+    android:id="@+id/headerImage"
+    android:layout_width="match_parent"
+    android:layout_height="300dp"
+    android:scaleType="centerCrop"
+    android:src="@mipmap/ic_launcher_aal_foreground" />
+
+  <!-- Inhalte -->
+  <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp"
+    android:orientation="vertical">
+
+    <TextView
+      android:id="@+id/txtVersionName"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginBottom="8dp"
+      android:text="Version:  OeTTINGER"
+      android:textSize="20dp"
+      android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/txtApiInfo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="API: https://www.pegelonline.wsv.de \n"
+        android:textSize="20dp"
+        android:autoLink="web"
+        android:linksClickable="true"/>
+
+    <TextView
+      android:id="@+id/txtEMail"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="mail: MainPegel(at)wiesenfarth-net.de"
+      android:textSize="20dp" />
+
+  </LinearLayout>
+</LinearLayout>

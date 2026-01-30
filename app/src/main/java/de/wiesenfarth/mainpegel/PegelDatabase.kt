@@ -28,7 +28,7 @@ abstract class PegelDatabase : RoomDatabase() {
     /**
      * Getter für das DAO, über das alle Datenbankzugriffe laufen.
      */
-    abstract fun pegelDao(): PegelDao?
+    abstract fun pegelDao(): PegelDao
 
     companion object {
         // Singleton-Instanz der Datenbank
@@ -46,7 +46,7 @@ abstract class PegelDatabase : RoomDatabase() {
             // Nur eine Instanz erstellen
 
             if (instance == null) {
-                instance = databaseBuilder<PegelDatabase?>(
+                instance = databaseBuilder<PegelDatabase>(
                     context.getApplicationContext(),  // verhindert Memory-Leaks
                     PegelDatabase::class.java,  // welche DB-Klasse
                     "pegel_database" // Dateiname der DB

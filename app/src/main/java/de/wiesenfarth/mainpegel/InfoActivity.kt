@@ -5,37 +5,79 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 
+/*******************************************************
+ * Activity:   InfoActivity
+ *
+ * Beschreibung:
+ * Zeigt eine Informationsseite (z. B. App-Infos,
+ * Versionsdaten oder rechtliche Hinweise) an.
+ *
+ * Die Activity verwendet eine eigene Toolbar mit
+ * Zurück-Pfeil (Up-Navigation), um zur vorherigen
+ * Activity zurückzukehren.
+ *
+ * @Autor:     Bollog
+ * @Datum:     2025-11-20
+ *******************************************************/
 class InfoActivity : AppCompatActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.info_activity)
 
-        // --------------------------------------------------------
-        // Toolbar einrichten
-        // --------------------------------------------------------
-        val toolbar: Toolbar?
-        Toolbar > < android . view . View > findViewById < android . view . View ? > (R.id.toolbar)
-        setSupportActionBar(toolbar)
-        getSupportActionBar()!!.setTitle(R.string.menu_info)
-        getSupportActionBar()!!.setDisplayHomeAsUpEnabled(true)
-    }
+  /**
+   * Wird beim Erstellen der Activity aufgerufen.
+   *
+   * Initialisiert:
+   * - das Layout
+   * - die Toolbar als ActionBar
+   * - den Titel sowie den Zurück-Button
+   */
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
 
-    /*
-  getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
-    @Override
-    public void handleOnBackPressed() {
-      finish();
-    }
-  });
-*/
+    // Layout für die Info-Seite setzen
+    setContentView(R.layout.info_activity)
+
     // --------------------------------------------------------
-    // Toolbar-Pfeil zurück → Einstellungen speichern
+    // Toolbar einrichten
     // --------------------------------------------------------
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.getItemId() == android.R.id.home) {
-            finish()
-            return true
-        }
-        return super.onOptionsItemSelected(item)
+
+    // Toolbar aus dem Layout laden
+    val toolbar = findViewById<Toolbar>(R.id.toolbar)
+
+    // Toolbar als ActionBar verwenden
+    setSupportActionBar(toolbar)
+
+    // ActionBar konfigurieren (Titel + Zurück-Pfeil)
+    supportActionBar?.let {
+      it.title = getString(R.string.menu_info)
+      it.setDisplayHomeAsUpEnabled(true)
     }
+  }
+
+  /*
+   * Alternative Möglichkeit (kommentiert):
+   *
+   * Moderne Back-Navigation über den
+   * OnBackPressedDispatcher.
+   *
+   * Wird hier nicht benötigt, da die Standard-
+   * Navigation per finish() ausreichend ist.
+   */
+
+  // --------------------------------------------------------
+  // Reaktion auf Toolbar-Aktionen (z. B. Zurück-Pfeil)
+  // --------------------------------------------------------
+  override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
+    // when ist übersichtlicher als if/else
+    return when (item.itemId) {
+
+      // Klick auf den "Up"-Button (Pfeil links oben)
+      android.R.id.home -> {
+        finish() // Activity beenden → zurück zur vorherigen
+        true     // Event wurde verarbeitet
+      }
+
+      // Alle anderen Menü-Events an die Basisklasse weiterreichen
+      else -> super.onOptionsItemSelected(item)
+    }
+  }
 }

@@ -8,6 +8,7 @@ import android.graphics.Paint
 import android.util.Log
 
 object PegelBitmapGenerator {
+    @JvmStatic
     fun makePegelBitmap(context: Context, width: Int, height: Int): Bitmap {
         //public static Bitmap makePegelBitmap(Context context) {
 

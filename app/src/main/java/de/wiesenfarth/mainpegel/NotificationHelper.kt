@@ -53,6 +53,7 @@ object NotificationHelper {
     /**
      * Sendet eine erweiterte Pegelwarnung.
      */
+    @JvmStatic
     fun sendWaveAlert(ctx: Context, value: Float, delta: Float, time: String?) {
         // Kanal sicherstellen (wichtig!)
 

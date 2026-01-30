@@ -64,8 +64,8 @@ class PegelForegroundService : Service() {
             )
             channel.setDescription("Überwacht regelmäßig die Pegeldaten")
 
-            val nm: NotificationManager?
-            NotificationManager > < NotificationManager > getSystemService < NotificationManager ? > (NotificationManager::class.java)
+
+            val nm = getSystemService<NotificationManager?>(NotificationManager::class.java)
             if (nm != null) {
                 nm.createNotificationChannel(channel)
             }

@@ -2,6 +2,7 @@ package de.wiesenfarth.mainpegel
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy // Gut für @Insert
 import androidx.room.Query
 
 /*******************************************************
@@ -30,8 +31,13 @@ interface PegelDao {
      *
      * @param pegelEntry Objekt mit Zeitstempel + Pegelwert
      */
-    @Insert
-    fun insert(pegelEntry: PegelEntry?)
+    @Insert(onConflict = OnConflictStrategy.REPLACE) // onConflict ist eine gute Praxis
+    fun insertEntry(pegelEntry: PegelEntry) // <<-- KORREKT: Ohne Fragezeichen
+
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertAll(entries: List<PegelEntry>) // NICHT List<PegelEntry?> oder List<PegelEntry>?
+
 
     /**
      * Holt alle Pegel-Einträge, deren Zeitstempel innerhalb der
@@ -41,7 +47,7 @@ interface PegelDao {
      * @return Liste aller Pegel-Einträge ≥ time24hAgo
      */
     @Query("SELECT * FROM pegel_table WHERE timestamp >= :time24hAgo")
-    fun getLast24Hours(time24hAgo: Long): MutableList<PegelEntry?>?
+    fun getLast24Hours(time24hAgo: Long): MutableList<PegelEntry>?
 
     /**
      * Löscht alle Einträge, die älter als 24 Stunden sind.

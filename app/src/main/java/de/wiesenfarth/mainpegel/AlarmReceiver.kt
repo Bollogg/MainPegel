@@ -26,7 +26,7 @@ import android.util.Log
  * @Version:   2025.11
  */
 class AlarmReceiver : BroadcastReceiver() {
-    override fun onReceive(context: Context?, intent: Intent) {
+    override fun onReceive(context: Context, intent: Intent) {
         // --- ACTION PRÜFEN ---
 
         if ("de.wiesenfarth.mainpegel.RUN_FGS" != intent.getAction()) {

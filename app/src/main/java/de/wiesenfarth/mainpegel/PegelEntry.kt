@@ -26,10 +26,11 @@ import androidx.room.PrimaryKey
  */
 @Entity(tableName = "pegel_table")
 class PegelEntry(// Zeitstempel in Millisekunden (System.currentTimeMillis)
-    var timestamp: Long, // Gemessener Pegelwert in Zentimetern
-    var value: Double
+    @JvmField var timestamp: Long, // Gemessener Pegelwert in Zentimetern
+    @JvmField var value: Double
 ) {
     // Primärschlüssel, automatisch fortlaufend generiert
+    @JvmField
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0
 

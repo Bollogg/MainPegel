@@ -32,6 +32,7 @@ object RetrofitClient {
     // Hält die zentrale Retrofit-Instanz (Singleton)
     private var retrofit: Retrofit? = null
 
+    @JvmStatic
     val apiService: PegelApiService
         /**
          * Liefert den API-Service für alle REST-Abfragen.

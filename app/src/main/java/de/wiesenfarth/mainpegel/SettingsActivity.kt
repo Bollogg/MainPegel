@@ -14,6 +14,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 
+
 /*******************************************************
  * Programm:  SettingsActivity
  *
@@ -89,36 +90,26 @@ class SettingsActivity : AppCompatActivity() {
         // --------------------------------------------------------
         // Toolbar einrichten
         // --------------------------------------------------------
-        val toolbar: Toolbar?
-        Toolbar > < android . view . View > findViewById < android . view . View ? > (R.id.toolbar)
+        val toolbar = findViewById<Toolbar?>(R.id.toolbar)
         setSupportActionBar(toolbar)
-        getSupportActionBar()!!.setTitle(R.string.menu_settings)
-        getSupportActionBar()!!.setDisplayHomeAsUpEnabled(true)
+
+        // KORRIGIERTE ZEILE:
+        supportActionBar!!.title = getString(R.string.menu_settings) // Modernere Kotlin-Syntax
+        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
         // SharedPreferences laden
         prefs = getSharedPreferences("settings", MODE_PRIVATE)
 
-            // --------------------------------------------------------
-            // UI-Elemente verbinden
-            // --------------------------------------------------------
-            .also {
-                spinnerLocality = it
-            }<Spinner><View> findViewById < android . view . View ? > (R.id.spinner_locality)
-            .also {
-                spinnerInterval = it
-            }<Spinner><View> findViewById < android . view . View ? > (R.id.spinner_interval)
-            .also {
-                waveThreshold = it
-            }<EditText><View> findViewById < android . view . View ? > (R.id.wave_threshold)
-            .also {
-                switchVibration = it
-            }<Switch><View> findViewById < android . view . View ? > (R.id.switch_vibration)
-            .also {
-                switchBeep = it
-            }<Switch><View> findViewById < android . view . View ? > (R.id.switch_beep)
-            .also {
-                spinnerMeasure = it
-            }<Spinner><View> findViewById < android . view . View ? > (R.id.spinner_Measure)
+        // --------------------------------------------------------
+        // UI-Elemente verbinden
+        // --------------------------------------------------------
+        spinnerLocality = findViewById(R.id.spinner_locality);
+        spinnerInterval = findViewById(R.id.spinner_interval);
+        waveThreshold = findViewById(R.id.wave_threshold);
+        switchVibration = findViewById(R.id.switch_vibration);
+        switchBeep = findViewById(R.id.switch_beep);
+        spinnerMeasure = findViewById(R.id.spinner_Measure);
+
 
         // Maximal 4 Ziffern (z. B. 9999)
         waveThreshold!!.setFilters(

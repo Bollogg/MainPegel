@@ -43,21 +43,20 @@ import java.util.concurrent.TimeUnit
  * @Autor:     Bollogg
  * @Datum:     2025-11-17
  * @Version:   2025.12
- */
+********************************************************/
 class MainActivity : AppCompatActivity() {
     // GUID der ausgewählten Messstelle
     private var localityGuid: String? = null
 
     // Einstellungen aus SharedPreferences
-    private var prefs: SharedPreferences? = null
-
+    private lateinit var prefs: SharedPreferences
     // Aktualisierungsintervall
     private var intervalMinutes = 0
 
     // UI-Elemente
-    private var textViewPegelstand: TextView? = null
-    private var buttonAktualisieren: Button? = null
-    private var lineChart: LineChart? = null // MPAndroidChart Diagramm
+    private lateinit var textViewPegelstand: TextView
+    private lateinit var buttonAktualisieren: Button
+    private lateinit var lineChart: LineChart
 
     private var pegelReceiver: BroadcastReceiver? = null
     private val isReceiverRegistered = false
@@ -108,8 +107,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         prefs = getSharedPreferences("settings", MODE_PRIVATE)
-        localityGuid = prefs!!.getString("locality_guid", CONST.WUERZBURG)
-        intervalMinutes = prefs!!.getInt("interval_minutes", 15)
+        localityGuid = prefs.getString("locality_guid", CONST.WUERZBURG)
+        intervalMinutes = prefs.getInt("interval_minutes", 15)
 
         // Übergabe an eigene Methode
         updateWithLocality(localityGuid, intervalMinutes)
@@ -144,7 +143,7 @@ class MainActivity : AppCompatActivity() {
 
         // Broadcast empfangen (vom Widget / Service)
         pegelReceiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context?, intent: Intent?) {
+            override fun onReceive(context: Context, intent: Intent?) {
                 Log.i("MAIN", "Broadcast empfangen → ladePegelstand()")
                 PegelUiHelper.ladePegelstand(context, textViewPegelstand, lineChart, prefs)
                 //PegelUiHelper.forceWidgetUpdate(context);
@@ -173,8 +172,8 @@ class MainActivity : AppCompatActivity() {
 
         // Einstellungen neu laden, falls in Settings geändert
         prefs = getSharedPreferences("settings", MODE_PRIVATE)
-        localityGuid = prefs!!.getString("locality_guid", CONST.WUERZBURG)
-        intervalMinutes = prefs!!.getInt("interval_minutes", 15)
+        localityGuid = prefs.getString("locality_guid", CONST.WUERZBURG)
+        intervalMinutes = prefs.getInt("interval_minutes", 15)
 
         // Scheduler & API neu starten
         // updateWithLocality(localityGuid, intervalMinutes);

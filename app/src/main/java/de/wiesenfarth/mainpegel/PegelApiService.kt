@@ -18,7 +18,7 @@ import retrofit2.http.Query
  *
  * @Autor:     Bollog
  * @Datum:     2025-11-20
- */
+ *******************************************************/
 interface PegelApiService {
     /**
      * Ruft Messwerte einer Pegelstation ab.
@@ -32,7 +32,7 @@ interface PegelApiService {
      */
     @GET("stations/{station}/W/measurements.json")
     fun getPegelstand(
-        @Path("station") station: String?,  // Platzhalter in der URL
-        @Query("start") start: String? // Query-Parameter für Zeitintervall
-    ): Call<MutableList<PegelResponse?>?>?
+        @Path("station") station: String,  // Platzhalter in der URL
+        @Query("start") start: String // Query-Parameter für Zeitintervall
+    ): Call<MutableList<PegelResponse>>
 }

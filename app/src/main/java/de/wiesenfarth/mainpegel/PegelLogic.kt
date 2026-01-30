@@ -17,38 +17,79 @@ import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
-
+/*******************************************************
+ * Objekt:      PegelLogic
+ *
+ * Beschreibung:
+ * Zentrale Geschäftslogik der App.
+ *
+ * - Ruft Pegeldaten über die REST-API ab (Retrofit)
+ * - Prüft Pegeländerungen (Schwellwert)
+ * - Löst bei starkem Anstieg Alarm (Notification, Ton, Vibration) aus
+ * - Speichert aktuelle Pegeldaten im lokalen Cache
+ * - Informiert Widgets/UI per Broadcast über neue Daten
+ *
+ * Dieses Objekt ist als Singleton implementiert, da
+ * immer nur ein Pegelabruf gleichzeitig laufen darf.
+ *
+ * @Website:   wiesenfarth-net.de
+ * @Autor:     Bollogg
+ ********************************************************/
 object PegelLogic {
+    /** letzter bekannter Pegelwert (cm), -1 = noch kein Wert vorhanden */
     private var lastValue = -1
+
+    /** verhindert parallele API-Aufrufe */
     private var isRunning = false
+
+    /** Notification-Channel-ID für Pegelalarme */
     const val CHANNEL_ID: String = "pegel_alarm"
 
+    /**
+     * Startet den Pegelabruf.
+     *
+     * @param context gültiger Android-Context (z. B. aus Receiver oder Service)
+     * @return true, wenn der Abruf gestartet wurde, false bei Abbruch
+     */
     fun run(context: Context): Boolean {
+
+        // Schutz gegen parallele Läufe
         if (isRunning) {
             Log.w("LOGIC", "⛔ Abgebrochen – bereits ein Lauf aktiv")
             return false
         }
+
         isRunning = true
         Log.i("LOGIC", "PegelLogic.run() gestartet")
 
+        // Einstellungen laden
         val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
         val localityGuid: String = prefs.getString("locality_guid", CONST.WUERZBURG)!!
         val hours = prefs.getInt("graph_hours", 4)
 
-        val startParam = "PT" + hours + "H"
+        // Startzeitraum für API (ISO-8601 Dauerformat)
+        //ToDo val startParam = "PT" + hours + "H"
+        val startParam = "PT${hours}H"
 
+        // Retrofit API-Aufruf vorbereiten
         val api = apiService
         val call = api.getPegelstand(localityGuid, startParam)
 
-        Log.d("LOGIC", "API URL: " + call!!.request().url)
+        //Log.d("LOGIC", "API URL: " + call.request().url)
+        Log.d("LOGIC", "API URL: ${call.request().url}")
 
-        call.enqueue(object : Callback<MutableList<PegelResponse?>?> {
+        // Asynchroner API-Aufruf
+        call.enqueue(object : Callback<MutableList<PegelResponse>> {
+            /**
+             * Erfolgreiche HTTP-Antwort (200–299)
+             */
             override fun onResponse(
-                call: Call<MutableList<PegelResponse?>?>,
-                res: Response<MutableList<PegelResponse>?>
+                call: Call<MutableList<PegelResponse>>,
+                res: Response<MutableList<PegelResponse>>
             ) {
                 isRunning = false
 
+                // HTTP-Fehler (z. B. 404, 500)
                 if (!res.isSuccessful()) {
                     storeErrorState(context)
                     sendUpdateBroadcast(context)
@@ -57,21 +98,23 @@ object PegelLogic {
 
                 val list = res.body()
 
+                // Keine oder leere Daten
                 if (list == null || list.isEmpty()) {
                     storeErrorState(context)
                     sendUpdateBroadcast(context)
                     return
                 }
 
-                // letzter Wert
+                // Letzter (aktueller) Pegelwert
                 val last = list.get(list.size - 1)
 
-                // Zeit formatieren
+                // Zeitstempel formatiert (HH:mm)
                 val formattedTime = formatTime(last.timestamp)
-                // Pegelanstieg prüfen
+
+                // Prüfen, ob der Pegel stark gestiegen ist
                 handleNewPegel(context, last.value, formattedTime)
 
-                // CACHE SPEICHERN
+                // --- CACHE SPEICHERN ---
                 val cache = context.getSharedPreferences("pegel_cache", Context.MODE_PRIVATE)
                 val e = cache.edit()
 
@@ -79,7 +122,7 @@ object PegelLogic {
                 e.putString("last_time", formattedTime)
                 e.putInt("count", list.size)
 
-                // Verlauf
+                // Verlauf speichern (für Diagramm)
                 for (idx in list.indices) {
                     val r = list.get(idx)
                     e.putInt("value_" + idx, r.value)
@@ -92,7 +135,10 @@ object PegelLogic {
                 sendUpdateBroadcast(context)
             }
 
-            override fun onFailure(call: Call<MutableList<PegelResponse?>?>, t: Throwable) {
+            /**
+             * Netzwerkfehler, Timeout oder Exception
+             */
+            override fun onFailure(call: Call<MutableList<PegelResponse>>, t: Throwable) {
                 isRunning = false
 
                 storeErrorState(context)
@@ -103,8 +149,13 @@ object PegelLogic {
         return true
     }
 
-    // 🔥 KORREKT: handleNewPegel AUSSERHALB der Callback Klasse
+    /**
+     * Prüft, ob der Pegelanstieg den Schwellwert überschreitet
+     * und löst ggf. Alarmaktionen aus.
+     */
     private fun handleNewPegel(ctx: Context, newValue: Int, time: String?) {
+
+        // Erster Wert → nur speichern
         if (lastValue < 0) {
             lastValue = newValue
             return
@@ -112,35 +163,31 @@ object PegelLogic {
 
         val delta = newValue - lastValue
 
-        // Schwellwert aus Settings laden, default = 15 cm
+        // Einstellungen laden
         val prefs = ctx.getSharedPreferences("settings", Context.MODE_PRIVATE)
-        val s: String = prefs.getString("wave_threshold", "15")!!
-        // Flags aus Settings laden
+        val s = prefs.getString("wave_threshold", "15")!!
         val vibrateEnabled = prefs.getBoolean("vibrate_alarm", true)
         val soundEnabled = prefs.getBoolean("sound_alarm", true)
 
-        var threshold: Int
-        try {
-            threshold = s.toInt()
+        // Schwellwert parsen
+        val threshold = try {
+            s.toInt()
         } catch (ex: Exception) {
-            threshold = 15 // fallback
+            15
         }
 
+        // Schwellwert überschritten → Alarm
         if (delta >= threshold) {
-            // System-Benachrichtigung senden (mit Standardton!)
             sendWaveAlert(ctx, newValue.toFloat(), delta.toFloat(), time)
-            // Vibration
-            if (vibrateEnabled == true) {
-                vibrateDevice(ctx)
-            }
-            if (soundEnabled == true) {
-                playSystemNotificationSound(ctx)
-            }
+
+            if (vibrateEnabled) vibrateDevice(ctx)
+            if (soundEnabled) playSystemNotificationSound(ctx)
         }
 
         lastValue = newValue
     }
 
+    /** Speichert einen Fehlerzustand im Cache */
     private fun storeErrorState(c: Context) {
         val cache = c.getSharedPreferences("pegel_cache", Context.MODE_PRIVATE)
         cache.edit()
@@ -148,42 +195,40 @@ object PegelLogic {
             .apply()
     }
 
+    /** Informiert Widgets und UI über neue Pegeldaten */
     private fun sendUpdateBroadcast(c: Context) {
         val bc = Intent(c, PegelWidget::class.java)
-        bc.setAction(PegelWidget.UPDATE_ACTION)
+        bc.action = PegelWidget.UPDATE_ACTION
         c.sendBroadcast(bc)
     }
 
+    /** Führt eine Geräte-Vibration aus (API-abhängig) */
     private fun vibrateDevice(ctx: Context) {
-        var vibrator: Vibrator? = null
-
-        // Android 12+ (API 31+)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            val vm = ctx.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager?
-            if (vm != null) vibrator = vm.getDefaultVibrator()
-        } else {
-            // Android < 12
-            vibrator = ctx.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator?
-        }
+        val vibrator: Vibrator? =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                val vm = ctx.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager?
+                vm?.defaultVibrator
+            } else {
+                ctx.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator?
+            }
 
         if (vibrator == null || !vibrator.hasVibrator()) {
             Log.e("VIBRATION", "Kein Vibrator vorhanden!")
             return
         }
 
-        // Vibrationsmuster (funktioniert auf allen Geräten)
         val pattern = longArrayOf(0, 500, 200, 700)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            vibrator.vibrate(
-                VibrationEffect.createWaveform(pattern, -1)
-            )
+            vibrator.vibrate(VibrationEffect.createWaveform(pattern, -1))
         } else {
             vibrator.vibrate(pattern, -1)
         }
     }
 
-    private fun playSystemNotificationSound(ctx: Context?) {
+
+    /** Spielt den System-Benachrichtigungston ab */
+    private fun playSystemNotificationSound(ctx: Context) {
         try {
             val uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
             RingtoneManager.getRingtone(ctx, uri).play()
@@ -192,20 +237,17 @@ object PegelLogic {
         }
     }
 
+    /**
+     * Wandelt API-Zeitstempel in lokale Uhrzeit (HH:mm) um
+     */
     private fun formatTime(apiTime: String?): String? {
-        try {
-            // Beispiel apiTime: "2025-12-02T12:15:00+01:00" oder "2025-12-02T12:15:00Z"
+        return try {
             val odt = OffsetDateTime.parse(apiTime)
-
-            // In lokale Zeitzone umwandeln (Europe/Berlin oder System-Zeitzone)
             val zdt = odt.atZoneSameInstant(ZoneId.systemDefault())
-
-            // Ausgabeformat HH:mm
             val fmt = DateTimeFormatter.ofPattern("HH:mm", Locale.GERMANY)
-            return zdt.format(fmt)
+            zdt.format(fmt)
         } catch (e: Exception) {
-            e.printStackTrace() // für Debug
-            return apiTime // fallback: unverändert anzeigen
+            apiTime // Fallback: Originalwert
         }
     }
 }

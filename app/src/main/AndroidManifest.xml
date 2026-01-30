@@ -40,7 +40,7 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="de.wiesenfarth.mainpegel.UPDATE_WIDGET" />
+                <action android:name="de.net.wiesenfarth.mainpegel.UPDATE_WIDGET" />
             </intent-filter>
 
             <meta-data

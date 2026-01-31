@@ -20,10 +20,12 @@
   <!-- Menu items -->
   <string name="menu_settings">Settings</string>
   <string name="menu_info">Version info</string>
+  <string name="menu_oss_licenses">License info</string>
 
   <!-- Toast messages -->
   <string name="toast_settings">Settings selected</string>
   <string name="toast_info">Versions info selected</string>
+  <string name="toast_oss_licenses">Open source licenses</string>
 
   <string name="water_level_location">Water level location:</string>
   <string name="reads_water_levels">Reads water levels:</string>

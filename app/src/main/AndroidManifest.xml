@@ -35,6 +35,14 @@
             android:name=".InfoActivity"
             android:exported="false" />
 
+        <activity
+          android:name="com.google.android.gms.oss.licenses.OssLicensesMenuActivity"
+          android:theme="@style/Theme.MainPegel.Oss" />
+
+        <activity
+          android:name="com.google.android.gms.oss.licenses.OssLicensesActivity"
+          android:theme="@style/Theme.MainPegel" />
+
         <receiver
             android:name=".Widget.PegelWidget"
             android:exported="true">

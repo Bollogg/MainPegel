@@ -1,5 +1,6 @@
 package de.net.wiesenfarth.mainpegel
 
+import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import android.Manifest
 import android.app.AlarmManager
 import android.content.BroadcastReceiver
@@ -242,24 +243,40 @@ class MainActivity : AppCompatActivity() {
         menuInflater.inflate(R.menu.menu_main, menu)
         return true
     }
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.getItemId()
 
-        // Settings öffnen
-        if (id == R.id.action_settings) {
-            Toast.makeText(this, getString(R.string.toast_settings), Toast.LENGTH_SHORT).show()
-            startActivity(Intent(this, SettingsActivity::class.java))
-            return true
+	// Toolbar Optionsmenue aufrufen
+  override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    val id = item.getItemId()
 
-            // About
-        } else if (id == R.id.action_about) {
-            Toast.makeText(this, getString(R.string.toast_info), Toast.LENGTH_SHORT).show()
-            startActivity((Intent(this, InfoActivity::class.java)))
-            return true
-        }
+    // Settings öffnen
+    if (id == R.id.action_settings) {
+      Toast.makeText(this, getString(R.string.toast_settings), Toast.LENGTH_SHORT).show()
+      startActivity(Intent(this, SettingsActivity::class.java))
+      return true
 
-        return super.onOptionsItemSelected(item)
-    }
+    // About (info Activity oeffnen
+    } else if (id == R.id.action_about) {
+      Toast.makeText(this, getString(R.string.toast_info), Toast.LENGTH_SHORT).show()
+      startActivity((Intent(this, InfoActivity::class.java)))
+      return true
+
+		// Open Source Lizenzen anzeigen
+		} else if (id == R.id.action_oss) {
+
+			OssLicensesMenuActivity.setActivityTitle(getString(R.string.toast_oss_licenses))
+			startActivity(Intent(this, OssLicensesMenuActivity::class.java))
+			return true
+		}
+		// About (info Activity oeffnen
+//		} else if (id == R.id.action_oss) {
+//			OssLicensesMenuActivity.setActivityTitle(getString(R.string.custom_license_title))
+//			Toast.makeText(this, getString(R.string.toast_OssLicensesMenu), Toast.LENGTH_SHORT).show()
+//			OssLicensesMenuActivity.setActivityTitle(getString(R.string.custom_license_title))
+//			startActivity((Intent(this, OssLicensesMenuActivity::class.java)))
+//		return true
+//		}
+      return super.onOptionsItemSelected(item)
+  }
 
     /*******************************************************
      * updateWithLocality

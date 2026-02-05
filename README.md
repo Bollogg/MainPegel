@@ -6,6 +6,13 @@ Bei Überschreitung des Pegelstand um x cm wird ein Alarm ausgelöst
   <img src="images/MainPegelApp.png" width="400">
 </p>
 
+## PlayStore
+Play store Download
+
+<a href='https://play.google.com/store/apps/'>
+  <img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png' height='80px'/>
+</a>
+
 ## Installation
 Wichtige Informationen!
 

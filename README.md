@@ -59,9 +59,9 @@ https://www.pegelonline.wsv.de/
 
 ## Android Version
 
-Minimum SDK 32
-Kotlin V2.3.0
-JavaVersion VERSION_17
+- Minimum SDK 32
+- Kotlin V2.3.0
+- JavaVersion VERSION_17
 
 ## Lizenz
 

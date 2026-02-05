@@ -3,11 +3,10 @@ Liest den Pegelstand von der angegebenen Messstelle aus.
 Bei Überschreitung des Pegelstand um x cm wird ein Alarm ausgelöst
 
 <p align="center">
-  <img src="images/MainPegelApp.png" width="400">
+  <img src="images/MainPegelApp.png" width="200">
 </p>
 
-## PlayStore
-Play store Download
+## Play Store
 
 <a href='https://play.google.com/store/apps/'>
   <img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png' height='80px'/>

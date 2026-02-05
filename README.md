@@ -19,6 +19,7 @@ Um die Pegelwarnung zu aktivieren ist es notwendig, dass die APP Benachrichtigun
 <p align="center">
   <img src="images/MainPegelBenachrichtigungen.png" width="400">
 </p>
+
 - Vibrationsalarm
 - Benachrichtigungsalarm
 

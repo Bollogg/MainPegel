@@ -18,7 +18,7 @@ Wichtige Informationen!
 ### Erinnerungsfunktion
 Damit der Pegel gelesen werden kann muss in der APP die Erinnerungsfunktion erlaubt werden!
 <p align="center">
-  <img src="images/MainPegelWeckerUndErinnerungen.png" width="400">
+  <img src="images/MainPegelWeckerUndErinnerungen.png" width="200">
 </p>
 
 Es wird im Hintergrund ein Wecker gestellt um alle 15, 30, 45,... Minuten den Pegelwert
@@ -27,7 +27,7 @@ auszulesen.
 ### Benachritigungsalarme
 Um die Pegelwarnung zu aktivieren ist es notwendig, dass die APP Benachrichtigungen senden darf
 <p align="center">
-  <img src="images/MainPegelBenachrichtigungen.png" width="400">
+  <img src="images/MainPegelBenachrichtigungen.png" width="200">
 </p>
 
 - Vibrationsalarm
@@ -37,7 +37,7 @@ Um die Pegelwarnung zu aktivieren ist es notwendig, dass die APP Benachrichtigun
 Es können folgende Einstellungen geändert werden.
 
 <p align="center">
-  <img src="images/MainPegelEinstellungen.png" width="400">
+  <img src="images/MainPegelEinstellungen.png" width="200">
 </p>
 
 - Pegelmessstelle (Ort)

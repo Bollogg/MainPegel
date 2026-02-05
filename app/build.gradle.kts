@@ -24,7 +24,7 @@ android {
         applicationId = "de.net.wiesenfarth.mainpegel"
         minSdk = 32
         targetSdk = 36
-        versionCode = 20260205
+        versionCode = 20260206
         versionName = "OeTTINGER V2026.02"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -35,13 +35,20 @@ android {
     }
 
     buildTypes {
-        release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-        }
+      release {
+
+        // Enables code-related app optimization.
+        isMinifyEnabled = true
+
+        // Enables resource shrinking.
+        isShrinkResources = true
+
+        proguardFiles(
+	        // Default file with automatically generated optimization rules.
+          getDefaultProguardFile("proguard-android-optimize.txt"),
+          "proguard-rules.pro"
+        )
+      }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17

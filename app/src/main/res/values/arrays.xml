@@ -30,4 +30,23 @@
         <item>90</item>
     </string-array>
 
+  <string-array name="locality_options">
+    <item>FRANKFURT_OSTHAFEN</item>
+    <item>HANAU_BRUECKE_DFH</item>
+    <item>AUHEIM_BRUECKE_DFH</item>
+    <item>KROTZENBURG</item>
+    <item>MAINFLINGEN</item>
+    <item>KLEINOSTHEIM_WUK</item>
+    <item>OBERNAU</item>
+    <item>KLEINHEUBACH</item>
+    <item>FAULBACH</item>
+    <item>WERTHEIM</item>
+    <item>STEINBACH</item>
+    <item>WUERZBURG</item>
+    <item>ASTHEIM</item>
+    <item>SCHWEINFURT_NEUER_HAFEN</item>
+    <item>TRUNSTADT</item>
+    <item>BAMBERG</item>
+    <item>RIEDENBURG_UP</item>
+  </string-array>
 </resources>

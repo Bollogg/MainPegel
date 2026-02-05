@@ -10,30 +10,43 @@
 		<item>reply_all</item>
 	</string-array>
 
-	<string-array name="interval_options">
-		<item>15</item>
-		<item>30</item>
-		<item>45</item>
-		<item>60</item>
-	</string-array>
+  <!-- Anzeige im Spinner -->
+  <string-array name="interval_display">
+    <item>@string/min_15</item>
+    <item>@string/min_30</item>
+    <item>@string/min_45</item>
+    <item>@string/min_60</item>
+    <item>@string/min_75</item>
+    <item>@string/min_90</item>
+  </string-array>
 
-	<string-array name="locality_options">
-		<item>FRANKFURT_OSTHAFEN</item>
-		<item>HANAU_BRUECKE_DFH</item>
-		<item>AUHEIM_BRUECKE_DFH</item>
-		<item>KROTZENBURG</item>
-		<item>MAINFLINGEN</item>
-		<item>KLEINOSTHEIM_WUK</item>
-		<item>OBERNAU</item>
-		<item>KLEINHEUBACH</item>
-		<item>FAULBACH</item>
-		<item>WERTHEIM</item>
-		<item>STEINBACH</item>
-		<item>WUERZBURG</item>
-		<item>ASTHEIM</item>
-		<item>SCHWEINFURT_NEUER_HAFEN</item>
-		<item>TRUNSTADT</item>
-		<item>BAMBERG</item>
-		<item>RIEDENBURG_UP</item>
-	</string-array>
+  <!-- Tatsächliche Werte, die gespeichert werden -->
+  <string-array name="interval_values">
+    <item>15</item>
+    <item>30</item>
+    <item>45</item>
+    <item>60</item>
+    <item>75</item>
+    <item>90</item>
+  </string-array>
+
+  <string-array name="locality_options">
+    <item>FRANKFURT_OSTHAFEN</item>
+    <item>HANAU_BRUECKE_DFH</item>
+    <item>AUHEIM_BRUECKE_DFH</item>
+    <item>KROTZENBURG</item>
+    <item>MAINFLINGEN</item>
+    <item>KLEINOSTHEIM_WUK</item>
+    <item>OBERNAU</item>
+    <item>KLEINHEUBACH</item>
+    <item>FAULBACH</item>
+    <item>WERTHEIM</item>
+    <item>STEINBACH</item>
+    <item>WUERZBURG</item>
+    <item>ASTHEIM</item>
+    <item>SCHWEINFURT_NEUER_HAFEN</item>
+    <item>TRUNSTADT</item>
+    <item>BAMBERG</item>
+    <item>RIEDENBURG_UP</item>
+  </string-array>
 </resources>

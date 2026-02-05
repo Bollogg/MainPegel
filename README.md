@@ -7,6 +7,9 @@ Bei Überschreitung des Pegelstand um x cm wird ein Alarm ausgelöst
 </p>
 
 ## Installation
+Wichtige Informationen!
+
+### Erinnerungsfunktion
 Damit der Pegel gelesen werden kann muss der APP die Erinnerungsfunktion erlaubt werden!
 <p align="center">
   <img src="images/MainPegelWeckerUndErinnerungen.png" width="400">
@@ -15,6 +18,7 @@ Damit der Pegel gelesen werden kann muss der APP die Erinnerungsfunktion erlaubt
 Es wird im Hintergrund ein Wecker gestellt um alle 15, 30, 45,... Minuten den Pegelwert
 auszulesen.
 
+### Benachritigungsalarme
 Um die Pegelwarnung zu aktivieren ist es notwendig, dass die APP Benachrichtigungen senden darf
 <p align="center">
   <img src="images/MainPegelBenachrichtigungen.png" width="400">
@@ -46,6 +50,11 @@ Anzeige des Pegels als Grafik und aktueller Pegelmesswert mit der Uhrzeit des zu
 <p align="center">
   <img src="images/MainPegelWidgets.png" width="400">
 </p>
+
+## Pegeldaten
+Die Pegeldaten werden von folgender API bezogen.
+
+https://www.pegelonline.wsv.de/
 
 ## Lizenz
 

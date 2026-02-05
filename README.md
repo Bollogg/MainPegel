@@ -10,7 +10,7 @@ Bei Überschreitung des Pegelstand um x cm wird ein Alarm ausgelöst
 Wichtige Informationen!
 
 ### Erinnerungsfunktion
-Damit der Pegel gelesen werden kann muss der APP die Erinnerungsfunktion erlaubt werden!
+Damit der Pegel gelesen werden kann muss in der APP die Erinnerungsfunktion erlaubt werden!
 <p align="center">
   <img src="images/MainPegelWeckerUndErinnerungen.png" width="400">
 </p>
@@ -55,6 +55,13 @@ Anzeige des Pegels als Grafik und aktueller Pegelmesswert mit der Uhrzeit des zu
 Die Pegeldaten werden von folgender API bezogen.
 
 https://www.pegelonline.wsv.de/
+
+
+## Android Version
+
+Minimum SDK 32
+Kotlin V2.3.0
+JavaVersion VERSION_17
 
 ## Lizenz
 

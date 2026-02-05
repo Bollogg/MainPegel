@@ -24,8 +24,8 @@ android {
         applicationId = "de.net.wiesenfarth.mainpegel"
         minSdk = 32
         targetSdk = 36
-        versionCode = 20260131
-        versionName = "OeTTINGER V2026.01"
+        versionCode = 20260205
+        versionName = "OeTTINGER V2026.02"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

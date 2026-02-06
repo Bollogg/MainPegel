@@ -4,9 +4,11 @@
 
 Verantwortlich für die App „Main Pegel“ ist:
 
-**[Dirk Wiesenfarth]**
-**[Lilienstr. 8, 73066, Uhingen]**
-**E-Mail:** [mainpegel@wiesenfarth-net.de]
+**Dirk Wiesenfarth**
+
+**Lilienstr. 8, 73066, Uhingen**
+
+**E-Mail:** mainpegel@wiesenfarth-net.de
 
 Bei Fragen zum Datenschutz können Sie sich jederzeit per E-Mail an uns wenden.
 

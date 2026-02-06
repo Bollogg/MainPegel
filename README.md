@@ -72,3 +72,7 @@ https://www.pegelonline.wsv.de/
 ## Lizenz
 
 Apache License Version 2.0
+
+## Rechtliches
+
+- [Datenschutzerklärung](datenschutzerklaerung.md)

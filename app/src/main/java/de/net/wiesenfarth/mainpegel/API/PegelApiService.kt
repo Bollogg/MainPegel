@@ -26,6 +26,8 @@ interface PegelApiService {
    *
    * Beispiel-URL (schematisch):
    * stations/123456/W/measurements.json?start=PT6H
+   * ToDo: für Wassertemperatur
+   * ToDo: /stations/915d76e1-3bf9-4e37-9a9a-4d144cd771cc/WT/measurements.json
    *
    * @param station  Stations-ID, wird dynamisch in die URL eingesetzt
    * @param start    Zeitraum, z. B. "PT6H" für letzte 6 Stunden

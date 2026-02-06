@@ -55,7 +55,7 @@
       android:id="@+id/txtEMail"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:text="mail: MainPegel(at)wiesenfarth-net.de"
+      android:text="mail: MainPegel@wiesenfarth-net.de"
       android:textSize="20dp" />
 
   </LinearLayout>

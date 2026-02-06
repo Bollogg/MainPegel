@@ -75,4 +75,4 @@ Apache License Version 2.0
 
 ## Rechtliches
 
-- [Datenschutzerklärung](datenschutzerklaerung.md)
+- [Datenschutzerklärung](app\src\main\assets\datenschutzerklaerung.txt)

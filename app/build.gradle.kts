@@ -19,12 +19,13 @@ android {
     // Version-Name (versionName) in InfoActivity freigeben
     buildFeatures {
         buildConfig = true
+	    viewBinding = true
     }
     defaultConfig {
         applicationId = "de.net.wiesenfarth.mainpegel"
         minSdk = 32
         targetSdk = 36
-        versionCode = 20260206
+        versionCode = 20260207
         versionName = "OeTTINGER V2026.02"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -68,7 +69,9 @@ android {
 
 dependencies {
 	implementation("androidx.preference:preference:1.2.1")
-  val workVersion = "2.11.1"
+	implementation(libs.androidx.navigation.fragment.ktx)
+	implementation(libs.androidx.navigation.ui.ktx)
+	val workVersion = "2.11.1"
   implementation("androidx.work:work-runtime-ktx:$workVersion")
   implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
   implementation(libs.androidx.core.ktx)

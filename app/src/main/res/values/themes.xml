@@ -1,6 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+  <!-- Base application theme. -->
   <style name="Base.Theme.MainPegel" parent="Theme.Material3.DayNight.NoActionBar" />
-  <style name="Theme.MainPegel.Oss" parent="Theme.Material3.DayNight"/>
+
+  <style name="Theme.MainPegel.Oss" parent="Theme.Material3.DayNight" />
+
   <style name="Theme.MainPegel" parent="Base.Theme.MainPegel" />
 </resources>

@@ -17,4 +17,9 @@
     android:orderInCategory="300"
     android:showAsAction="never" />
 
+  <item
+    android:id="@+id/action_privacy_policy"
+    android:title="@string/menu_privacy_policy"
+    android:showAsAction="never" />
+
 </menu>

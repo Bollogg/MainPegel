@@ -93,3 +93,17 @@ dependencies {
 	implementation("com.google.code.gson:gson:2.10.1")
 }
 
+/* ===============================
+   Datenschutzerklärung Sync
+   =============================== */
+
+tasks.register<Copy>("syncPrivacyPolicy") {
+	from("${rootProject.projectDir}/datenschutzerklaerung.md")
+	into("$projectDir/src/main/assets")
+	rename { "datenschutzerklaerung.txt" }
+}
+
+/* vor JEDEM Build ausführen */
+tasks.named("preBuild") {
+	dependsOn("syncPrivacyPolicy")
+}

@@ -260,21 +260,26 @@ class MainActivity : AppCompatActivity() {
       startActivity((Intent(this, InfoActivity::class.java)))
       return true
 
-		// Open Source Lizenzen anzeigen
-		} else if (id == R.id.action_oss) {
+	    // About (Datenschutzerklaerung Activity oeffnen
+    } else if (id == R.id.action_privacy_policy) {
+	    Toast.makeText(this, getString(R.string.toast_privacy_policy), Toast.LENGTH_SHORT).show()
+	    startActivity((Intent(this, DatenschutzerklaerungActivity::class.java)))
+	    return true
 
+ 	    // Open Source Lizenzen anzeigen
+		} else if (id == R.id.action_oss) {
 			OssLicensesMenuActivity.setActivityTitle(getString(R.string.toast_oss_licenses))
 			startActivity(Intent(this, OssLicensesMenuActivity::class.java))
 			return true
-		}
+    }
 		// About (info Activity oeffnen
-//		} else if (id == R.id.action_oss) {
-//			OssLicensesMenuActivity.setActivityTitle(getString(R.string.custom_license_title))
-//			Toast.makeText(this, getString(R.string.toast_OssLicensesMenu), Toast.LENGTH_SHORT).show()
-//			OssLicensesMenuActivity.setActivityTitle(getString(R.string.custom_license_title))
-//			startActivity((Intent(this, OssLicensesMenuActivity::class.java)))
-//		return true
-//		}
+		//		} else if (id == R.id.action_oss) {
+		//			OssLicensesMenuActivity.setActivityTitle(getString(R.string.custom_license_title))
+		//			Toast.makeText(this, getString(R.string.toast_OssLicensesMenu), Toast.LENGTH_SHORT).show()
+		//			OssLicensesMenuActivity.setActivityTitle(getString(R.string.custom_license_title))
+		//			startActivity((Intent(this, OssLicensesMenuActivity::class.java)))
+		//		return true
+		//		}
       return super.onOptionsItemSelected(item)
   }
 

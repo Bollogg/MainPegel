@@ -9,6 +9,7 @@
   <color name="colorButton">#ff6750a4</color>
 
   <color name="lineColor">#0000FF</color>                 <!-- Blau -->
+  <color name="tempLineColor">#FF0000</color>             <!-- Rot -->
   <color name="fillColor">#500000FF</color>               <!-- halbtransparent -->
   <color name="textColor">#444444</color>
   <color name="axisColor">#000000</color>

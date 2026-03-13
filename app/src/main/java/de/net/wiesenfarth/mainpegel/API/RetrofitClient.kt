@@ -1,6 +1,7 @@
 package de.net.wiesenfarth.mainpegel.API
 
 import android.util.Log
+import java.util.concurrent.TimeUnit
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -57,11 +58,18 @@ object RetrofitClient {
         logging.setLevel(HttpLoggingInterceptor.Level.BODY)
 
         // OkHttpClient – HTTP-Bibliothek hinter Retrofit
-        val client = OkHttpClient.Builder()
-            .addInterceptor(logging) // Logging via Interceptor
-            .build()
+//        val client = OkHttpClient.Builder()
+//            .addInterceptor(logging) // Logging via Interceptor
+//            .build()
+	      val client = OkHttpClient.Builder()
+		      .connectTimeout(15, TimeUnit.SECONDS)   // Verbindung aufbauen
+		      .readTimeout(15, TimeUnit.SECONDS)      // Antwort lesen
+		      .writeTimeout(15, TimeUnit.SECONDS)     // Request senden
+		      .addInterceptor(logging)
+		      .build()
 
-        // Retrofit-Objekt erstellen
+
+	      // Retrofit-Objekt erstellen
         retrofit = Retrofit.Builder()
             .baseUrl("https://www.pegelonline.wsv.de/webservices/rest-api/v2/") // Basis-URL für alle Endpunkte
             .addConverterFactory(GsonConverterFactory.create()) // JSON ↔ Java Mapping (Gson)

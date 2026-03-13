@@ -169,11 +169,13 @@ class PegelWidget : AppWidgetProvider() {
 		* Pegeldaten aktualisieren & anzeigen
 		* -----------------------------------------------
 		*/
-    PegelLogic.run(context) // API starten und Daten abholen
+
+    //ToDo: löschen PegelLogic.run(context) // API starten und Daten abholen
 
     val cache = context.getSharedPreferences("pegel_cache", Context.MODE_PRIVATE)
 
     val correntValue = cache.getInt("last_value", -1)
+		val correntTemp  = cache.getFloat("last_temp", 0F)
     val time: String = cache.getString("last_time", "--:--")!!
 
     // Übergabe letzte Wasserhöhe
@@ -182,7 +184,13 @@ class PegelWidget : AppWidgetProvider() {
       "Pegel: $correntValue cm"
     )
 
-    //Übergabe letzte Messzeit
+		// Übergabe letzte Wassertemperatur
+		views.setTextViewText(
+			R.id.widget_temp,
+			"Wasser: $correntTemp °C"
+		)
+
+		//Übergabe letzte Messzeit
     views.setTextViewText(
       R.id.widget_timestamp,
       "Stand: $time Uhr"
@@ -223,7 +231,6 @@ class PegelWidget : AppWidgetProvider() {
     return (heightDp * density).toInt()
   }
 
-	//ToDo: löschen von ToDoupdateWidget????
   private fun ToDoupdateWidget(context: Context, mgr: AppWidgetManager, widgetId: Int) {
 	  Log.i("WIDGET", "⟳ onReceive() – action= updateWidget")
 
@@ -273,26 +280,31 @@ class PegelWidget : AppWidgetProvider() {
   override fun onReceive(context: Context, intent: Intent) {
     super.onReceive(context, intent)
 
-    if (UPDATE_ACTION == intent.getAction()) {
-      Log.i("WIDGET", "⟳ Widget Update ausgelöst – lade Pegel…")
+		when (intent.action) {
 
-      // Erst API ausführen → speichert Daten → sendet Broadcast
-      //ToDo: testen PegelLogic.run(context);
+			ACTION_UPDATE_REQUEST -> {
+				Log.i("WIDGET", "🔄 Daten werden geladen")
+				PegelLogic.run(context)
+				scheduleNextUpdate(context)
+			}
 
-      // Widget neu zeichnen
-      val mgr = AppWidgetManager.getInstance(context)
-      val ids = mgr.getAppWidgetIds(
-	      ComponentName(context, PegelWidget::class.java)
-      )
-      for (id in ids) {
-        Log.i("WIDGET", "updateWidget() CALLER = onReceive(" + intent.getAction() + ")")
-        updateWidget(context, mgr, id)
-      }
-
-      // nächsten Update setzen
-      scheduleNextUpdate(context)
-    }
+			ACTION_DATA_UPDATED -> {
+				Log.i("WIDGET", "🎨 Widget wird neu gerendert")
+				updateAllWidgets(context)
+			}
+		}
   }
+	private fun updateAllWidgets(context: Context) {
+		val mgr = AppWidgetManager.getInstance(context)
+		val ids = mgr.getAppWidgetIds(
+			ComponentName(context, PegelWidget::class.java)
+		)
+
+		for (id in ids) {
+			updateWidget(context, mgr, id)
+		}
+	}
+
 
 	/**
  * Plant das nächste Widget-Update über den AlarmManager.
@@ -306,7 +318,7 @@ class PegelWidget : AppWidgetProvider() {
     val triggerAt = System.currentTimeMillis() + minutes * 60 * 1000
 
     val i = Intent(context, PegelWidget::class.java)
-    i.setAction(UPDATE_ACTION)
+		i.action = ACTION_UPDATE_REQUEST
 
     val pi = PendingIntent.getBroadcast(
       context,
@@ -328,6 +340,8 @@ class PegelWidget : AppWidgetProvider() {
 
   companion object {
 	  /** Eigene Action zum Aktualisieren des Widgets */
-	  const val UPDATE_ACTION: String = "de.net.wiesenfarth.mainpegel.UPDATE_WIDGET"
+	  const val ACTION_UPDATE_REQUEST = "de.net.wiesenfarth.mainpegel.UPDATE_REQUEST"
+	  const val ACTION_DATA_UPDATED  = "de.net.wiesenfarth.mainpegel.DATA_UPDATED"
+
   }
 }

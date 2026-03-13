@@ -35,8 +35,7 @@ import de.net.wiesenfarth.mainpegel.AlarmManager.NotificationHelper
 import de.net.wiesenfarth.mainpegel.AlarmManager.PegelScheduler
 import de.net.wiesenfarth.mainpegel.Graph.PegelUiHelper
 import de.net.wiesenfarth.mainpegel.API.PegelWorker
-import de.net.wiesenfarth.mainpegel.R
-import de.net.wiesenfarth.mainpegel.SettingsActivity
+import de.net.wiesenfarth.mainpegel.Widget.PegelWidget
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
 
@@ -49,13 +48,13 @@ import java.util.concurrent.TimeUnit
  *
  * @Website:   wiesenfarth-net.de
  * @Autor:     Bollogg
- * @Datum:     2025-11-17
- * @Version:   2026.01
+ * @Datum:     2026-03-06
+ * @Version:   2026.03
 ********************************************************/
 class MainActivity : AppCompatActivity() {
     // GUID der ausgewählten Messstelle
     private var localityGuid: String? = null
-    private var showSettings = true
+    //ToDo: löschen private var showSettings = true
 
     // Einstellungen aus SharedPreferences
     private lateinit var prefs: SharedPreferences
@@ -67,8 +66,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var buttonAktualisieren: Button
     private lateinit var lineChart: LineChart
 
-    private lateinit var pegelReceiver: BroadcastReceiver
-    private val isReceiverRegistered = false
+//ToDo: löschen    private lateinit var pegelReceiver: BroadcastReceiver
+//ToDo: löschen private val isReceiverRegistered = false
     private var settingsChanged = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -76,8 +75,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         // NotificationChannel einmalig initialisieren
-        NotificationHelper.ensureChannel(this)
-        checkExactAlarmPermission() //Erlauben von Wecker und Errinerungen
+        //ToDo: löschen NotificationHelper.ensureChannel(this)
+        //ToDo: prüfen checkExactAlarmPermission() //Erlauben von Wecker und Errinerungen
 
         // Aktiviert moderne “Edge-to-Edge”-Darstellung
         this.enableEdgeToEdge()
@@ -138,8 +137,10 @@ class MainActivity : AppCompatActivity() {
         buttonAktualisieren = findViewById<Button>(R.id.buttonAktualisieren)
         lineChart = findViewById<LineChart>(R.id.lineChart)
 
+        PegelUiHelper.ladePegelstand(this, textViewPegelstand, lineChart, prefs)
+
         // Scheduler starten (Hintergrund-Aktualisierungen)
-        PegelScheduler.schedule(this)
+        //PegelScheduler.schedule(this)
 
         // Direkt den ersten Pegel laden
         //PegelUiHelper.ladePegelstand(this, textViewPegelstand, lineChart, prefs);
@@ -147,9 +148,18 @@ class MainActivity : AppCompatActivity() {
 
         // Button: manuelles Aktualisieren
         buttonAktualisieren!!.setOnClickListener(View.OnClickListener { v: View ->
+            Log.i("MAIN", "Manuelles Update gestartet")
+
+            val started = de.net.wiesenfarth.mainpegel.API.PegelLogic.run(this)
+
+            if (!started) {
+                Toast.makeText(this, "Update läuft bereits", Toast.LENGTH_SHORT).show()
+            }
+            //ToDo Prüfen!
             PegelUiHelper.ladePegelstand(this, textViewPegelstand, lineChart, prefs)
         })
 
+/* ToDo: löschen
         // Broadcast empfangen (vom Widget / Service)
         pegelReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
@@ -160,8 +170,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         val filter = IntentFilter()
-        filter.addAction(ACTION_PEGEL_UPDATE)
-
+        //ToDo: löschenfilter.addAction(ACTION_PEGEL_UPDATE)
         //Regestrieren von pegelReciver
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             //für Android 13 und größer
@@ -170,6 +179,7 @@ class MainActivity : AppCompatActivity() {
             // kleiner Android 13
             registerReceiver(pegelReceiver, filter)
         }
+*/
     }
 
     override fun onStart() {
@@ -193,10 +203,25 @@ class MainActivity : AppCompatActivity() {
         // updateWithLocality(localityGuid, intervalMinutes);
         // Nach Rückkehr aus Activity (Settings, Info) erneut laden
         // Pegel lesen
+        //PegelUiHelper.ladePegelstand(this, textViewPegelstand, lineChart, prefs)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(
+                dataReceiver,
+                IntentFilter(PegelWidget.ACTION_DATA_UPDATED),
+                RECEIVER_NOT_EXPORTED
+            )
+        } else {
+            registerReceiver(
+                dataReceiver,
+                IntentFilter(PegelWidget.ACTION_DATA_UPDATED)
+            )
+        }
+
+        // Cache sofort anzeigen
         PegelUiHelper.ladePegelstand(this, textViewPegelstand, lineChart, prefs)
 
         // Scheduler starte Task für Hintergrund-Aktualisierungen
-        PegelScheduler.schedule(this)
+        //PegelScheduler.schedule(this)
 
         // Graph aktualisieren
         updateWithLocality(localityGuid, intervalMinutes)
@@ -205,6 +230,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
+
+        unregisterReceiver(dataReceiver)
+
     }
 
     override fun onStop() {
@@ -214,7 +242,7 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         // Pegel lesen
-        PegelUiHelper.ladePegelstand(this, textViewPegelstand, lineChart, prefs)
+        //PegelUiHelper.ladePegelstand(this, textViewPegelstand, lineChart, prefs)
     }
     /*
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -372,8 +400,22 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
-        const val ACTION_PEGEL_UPDATE: String = "de.net.wiesenfarth.mainpegel.PEGEL_UPDATE"
+        //ToDo: löschen const val ACTION_PEGEL_UPDATE: String = "de.net.wiesenfarth.mainpegel.PEGEL_UPDATE"
 
         private const val REQUEST_SETTINGS = 1001
     }
+  private val dataReceiver = object : BroadcastReceiver() {
+    override fun onReceive(context: Context, intent: Intent) {
+      if (intent.action == PegelWidget.ACTION_DATA_UPDATED) {
+        Log.i("MAIN", "Neue Daten empfangen → UI wird aktualisiert")
+        PegelUiHelper.ladePegelstand(
+          this@MainActivity,
+          textViewPegelstand,
+          lineChart,
+          prefs
+        )
+      }
+    }
+  }
+
 }

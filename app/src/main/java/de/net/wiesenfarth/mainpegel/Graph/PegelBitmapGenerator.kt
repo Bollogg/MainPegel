@@ -8,177 +8,254 @@ import android.graphics.Paint
 import android.util.Log
 import androidx.core.content.ContextCompat
 import de.net.wiesenfarth.mainpegel.R
-
+import java.util.Locale
 /*******************************************************
- * Programm:  PegelBitmapGenerator
+ * Objekt:  PegelBitmapGenerator
  *
  * Beschreibung:
- * Diese Klasse erzeugt ein Bitmap mit einem einfachen
- * Liniendiagramm zur Darstellung eines Pegelverlaufs.
+ * Dieses Objekt erzeugt ein Bitmap mit einem Diagramm
+ * zur Darstellung des zeitlichen Verlaufs von
  *
- * Die Pegeldaten werden aus den SharedPreferences
- * ("pegel_cache") gelesen und grafisch aufbereitet.
- * Das erzeugte Bitmap ist u.a. für die Anzeige in
- * App-Widgets vorgesehen.
+ * • Pegelwerten (cm)
+ * • Temperaturwerten (°C)
  *
- * Gespeicherte Preferences:
- * - count        : Anzahl der gespeicherten Messwerte
- * - value_X      : Pegelwert als Integer (cm)
- * - Time_X       : Zeitstempel der Messung (derzeit
- *                  noch nicht grafisch genutzt)
+ * Das erzeugte Bitmap wird z.B. verwendet für:
+ *
+ * • AppWidgets
+ * • statische Diagrammansichten
+ * • Hintergrundgrafiken in der UI
+ *
+ * Datenquelle:
+ * Die Messwerte werden aus dem lokalen Cache gelesen:
+ *
+ * SharedPreferences("pegel_cache")
+ *
+ * Gespeicherte Datenstruktur:
+ *
+ * count          -> Anzahl der gespeicherten Messwerte
+ * value_i        -> Pegelwert (cm)
+ * temp_i         -> Temperatur (°C)
+ * Time_i         -> Zeitstempel (String)
+ *
+ * Grafikaufbau:
+ *
+ * Das Diagramm besteht aus:
+ *
+ * • X-Achse (Zeit)
+ * • Y-Achse links  → Pegelwerte
+ * • Y-Achse rechts → Temperaturwerte
+ *
+ * Linien:
+ *
+ * • Pegelverlauf       → Farbe aus graph_line
+ * • Temperaturverlauf  → Rot
+ *
+ * Skalierung:
+ *
+ * Die Achsen werden automatisch an die vorhandenen
+ * Minimal- und Maximalwerte angepasst.
+ *
+ * Konfiguration:
+ *
+ * Darstellungseigenschaften wie
+ *
+ * • Ränder
+ * • Linienstärke
+ * • Achsenstärke
+ *
+ * werden über PegelGraphConfig gesteuert.
+ *
+ * Architekturprinzip:
+ *
+ * - Daten werden ausschließlich aus dem Cache gelesen
+ * - Keine direkte Kopplung zur API
+ * - Dadurch identische Datenbasis für
+ *   App, Widget und Diagramm
+ *
+ * Fehlerfälle:
+ *
+ * Wenn keine Pegeldaten vorhanden sind,
+ * wird ein Bitmap mit dem Text
+ *
+ * "Keine Daten"
+ *
+ * erzeugt.
  *
  * Autor:     Bollogg
- * Datum:     2025-11-20
+ * Datum:     2026-03-13
  *******************************************************/
-
 object PegelBitmapGenerator {
-	 /**
-	 * Erstellt ein Bitmap mit dem Pegelverlauf.
-	 *
-	 * @param context Context zum Zugriff auf SharedPreferences
-	 * @param width   Breite des Bitmaps
-	 * @param height  Höhe des Bitmaps
-	 * @return        Fertiges Bitmap mit Diagramm
-	 */
-	 @JvmStatic
-	 fun makePegelBitmap(context: Context,
-	                     width  : Int,
-	                     height : Int,
-	                     config : PegelGraphConfig = PegelGraphConfig()
-	 ): Bitmap {
 
-	    //public static Bitmap makePegelBitmap(Context context) {
+	@JvmStatic
+	fun makePegelBitmap(
+		context: Context,
+		width: Int,
+		height: Int,
+		config: PegelGraphConfig = PegelGraphConfig()
+	): Bitmap {
 
-	    //int width = (4 * 70) - 30;
-	    //int height = (3 * 70) - 30;
+		// Bitmap erzeugen
+		val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+		val canvas = Canvas(bitmap)
 
-			// Bitmap und Zeichenfläche erzeugen
-	    val bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-	    val c = Canvas(bmp)
+		// Hintergrundfarbe setzen
+		canvas.drawColor(ContextCompat.getColor(context, R.color.graph_background))
 
-			// Hintergrundfarbe setzen
-			c.drawColor(ContextCompat.getColor(context, R.color.graph_background))
+		// Pegel-Cache laden
+		val prefs = context.getSharedPreferences("pegel_cache", Context.MODE_PRIVATE)
+		val count = prefs.getInt("count", 0)
 
-			// Paint-Objekt für Linien, Punkte und Text
-	    val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+		val levelValues = ArrayList<Float>()
+		val tempValues = ArrayList<Float>()
+		val timeValues = ArrayList<String>()
 
-			// Zugriff auf gecachte Pegeldaten
-			val prefs = context.getSharedPreferences("pegel_cache", Context.MODE_PRIVATE)
+		// Messwerte aus dem Cache lesen
+		for (i in 0 until count) {
 
-	    Log.i("WIDGET", "Bitmap: count=" + prefs.getInt("count", 0))
-	    val count = prefs.getInt("count", 0)
-	    val values = ArrayList<Float?>()
+			val level = prefs.getInt("value_$i", -1)
 
-			// Pegelwerte einlesen
-			// WICHTIG: Werte sind als int gespeichert → Konvertierung zu Float
-	    for (i in 0..<count) {
-	      val raw = prefs.getInt("value_" + i, -1)
-	      if (raw >= 0) values.add(raw.toFloat()) // -1 ignorieren
+			if (level >= 0) {
+				levelValues.add(level.toFloat())
+				timeValues.add(prefs.getString("Time_$i", "") ?: "")
 
-	      val time: String = prefs.getString("Time_" + i, "No time")!!
-	    }
+				val temp = prefs.getFloat("temp_$i", -999f)
+				if (temp > -100) tempValues.add(temp)
+			}
+		}
 
-			// Zeitstempel aktuell noch ungenutzt
-	    /* ToDo:   for (int i = 0; i < count; i++) {
-	    values.add((float) prefs.getInt("value_" + i, -1));
-	    } */
+		// Falls keine Daten vorhanden sind
+		if (levelValues.isEmpty()) {
+			val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+				color = Color.WHITE
+				textSize = 40f
+			}
 
-			// Falls keine gültigen Daten vorhanden sind
-	    if (values.isEmpty()) {
-		    paint.color = config.pointColor
-		    paint.textSize = config.emptyTextSize
-		    c.drawText(
-			    context.getString(config.emptyTextRes),
-			    config.emptyTextX,
-			    config.emptyTextY,
-			    paint
-		    )
+			canvas.drawText("Keine Daten", 20f, height / 2f, paint)
+			return bitmap
+		}
 
-	      //paint.setColor(Color.WHITE)
-	      //paint.setTextSize(40f)
-	      c.drawText("Keine Daten", 20f, 120f, paint)
-	      return bmp
-	    }
+		// Diagrammfläche berechnen
+		val graphLeft = config.marginLeft
+		val graphRight = width - config.marginRight
+		val graphTop = config.marginTop
+		val graphBottom = height - config.marginBottom
 
-			// Minimal- und Maximalwert bestimmen
-			var min = Float.Companion.MAX_VALUE
-	    var max = Float.Companion.MIN_VALUE
+		val graphWidth = graphRight - graphLeft
+		val graphHeight = graphBottom - graphTop
 
-	    for (v in values) {
-	        if (v!! < min) min = v
-	        if (v > max) max = v
-	    }
+		// Achsen zeichnen
+		val axisPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+			color = Color.WHITE
+			strokeWidth = config.axisStroke
+		}
 
-			// Falls alle Werte identisch sind → Spreizung erzwingen
-	    if (min == max) {
-	        min -= 5f
-	        max += 5f
-	    }
+		canvas.drawLine(graphLeft, graphBottom, graphRight, graphBottom, axisPaint) // X-Achse
+		canvas.drawLine(graphLeft, graphTop, graphLeft, graphBottom, axisPaint)     // Pegel-Achse (links)
+		canvas.drawLine(graphRight, graphTop, graphRight, graphBottom, axisPaint)   // Temperatur-Achse (rechts)
 
-			// Definition des Diagrammbereichs
-	    val graphLeft = config.marginLeft
-		  val graphRight  = width  - config.marginRight
-	    val graphTop = config.marginTop
-	    val graphBottom = height - config.marginBottom
+		val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+			color = Color.WHITE
+			textSize = 20f
+		}
 
-	    val graphWidth = graphRight - graphLeft
-	    val graphHeight = graphBottom - graphTop
+		// --- Pegel-Achse (links) ---
+		textPaint.textAlign = Paint.Align.RIGHT
 
-			// Achsen zeichnen
-	    paint.setColor(Color.GRAY)
-	    paint.setStrokeWidth(config.axisStroke)
-	    c.drawLine(graphLeft, graphBottom, graphRight, graphBottom, paint)
-	    c.drawLine(graphLeft, graphTop, graphLeft, graphBottom, paint)
+		val levelMin = levelValues.min().let {
+			if (it == levelValues.max()) it - 5f else it
+		}
 
-			// Farbe und Stärke für den Pegelverlauf
-			paint.setColor(ContextCompat.getColor(context, R.color.graph_line))
-	    paint.setStrokeWidth(config.lineStroke)
+		val levelMax = levelValues.max().let {
+			if (it == levelValues.min()) it + 5f else it
+		}
 
-			// Horizontaler Abstand zwischen den Messpunkten
-	    val stepX = graphWidth / (values.size - 1)
+		canvas.drawText("${levelMax.toInt()} cm", graphLeft - 10f, graphTop + 15f, textPaint)
+		canvas.drawText("${levelMin.toInt()} cm", graphLeft - 10f, graphBottom, textPaint)
 
-	    var prevX = -1f
-	    var prevY = -1f
+		// --- Temperatur-Achse (rechts) ---
+		var tempMin = 0f
+		var tempMax = 0f
 
-			// Linien zwischen den Messpunkten zeichnen
-	    for (i in values.indices) {
-	      val value: Float = values.get(i)!!
+		if (tempValues.isNotEmpty()) {
 
-	      val x = graphLeft + stepX * i
-	      val norm = (value - min) / (max - min)
-	      val y = graphBottom - (norm * graphHeight)
+			textPaint.textAlign = Paint.Align.LEFT
 
-	      if (i > 0) c.drawLine(prevX, prevY, x, y, paint)
+			tempMin = tempValues.min().let {
+				if (it == tempValues.max()) it - 2f else it
+			}
 
-	      prevX = x
-	      prevY = y
-	    }
+			tempMax = tempValues.max().let {
+				if (it == tempValues.min()) it + 2f else it
+			}
 
-			// Messpunkte als Linie darstellen
-	    paint.setColor(Color.WHITE)
-	    for (i in values.indices) {
-	      val value: Float = values.get(i)!!
+			val maxLabel = String.format(Locale.GERMANY, "%.1f °C", tempMax)
+			val minLabel = String.format(Locale.GERMANY, "%.1f °C", tempMin)
 
-	      val x = graphLeft + stepX * i
-	      val norm = (value - min) / (max - min)
-	      val y = graphBottom - (norm * graphHeight)
+			canvas.drawText(maxLabel, graphRight + 10f, graphTop + 15f, textPaint)
+			canvas.drawText(minLabel, graphRight + 10f, graphBottom, textPaint)
+		}
 
-	      c.drawCircle(x, y, config.pointRadius, paint)
-	    }
-	  /*
-	  //ToDo: Text für hohen einblenden?
-	  paint.setColor(Color.WHITE);
-	  paint.setTextSize(30);
-	  //c.drawText("Pegelverlauf", 20, 35, paint);
-	  c.drawText("", 20, 35, paint);
+		// Abstand der Punkte auf der X-Achse
+		val stepX = if (levelValues.size > 1)
+			graphWidth / (levelValues.size - 1)
+		else
+			graphWidth
 
-	  paint.setTextSize(24);
-	  c.drawText(min + " cm", 5, graphBottom, paint);
-	  c.drawText(max + " cm", 5, graphTop + 10, paint);
-		*/
+		// --- Pegel-Linie ---
+		val levelPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+			color = ContextCompat.getColor(context, R.color.graph_line)
+			strokeWidth = config.lineStroke
+			style = Paint.Style.STROKE
+		}
 
-		// Fertiges Bitmap zurückgeben
-	  return bmp
+		for (i in 0 until levelValues.size - 1) {
+
+			val x1 = graphLeft + stepX * i
+			val y1 = graphBottom - ((levelValues[i] - levelMin) / (levelMax - levelMin) * graphHeight)
+
+			val x2 = graphLeft + stepX * (i + 1)
+			val y2 = graphBottom - ((levelValues[i + 1] - levelMin) / (levelMax - levelMin) * graphHeight)
+
+			canvas.drawLine(x1, y1, x2, y2, levelPaint)
+		}
+
+		// --- Temperatur-Linie ---
+		if (tempValues.isNotEmpty()) {
+
+			val tempPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+				color = Color.RED
+				strokeWidth = config.lineStroke
+				style = Paint.Style.STROKE
+			}
+
+			for (i in 0 until tempValues.size - 1) {
+
+				val x1 = graphLeft + stepX * i
+				val y1 = graphBottom - ((tempValues[i] - tempMin) / (tempMax - tempMin) * graphHeight)
+
+				val x2 = graphLeft + stepX * (i + 1)
+				val y2 = graphBottom - ((tempValues[i + 1] - tempMin) / (tempMax - tempMin) * graphHeight)
+
+				canvas.drawLine(x1, y1, x2, y2, tempPaint)
+			}
+		}
+
+		// --- Zeitachse (X) ---
+		textPaint.textAlign = Paint.Align.CENTER
+		textPaint.textSize = 18f
+
+		val labelStep =
+			if (timeValues.size > 6) timeValues.size / 4
+			else 1
+
+		for (i in timeValues.indices step labelStep) {
+
+			val x = graphLeft + stepX * i
+			val label = timeValues[i].substringBefore(":")
+
+			canvas.drawText(label, x, graphBottom + 45f, textPaint)
+		}
+
+		return bitmap
 	}
-
 }

@@ -28,28 +28,29 @@
 
     <!-- Zentrierter Bereich -->
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:gravity="center"
-        android:orientation="vertical">
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="16dp"
+      android:gravity="center"
+      android:orientation="vertical">
 
         <TextView
-            android:id="@+id/textViewPegelstand"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/level_is_loading"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+          android:id="@+id/textViewPegelstand"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:fontFamily="sans-serif-condensed-light"
+          android:text="@string/level_is_loading"
+          android:textSize="18sp"
+          android:textStyle="bold" />
 
         <Button
-            android:id="@+id/buttonAktualisieren"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="60dp"
-            android:backgroundTint="@color/textColor"
-            android:text="@string/to_update"
-            android:textColor="@color/white" />
+          android:id="@+id/buttonAktualisieren"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="60dp"
+          android:backgroundTint="@color/textColor"
+          android:text="@string/to_update"
+          android:textColor="@color/white" />
     </LinearLayout>
 
 </LinearLayout>

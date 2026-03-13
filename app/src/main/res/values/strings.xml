@@ -32,6 +32,7 @@
   <string name="water_level_location">Water level location:</string>
   <string name="reads_water_levels">Reads water levels:</string>
   <string name="level_curve">Level curve</string>
+  <string name="level_temperature">temperature</string>
 
   <string name="wave_detection">Wave detection threshold [cm]:</string>
   <string name="vibration_alarm">Vibration alarm</string>

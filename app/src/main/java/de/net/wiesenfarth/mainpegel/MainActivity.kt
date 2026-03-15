@@ -26,184 +26,174 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.view.OnApplyWindowInsetsListener
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.PeriodicWorkRequest
-import androidx.work.WorkManager
-import com.github.mikephil.charting.charts.LineChart
 import de.net.wiesenfarth.mainpegel.Variable.CONST
 import de.net.wiesenfarth.mainpegel.AlarmManager.NotificationHelper
 import de.net.wiesenfarth.mainpegel.AlarmManager.PegelScheduler
 import de.net.wiesenfarth.mainpegel.Graph.PegelUiHelper
-import de.net.wiesenfarth.mainpegel.API.PegelWorker
 import de.net.wiesenfarth.mainpegel.Widget.PegelWidget
-import java.util.Calendar
-import java.util.concurrent.TimeUnit
 
 /*******************************************************
  * Programm:  MainPegel
  *
  * Beschreibung:
- * Zeigt aktuelle Pegelstände am Main für
- * unterschiedliche Messstationen
+ * Haupt-Activity der App.
+ * Zeigt aktuelle Pegelstände des Mains für
+ * verschiedene Messstationen und stellt
+ * ein Diagramm des Pegelverlaufs dar.
+ *
+ * Funktionen:
+ * - Anzeige aktueller Pegelstand
+ * - Anzeige eines Pegeldiagramms
+ * - Manuelles Aktualisieren der Daten
+ * - Empfang von Updates vom Widget
+ * - Start des Hintergrund-Schedulers
  *
  * @Website:   wiesenfarth-net.de
  * @Autor:     Bollogg
- * @Datum:     2026-03-06
+ * @Datum:     2026-03-15
  * @Version:   2026.03
-********************************************************/
+ ********************************************************/
 class MainActivity : AppCompatActivity() {
-    // GUID der ausgewählten Messstelle
-    private var localityGuid: String? = null
-    //ToDo: löschen private var showSettings = true
 
-    // Einstellungen aus SharedPreferences
+    // GUID der aktuell ausgewählten Messstelle
+    private var localityGuid: String? = null
+
+    // SharedPreferences zum Speichern der App-Einstellungen
     private lateinit var prefs: SharedPreferences
-    // Aktualisierungsintervall
+
+    // Aktualisierungsintervall der Pegeldaten in Minuten
     private var intervalMinutes = 0
 
-    // UI-Elemente
+    // UI-Komponenten
     private lateinit var textViewPegelstand: TextView
     private lateinit var buttonAktualisieren: Button
-    private lateinit var lineChart: LineChart
 
-//ToDo: löschen    private lateinit var pegelReceiver: BroadcastReceiver
-//ToDo: löschen private val isReceiverRegistered = false
+    // Diagramm (MPAndroidChart) zur Darstellung des Pegelverlaufs
+    private lateinit var lineChart: com.github.mikephil.charting.charts.LineChart
+
+    // Flag, ob Einstellungen geändert wurden
     private var settingsChanged = true
 
+    /**
+     * Wird beim Start der Activity aufgerufen.
+     * Initialisiert UI, Einstellungen, Berechtigungen
+     * sowie Hintergrunddienste.
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Layout laden
         setContentView(R.layout.activity_main)
 
-        // NotificationChannel einmalig initialisieren
-        //ToDo: löschen NotificationHelper.ensureChannel(this)
-        //ToDo: prüfen checkExactAlarmPermission() //Erlauben von Wecker und Errinerungen
-
-        // Aktiviert moderne “Edge-to-Edge”-Darstellung
+        // Aktiviert modernes Edge-to-Edge Layout (Android 13+ Design)
         this.enableEdgeToEdge()
 
-        // Debug: Prüfen, ob INTERNET-Permission gesetzt ist
+        // Debug-Ausgabe: Prüfen, ob INTERNET Permission vorhanden ist
         Log.e(
             "NET", "INTERNET PERMISSION: " +
-                    (checkSelfPermission(Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED)
+                (checkSelfPermission(Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED)
         )
 
-        // Toolbar aktivieren
+        // Toolbar initialisieren
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-        // Korrekte Abstände für Status-/Navigationsleisten setzen
+        /**
+         * Passt das Layout automatisch an Statusleiste und Navigationsleiste an.
+         * Dadurch werden UI-Elemente nicht von Systemleisten überlagert.
+         */
         ViewCompat.setOnApplyWindowInsetsListener(
             findViewById<View>(R.id.main),
             OnApplyWindowInsetsListener { v: View, insets: WindowInsetsCompat? ->
                 val systemBars = insets!!.getInsets(WindowInsetsCompat.Type.systemBars())
-                v!!.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+                v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
                 insets
             })
 
-        // Einstellungen laden
+        // Notification Channel sicherstellen (für Android Notifications)
         NotificationHelper.ensureChannel(this)
+
+        // Berechtigung für exakte Alarme prüfen (Android 12+)
+        checkExactAlarmPermission()
+
+        /**
+         * Ab Android 13 muss die Notification-Permission
+         * zur Laufzeit angefordert werden.
+         */
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)
                 != PackageManager.PERMISSION_GRANTED
             ) {
                 requestPermissions(
-                    arrayOf<String>(
+                    arrayOf(
                         Manifest.permission.POST_NOTIFICATIONS
                     ), 1
                 )
             }
         }
 
+        // SharedPreferences laden
         prefs = getSharedPreferences("settings", MODE_PRIVATE)
+
+        // gespeicherte Messstelle laden (Standard: Würzburg)
         localityGuid = prefs.getString("locality_guid", CONST.WUERZBURG)
+
+        // Aktualisierungsintervall laden
         intervalMinutes = prefs.getInt("interval_minutes", 15)
 
-        // Übergabe an eigene Methode
+        // Debug-Ausgabe der aktuellen Einstellungen
         updateWithLocality(localityGuid, intervalMinutes)
 
+        /**
+         * Scheduler starten
+         * Dieser sorgt für regelmäßige Hintergrundupdates
+         * der Pegeldaten.
+         */
+        PegelScheduler.schedule(this)
 
-        val request =
-            PeriodicWorkRequest.Builder(PegelWorker::class.java, 15, TimeUnit.MINUTES)
-                .build()
+        // UI-Elemente initialisieren
+        textViewPegelstand = findViewById(R.id.textViewPegelstand)
+        buttonAktualisieren = findViewById(R.id.buttonAktualisieren)
+        lineChart = findViewById(R.id.lineChart)
 
-        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
-            "pegel_update",
-            ExistingPeriodicWorkPolicy.UPDATE,
-            request
-        )
-
-        // UI-Referenzen
-        textViewPegelstand = findViewById<TextView>(R.id.textViewPegelstand)
-        buttonAktualisieren = findViewById<Button>(R.id.buttonAktualisieren)
-        lineChart = findViewById<LineChart>(R.id.lineChart)
-
+        // Pegeldaten aus Cache laden und anzeigen
         PegelUiHelper.ladePegelstand(this, textViewPegelstand, lineChart, prefs)
 
-        // Scheduler starten (Hintergrund-Aktualisierungen)
-        //PegelScheduler.schedule(this)
-
-        // Direkt den ersten Pegel laden
-        //PegelUiHelper.ladePegelstand(this, textViewPegelstand, lineChart, prefs);
-        //PegelUiHelper.forceWidgetUpdate(this);
-
-        // Button: manuelles Aktualisieren
-        buttonAktualisieren!!.setOnClickListener(View.OnClickListener { v: View ->
+        /**
+         * Button für manuelles Aktualisieren der Pegeldaten
+         */
+        buttonAktualisieren.setOnClickListener {
             Log.i("MAIN", "Manuelles Update gestartet")
 
+            // Startet API-Update
             val started = de.net.wiesenfarth.mainpegel.API.PegelLogic.run(this)
 
+            // Falls Update bereits läuft
             if (!started) {
                 Toast.makeText(this, "Update läuft bereits", Toast.LENGTH_SHORT).show()
             }
-            //ToDo Prüfen!
+
+            // UI erneut laden
             PegelUiHelper.ladePegelstand(this, textViewPegelstand, lineChart, prefs)
-        })
-
-/* ToDo: löschen
-        // Broadcast empfangen (vom Widget / Service)
-        pegelReceiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                Log.i("MAIN", "Broadcast empfangen → ladePegelstand()")
-                PegelUiHelper.ladePegelstand(context, textViewPegelstand, lineChart, prefs)
-                //PegelUiHelper.forceWidgetUpdate(context);
-            }
         }
-
-        val filter = IntentFilter()
-        //ToDo: löschenfilter.addAction(ACTION_PEGEL_UPDATE)
-        //Regestrieren von pegelReciver
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            //für Android 13 und größer
-            registerReceiver(pegelReceiver, filter, RECEIVER_NOT_EXPORTED)
-        } else {
-            // kleiner Android 13
-            registerReceiver(pegelReceiver, filter)
-        }
-*/
     }
 
-    override fun onStart() {
-        super.onStart()
-
-        //settingsLauncher.launch(
-        //    Intent(this, SettingsActivity::class.java)
-        //)
-
-    }
-
+    /**
+     * Wird aufgerufen, wenn die Activity wieder sichtbar wird.
+     * Lädt Einstellungen neu und registriert den BroadcastReceiver.
+     */
     override fun onResume() {
         super.onResume()
 
-        // Einstellungen neu laden, falls in Settings geändert
+        // Einstellungen erneut laden
         prefs = getSharedPreferences("settings", MODE_PRIVATE)
         localityGuid = prefs.getString("locality_guid", CONST.WUERZBURG)
         intervalMinutes = prefs.getInt("interval_minutes", 15)
 
-        // Scheduler & API neu starten
-        // updateWithLocality(localityGuid, intervalMinutes);
-        // Nach Rückkehr aus Activity (Settings, Info) erneut laden
-        // Pegel lesen
-        //PegelUiHelper.ladePegelstand(this, textViewPegelstand, lineChart, prefs)
+        /**
+         * BroadcastReceiver registrieren.
+         * Dieser empfängt Updates vom Widget oder Hintergrundprozess.
+         */
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             registerReceiver(
                 dataReceiver,
@@ -217,44 +207,28 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
-        // Cache sofort anzeigen
+        // Cached Daten sofort anzeigen
         PegelUiHelper.ladePegelstand(this, textViewPegelstand, lineChart, prefs)
 
-        // Scheduler starte Task für Hintergrund-Aktualisierungen
-        //PegelScheduler.schedule(this)
-
-        // Graph aktualisieren
+        // Debug-Ausgabe
         updateWithLocality(localityGuid, intervalMinutes)
+
         settingsChanged = false
     }
 
+    /**
+     * Wird aufgerufen, wenn Activity in den Hintergrund geht.
+     * Receiver wird entfernt um Speicherlecks zu vermeiden.
+     */
     override fun onPause() {
         super.onPause()
-
         unregisterReceiver(dataReceiver)
-
     }
 
-    override fun onStop() {
-        super.onStop()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        // Pegel lesen
-        //PegelUiHelper.ladePegelstand(this, textViewPegelstand, lineChart, prefs)
-    }
-    /*
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == REQUEST_SETTINGS && resultCode == RESULT_OK) {
-            if (data != null && data.getBooleanExtra("settings_changed", false)) {
-                settingsChanged = true
-            }
-        }
-    }
-    */
+    /**
+     * ActivityResultLauncher für SettingsActivity.
+     * Erkennt, ob Einstellungen geändert wurden.
+     */
     private val settingsLauncher =
         registerForActivityResult(
             androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()
@@ -267,155 +241,83 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+    /**
+     * Erstellt das Options-Menü (Toolbar-Menü)
+     */
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
         return true
     }
 
-	// Toolbar Optionsmenue aufrufen
-  override fun onOptionsItemSelected(item: MenuItem): Boolean {
-    val id = item.getItemId()
+    /**
+     * Behandlung von Menüeinträgen
+     */
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val id = item.itemId
 
-    // Settings öffnen
-    if (id == R.id.action_settings) {
-      Toast.makeText(this, getString(R.string.toast_settings), Toast.LENGTH_SHORT).show()
-      startActivity(Intent(this, SettingsActivity::class.java))
-      return true
-
-    // About (info Activity oeffnen
-    } else if (id == R.id.action_about) {
-      Toast.makeText(this, getString(R.string.toast_info), Toast.LENGTH_SHORT).show()
-      startActivity((Intent(this, InfoActivity::class.java)))
-      return true
-
-	    // About (Datenschutzerklaerung Activity oeffnen
-    } else if (id == R.id.action_privacy_policy) {
-	    Toast.makeText(this, getString(R.string.toast_privacy_policy), Toast.LENGTH_SHORT).show()
-	    startActivity((Intent(this, DatenschutzerklaerungActivity::class.java)))
-	    return true
-
- 	    // Open Source Lizenzen anzeigen
-		} else if (id == R.id.action_oss) {
-			OssLicensesMenuActivity.setActivityTitle(getString(R.string.toast_oss_licenses))
-			startActivity(Intent(this, OssLicensesMenuActivity::class.java))
-			return true
+        if (id == R.id.action_settings) {
+            Toast.makeText(this, getString(R.string.toast_settings), Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this, SettingsActivity::class.java))
+            return true
+        } else if (id == R.id.action_about) {
+            Toast.makeText(this, getString(R.string.toast_info), Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this, InfoActivity::class.java))
+            return true
+        } else if (id == R.id.action_privacy_policy) {
+            Toast.makeText(this, getString(R.string.toast_privacy_policy), Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this, DatenschutzerklaerungActivity::class.java))
+            return true
+        } else if (id == R.id.action_oss) {
+            OssLicensesMenuActivity.setActivityTitle(getString(R.string.toast_oss_licenses))
+            startActivity(Intent(this, OssLicensesMenuActivity::class.java))
+            return true
+        }
+        return super.onOptionsItemSelected(item)
     }
-		// About (info Activity oeffnen
-		//		} else if (id == R.id.action_oss) {
-		//			OssLicensesMenuActivity.setActivityTitle(getString(R.string.custom_license_title))
-		//			Toast.makeText(this, getString(R.string.toast_OssLicensesMenu), Toast.LENGTH_SHORT).show()
-		//			OssLicensesMenuActivity.setActivityTitle(getString(R.string.custom_license_title))
-		//			startActivity((Intent(this, OssLicensesMenuActivity::class.java)))
-		//		return true
-		//		}
-      return super.onOptionsItemSelected(item)
-  }
 
-    /*******************************************************
-     * updateWithLocality
-     *
-     * Wird nach Änderungen in SettingsActivity genutzt
-     * (GUID + Intervall).
+    /**
+     * Debug-Methode zur Ausgabe der aktuellen Einstellungen
      */
     private fun updateWithLocality(guid: String?, min: Int) {
-        Log.i("SETTINGS", "Messstelle: " + guid)
-        Log.i("SETTINGS", "Intervall: " + min + " min")
-
-        // Platzhalter für spätere API-Fortführung
+        Log.i("SETTINGS", "Messstelle: $guid")
+        Log.i("SETTINGS", "Intervall: $min min")
     }
 
-
-    /*******************************************************
-     * berechneStartVerzoegerung
-     *
-     * Berechnet die Verzögerung für den ersten
-     * WorkManager-Aufruf (1, 16, 31, 46 Minuten)
+    /**
+     * Prüft, ob die App exakte Alarme planen darf.
+     * Falls nicht, wird der Benutzer zu den Systemeinstellungen geführt.
      */
-    private fun berechneStartVerzoegerung(): Long {
-        val cal = Calendar.getInstance()
-        val minute = cal.get(Calendar.MINUTE)
-        val second = cal.get(Calendar.SECOND)
+    private fun checkExactAlarmPermission() {
+        val am = getSystemService(ALARM_SERVICE) as AlarmManager
+        if (!am.canScheduleExactAlarms()) {
+            Log.w("PERMISSION", "Exact-Alarms NICHT erlaubt → User muss es erlauben.")
+            val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
+            intent.data = Uri.parse("package:$packageName")
+            startActivity(intent)
+        } else {
+            Log.i("PERMISSION", "Exact-Alarms sind erlaubt.")
+        }
+    }
 
-        // Triggerpunkte im 15-Minuten-Raster
-        val trigger = intArrayOf(1, 16, 31, 46)
-        var nextMin = 0
+    /**
+     * BroadcastReceiver für Datenupdates.
+     * Wird ausgelöst, wenn neue Pegeldaten vorliegen.
+     */
+    private val dataReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
 
-        // Nächsten passenden Trigger finden
-        for (t in trigger) {
-            if (minute < t || (minute == t && second == 0)) {
-                nextMin = t
-                break
+            if (intent.action == PegelWidget.ACTION_DATA_UPDATED) {
+
+                Log.i("MAIN", "Neue Daten empfangen → UI wird aktualisiert")
+
+                // UI aktualisieren
+                PegelUiHelper.ladePegelstand(
+                    this@MainActivity,
+                    textViewPegelstand,
+                    lineChart,
+                    prefs
+                )
             }
         }
-
-        // Falls wir schon vorbei sind → nächste Stunde
-        if (nextMin == 0) {
-            nextMin = trigger[0]
-            cal.add(Calendar.HOUR_OF_DAY, 1)
-        }
-
-        cal.set(Calendar.MINUTE, nextMin)
-        cal.set(Calendar.SECOND, 0)
-        cal.set(Calendar.MILLISECOND, 0)
-
-        val now = System.currentTimeMillis()
-        val target = cal.getTimeInMillis()
-
-        return target - now
     }
-
-    private fun checkExactAlarmPermission() {
-        // Nur Android 12 oder neuer benötigt das!
-
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S) {
-            return
-        }
-
-        val am = getSystemService(ALARM_SERVICE) as AlarmManager
-
-        if (am.canScheduleExactAlarms()) {
-            Log.i("PERMISSION", "Exact-Alarms sind erlaubt.")
-            return
-        }
-
-        Log.w("PERMISSION", "Exact-Alarms NICHT erlaubt → User muss es erlauben.")
-
-        // Benutzer auffordern, die Einstellung zu aktivieren
-        val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
-        intent.setData(Uri.parse("package:" + getPackageName()))
-
-        startActivity(intent)
-    }
-
-    private fun getIntSafe(prefs: SharedPreferences, key: String?, def: Int): Int {
-        try {
-            return prefs.getInt(key, def)
-        } catch (e: ClassCastException) {
-            val f = prefs.getFloat(key, def.toFloat())
-            val v = Math.round(f)
-
-            prefs.edit().putInt(key, v).apply()
-            return v
-        }
-    }
-
-    companion object {
-        //ToDo: löschen const val ACTION_PEGEL_UPDATE: String = "de.net.wiesenfarth.mainpegel.PEGEL_UPDATE"
-
-        private const val REQUEST_SETTINGS = 1001
-    }
-  private val dataReceiver = object : BroadcastReceiver() {
-    override fun onReceive(context: Context, intent: Intent) {
-      if (intent.action == PegelWidget.ACTION_DATA_UPDATED) {
-        Log.i("MAIN", "Neue Daten empfangen → UI wird aktualisiert")
-        PegelUiHelper.ladePegelstand(
-          this@MainActivity,
-          textViewPegelstand,
-          lineChart,
-          prefs
-        )
-      }
-    }
-  }
-
 }

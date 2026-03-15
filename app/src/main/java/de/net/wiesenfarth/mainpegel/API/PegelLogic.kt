@@ -18,6 +18,7 @@ import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+
 /*******************************************************
  * Objekt:      PegelLogic
  *
@@ -25,130 +26,85 @@ import java.util.Locale
  * -----------------------------------------------------
  * Zentrale Geschäftslogik für Pegel- und Temperaturdaten.
  *
- * Dieses Singleton kapselt die komplette Datenverarbeitung
- * zwischen API, Cache, Alarmfunktion und UI-Aktualisierung.
+ * Dieses Singleton verarbeitet alle Daten zwischen:
+ *  • REST-API
+ *  • lokalem Cache
+ *  • Alarmfunktionen
+ *  • Widget / UI Updates
  *
- * Die Klasse arbeitet vollständig asynchron über Retrofit
- * und speichert alle relevanten Daten im lokalen Cache.
- *
- * Architektur-Prinzip:
+ * Architekturprinzip:
  * -----------------------------------------------------
- * - API speichert ausschließlich in SharedPreferences
- * - UI liest ausschließlich aus dem Cache
- * - Widget wird per Broadcast aktualisiert
+ * API → SharedPreferences (Cache)
+ * UI  → liest ausschließlich aus Cache
  *
  * Dadurch sind App, Widget und Hintergrunddienste
- * immer synchron und voneinander entkoppelt.
- *
+ * entkoppelt und synchron.
  *
  * Hauptaufgaben:
  * -----------------------------------------------------
- * • Asynchroner Abruf von:
- *     - Pegelstand (Wasserhöhe)
- *     - Wassertemperatur
- *
- * • Gemeinsame Verarbeitung beider API-Ergebnisse
- *
- * • Schwellwertüberwachung (Pegelanstieg)
- *
- * • Auslösen eines Alarms bei kritischem Anstieg:
- *     - Notification
- *     - Vibration (optional)
- *     - Systemton (optional)
- *
- * • Persistierung aller Daten im Cache:
- *     - letzter Pegelwert
- *     - Verlaufsliste
- *     - Zeitstempel
- *     - Temperatur
- *
- * • Broadcast an Widget & UI nach Datenänderung
- *
+ * • Abrufen von Pegel- und Temperaturdaten über Retrofit
+ * • Zusammenführen der API-Ergebnisse
+ * • Alarmprüfung bei Pegelanstieg
+ * • Speicherung der Messwerte im Cache
+ * • Aktualisieren von UI und Widget über Broadcast
  *
  * Thread-Sicherheit:
  * -----------------------------------------------------
- * - Es darf immer nur EIN API-Lauf aktiv sein.
- * - Zugriff wird über @Synchronized abgesichert.
- * - isRunning verhindert parallele Netzwerkanfragen.
- *
- *
- * Datenfluss:
- * -----------------------------------------------------
- * run()
- *   → Retrofit Call Wasser
- *   → Retrofit Call Temperatur
- *   → finishIfReady()
- *       → Cache speichern
- *       → Alarm prüfen
- *       → Broadcast senden
- *
- *
- * Verwendete Komponenten:
- * -----------------------------------------------------
- * - RetrofitClient
- * - PegelResponse
- * - NotificationHelper
- * - PegelWidget (ACTION_DATA_UPDATED)
- *
+ * Es darf immer nur EIN API-Lauf aktiv sein.
+ * isRunning verhindert parallele Netzwerkanfragen.
  *
  * Autor:  Bollogg
- * Stand:  2026-02-13
+ * Stand:  2026-03-15
  *******************************************************/
- object PegelLogic {
-  /** Gibt an, ob beim Pegelabruf ein Fehler aufgetreten ist */
+object PegelLogic {
+
+  /** Fehlerstatus beim Abruf der Pegeldaten */
   private var waterError = false
-  /** Gibt an, ob beim Temperaturabruf ein Fehler aufgetreten ist */
-  private var tempError  = false
+
+  /** Fehlerstatus beim Abruf der Temperaturdaten */
+  private var tempError = false
 
   /**
-   * Letzter bekannter Pegelwert in Zentimetern.
+   * Letzter bekannter Pegelwert.
    *
-   * -1 bedeutet: Es wurde noch kein Wert verarbeitet.
-   * Wird zur Berechnung der Pegeldifferenz verwendet.
+   * Wird benötigt, um Pegelanstieg zu berechnen.
+   * -1 bedeutet: noch kein Wert vorhanden.
    */
   private var lastValue = -1
-  //private var lastValue = cache.getInt("last_value", -1)
-
 
   /**
-   * Verhindert parallele API-Aufrufe.
+   * Schutz gegen parallele API-Aufrufe.
    * true = ein Abruf läuft bereits
    */
   private var isRunning = false
 
-  /** Notification-Channel-ID für Pegelalarme */
-  const val CHANNEL_ID: String = "pegel_alarm"
-
   /**
    * Startet einen vollständigen API-Abruf.
    *
-   * Verhalten:
-   * -----------------------------------------------------
-   * - Prüft, ob bereits ein Lauf aktiv ist.
-   * - Lädt Benutzereinstellungen (Messstelle, Zeitraum).
-   * - Startet zwei parallele Retrofit-Requests:
+   * Ablauf:
+   * ------------------------------------------------
+   * 1. Prüfen ob bereits ein Lauf aktiv ist
+   * 2. Einstellungen laden
+   * 3. Zwei parallele API-Requests starten
    *      • Pegelstand
    *      • Wassertemperatur
+   * 4. Ergebnisse zusammenführen
    *
-   * Die eigentliche Verarbeitung erfolgt erst,
-   * wenn BEIDE Requests abgeschlossen sind.
-   *
-   * @param context Gültiger Application-Context
-   * @return true  → Lauf gestartet
-   *         false → Lauf bereits aktiv
+   * @param context ApplicationContext
+   * @return true wenn Abruf gestartet wurde
    */
   @Synchronized
-  fun run(context: Context): Boolean {
+  fun run(context: Context, onFinished: (() -> Unit)? = null): Boolean {
 
-
+    // Letzten bekannten Pegelwert aus Cache laden
     if (lastValue < 0) {
       val cache = context.getSharedPreferences("pegel_cache", Context.MODE_PRIVATE)
       lastValue = cache.getInt("last_value", -1)
     }
 
-    // Schutz gegen parallele Läufe
+    // Abbrechen wenn bereits ein Abruf läuft
     if (isRunning) {
-      Log.w("LOGIC", "⛔ Abgebrochen – bereits ein Lauf aktiv")
+      Log.w("API/PegelLogic", "⛔ Abgebrochen – bereits ein Lauf aktiv")
       return false
     }
 
@@ -156,213 +112,200 @@ import java.util.Locale
     waterError = false
     tempError = false
 
-    Log.i("LOGIC", "PegelLogic.run() gestartet")
+    Log.i("API/PegelLogic", "PegelLogic.run() gestartet")
 
     // Einstellungen laden
     val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
     val localityGuid: String = prefs.getString("locality_guid", CONST.WUERZBURG)!!
     val hours = prefs.getInt("graph_hours", 4)
 
-    // Startzeitraum für API (ISO-8601 Dauerformat)
+    // Zeitraum für API (ISO-8601 Dauerformat)
     val startParam = "PT${hours}H"
 
-    // Retrofit API-Aufruf vorbereiten
+    // Retrofit API-Service
     val api = RetrofitClient.apiService
+
+    // API Calls vorbereiten
     val callW = api.getPegelstand(localityGuid, startParam)
     val callWT = api.getWassertemperatur(localityGuid, startParam)
 
-    // Gemeinsame Ergebnis-Container
+    // Ergebniscontainer
     var waterList: List<PegelResponse>? = null
     var tempList: List<TempResponse>? = null
 
     /**
-     * Interne Synchronisationsmethode.
+     * Synchronisationsmethode.
      *
-     * Wird nach jeder API-Antwort aufgerufen.
-     * Die Verarbeitung erfolgt erst, wenn:
-     *
-     *   waterList != null
-     *   UND
-     *   tempList  != null
-     *
-     * Aufgaben:
-     * -----------------------------------------------------
-     * - Fehlerbehandlung
-     * - Letzten Pegelwert ermitteln
-     * - Alarmprüfung durchführen
-     * - Verlauf in Cache speichern
-     * - Broadcast senden
-     *
-     * Diese Methode ist der zentrale Abschluss
-     * eines API-Zyklus.
+     * Wird nach jedem API-Callback aufgerufen.
+     * Verarbeitung erfolgt erst wenn beide Antworten vorliegen.
      */
     fun finishIfReady() {
 
-      if (waterList == null ) return //ToDo: || tempList == null) return
+      if (waterList == null || tempList == null) return
 
       try {
+
         if (waterError && tempError) {
           storeErrorState(context)
-          sendDataUpdatedBroadcast(context)
-          return
-        }
-
-        val list = waterList ?: return
-        val temp = tempList ?: return
-
-        if (list.isEmpty()) {
-          storeErrorState(context)
-          sendDataUpdatedBroadcast(context)
-          return
-        }
-
-
-        val lastWater = list.last()
-        val formattedTime = formatTime(lastWater.timestamp)
-
-        handleNewPegel(context, lastWater.value, formattedTime)
-
-        val cache = context.getSharedPreferences("pegel_cache", Context.MODE_PRIVATE)
-        val e = cache.edit()
-
-        // ---- Wasserstand ----
-        e.putInt("last_value", lastWater.value)
-        e.putString("last_time", formattedTime)
-        e.putInt("count", list.size)
-
-      /*ToDo: löschen
-        for ((idx, r) in list.withIndex()) {
-          e.putInt("value_$idx", r.value)
-          e.putFloat("temp_$idx", tempValue)
-
-          e.putString("timestamp_$idx", r.timestamp)
-        }
-*/
-
-        // ---- Temperatur Map erstellen (timestamp → value) ----
-        for ((idx, r) in list.withIndex()) {
-
-          e.putInt("value_$idx", r.value)
-          e.putString("timestamp_$idx", r.timestamp)
-
-          // NEU: Formatiert die Zeit für den Graph (z.B. "14:30")
-          val fTime = formatTime(r.timestamp) ?: "--:--"
-          e.putString("Time_$idx", fTime)
-
-          // passende Temperatur suchen (letzte bekannte <= Zeit)
-          val waterTime = OffsetDateTime.parse(r.timestamp)
-
-          val matchingTemp = temp
-          .mapNotNull {
-            try {
-              val tTime = OffsetDateTime.parse(it.timestamp)
-              if (!tTime.isAfter(waterTime)) Pair(tTime, it.value.toFloat())
-              else null
-            } catch (e: Exception) { null }
-          }
-          .maxByOrNull { it.first }
-
-          if (matchingTemp != null) {
-            e.putFloat("temp_$idx", matchingTemp.second)
-          } else {
-            e.remove("temp_$idx")
-          }
-        }
-
-        // ---- Temperatur (letzter Wert speichern) ----
-        if (temp.isNotEmpty()) {
-          val lastTemp = temp.last()
-          e.putFloat("last_temp", lastTemp.value.toFloat())
-          e.putString("last_temp_time", formatTime(lastTemp.timestamp))
         } else {
-          e.putFloat("last_temp", -999f)
-          e.remove("last_temp_time")   // optional, aber sauber
+          processResults(context, waterList, tempList)
         }
-        e.apply()
+
+        // UI und Widget informieren
         sendDataUpdatedBroadcast(context)
+
+      } catch (e: Exception) {
+
+        Log.e("API/PegelLogic", "Fehler bei der Datenverarbeitung", e)
+
       } finally {
-      isRunning = false
+
+        isRunning = false
+        onFinished?.invoke()
+        Log.i("API/PegelLogic", "PegelLogic.run() abgeschlossen")
+
+      }
     }
-  }
-    // Asynchroner API-Aufruf
+
+    /** API Callback Pegelstand */
     callW.enqueue(object : Callback<List<PegelResponse>> {
+
       override fun onResponse(
         call: Call<List<PegelResponse>>,
         res: Response<List<PegelResponse>>
       ) {
-        if (res.isSuccessful && res.body() != null) {
-          waterList = res.body()
-        } else {
-          waterList = emptyList()
-        }
+        waterList = res.body() ?: emptyList()
         finishIfReady()
       }
 
       override fun onFailure(call: Call<List<PegelResponse>>, t: Throwable) {
         waterError = true
-        waterList  = emptyList()
+        waterList = emptyList()
         finishIfReady()
       }
     })
 
+    /** API Callback Wassertemperatur */
     callWT.enqueue(object : Callback<List<TempResponse>> {
+
       override fun onResponse(
         call: Call<List<TempResponse>>,
         res: Response<List<TempResponse>>
       ) {
-        if (res.isSuccessful && res.body() != null) {
-          tempList = res.body()
-        } else {
-          tempList = emptyList()
-        }
+        tempList = res.body() ?: emptyList()
         finishIfReady()
       }
 
       override fun onFailure(call: Call<List<TempResponse>>, t: Throwable) {
         tempError = true
-        tempList  = emptyList()
+        tempList = emptyList()
         finishIfReady()
       }
     })
+
     return true
   }
 
   /**
-   * Sendet einen System-Broadcast an das Widget
-   * und ggf. an aktive Activities.
-   *
-   * ACTION:
-   * PegelWidget.ACTION_DATA_UPDATED
-   *
-   * Zweck:
-   * UI und Widget neu rendern,
-   * nachdem neue Daten im Cache gespeichert wurden.
+   * Verarbeitet die API-Ergebnisse und speichert sie im Cache.
    */
+  private fun processResults(
+    context: Context,
+    list: List<PegelResponse>?,
+    temp: List<TempResponse>?
+  ) {
+
+    if (list == null || list.isEmpty()) {
+      storeErrorState(context)
+      return
+    }
+
+    val lastWater = list.last()
+
+    val formattedTime = formatTime(lastWater.timestamp)
+
+    // Pegelanstieg prüfen
+    handleNewPegel(context, lastWater.value, formattedTime)
+
+    val cache = context.getSharedPreferences("pegel_cache", Context.MODE_PRIVATE)
+    val e = cache.edit()
+
+    // Letzten Pegelwert speichern
+    e.putInt("last_value", lastWater.value)
+    e.putString("last_time", formattedTime)
+
+    // Anzahl Messwerte
+    e.putInt("count", list.size)
+
+    /**
+     * Verlauf speichern
+     */
+    for ((idx, r) in list.withIndex()) {
+
+      e.putInt("value_$idx", r.value)
+      e.putString("timestamp_$idx", r.timestamp)
+      e.putString("Time_$idx", formatTime(r.timestamp) ?: "--:--")
+
+      val waterTime = OffsetDateTime.parse(r.timestamp)
+
+      // Temperaturwert zum gleichen Zeitpunkt suchen
+      val matchingTemp = temp?.mapNotNull {
+
+        try {
+
+          val tTime = OffsetDateTime.parse(it.timestamp)
+
+          if (!tTime.isAfter(waterTime))
+            Pair(tTime, it.value.toFloat())
+          else null
+
+        } catch (e: Exception) {
+          null
+        }
+
+      }?.maxByOrNull { it.first }
+
+      if (matchingTemp != null) {
+        e.putFloat("temp_$idx", matchingTemp.second)
+      } else {
+        e.remove("temp_$idx")
+      }
+    }
+
+    /**
+     * Letzte Temperatur speichern
+     */
+    if (temp != null && temp.isNotEmpty()) {
+
+      val lastTemp = temp.last()
+
+      e.putFloat("last_temp", lastTemp.value.toFloat())
+      e.putString("last_temp_time", formatTime(lastTemp.timestamp))
+
+    } else {
+
+      e.putFloat("last_temp", -999f)
+      e.remove("last_temp_time")
+
+    }
+
+    e.apply()
+  }
+
+  /** Sendet Broadcast zur Aktualisierung von Widget und UI */
   private fun sendDataUpdatedBroadcast(context: Context) {
+
     val intent = Intent(PegelWidget.ACTION_DATA_UPDATED)
+    intent.setPackage(context.packageName)
+
     context.sendBroadcast(intent)
   }
 
-
   /**
-   * Prüft, ob der Pegelanstieg den
-   * konfigurierten Schwellwert überschreitet.
-   *
-   * Vergleich:
-   * delta = newValue - lastValue
-   *
-   * Wenn delta >= threshold:
-   *     → Notification
-   *     → Vibration (optional)
-   *     → Systemton (optional)
-   *
-   * @param ctx Android Context
-   * @param newValue Neuer Pegelwert (cm)
-   * @param time Formatierte Uhrzeit (HH:mm)
+   * Prüft Pegelanstieg und löst ggf. Alarm aus.
    */
   private fun handleNewPegel(ctx: Context, newValue: Int, time: String?) {
 
-    // Erster Wert → nur speichern
     if (lastValue < 0) {
       lastValue = newValue
       return
@@ -370,16 +313,12 @@ import java.util.Locale
 
     val delta = newValue - lastValue
 
-    // Einstellungen laden
     val prefs = ctx.getSharedPreferences("settings", Context.MODE_PRIVATE)
-    val threshold = prefs
-      .getString("wave_threshold", "15")
-      ?.toIntOrNull() ?: 15
-    val vibrateEnabled = prefs.getBoolean("vibrate_alarm", true)
-    val soundEnabled = prefs.getBoolean("sound_alarm", true)
 
-    // Schwellwert überschritten → Alarm
+    val threshold = prefs.getString("wave_threshold", "15")?.toIntOrNull() ?: 15
+
     if (delta >= threshold) {
+
       NotificationHelper.sendWaveAlert(
         ctx,
         newValue.toFloat(),
@@ -387,53 +326,32 @@ import java.util.Locale
         time ?: "--"
       )
 
-      if (vibrateEnabled) vibrateDevice(ctx)
-      if (soundEnabled) playSystemNotificationSound(ctx)
+      if (prefs.getBoolean("vibrate_alarm", true))
+        vibrateDevice(ctx)
+
+      if (prefs.getBoolean("sound_alarm", true))
+        playSystemNotificationSound(ctx)
     }
 
     lastValue = newValue
   }
 
-  /**
-   * Speichert einen Fehlerzustand im lokalen Cache.
-   *
-   * Wird verwendet bei:
-   * - Netzwerkfehler
-   * - HTTP-Fehler
-   * - Leeren Daten
-   *
-   * UI kann anhand des gespeicherten Wertes
-   * einen Fehler anzeigen.
-   */
+  /** Speichert Fehlerstatus im Cache */
   private fun storeErrorState(c: Context) {
-    val cache = c.getSharedPreferences("pegel_cache", Context.MODE_PRIVATE)
-    cache.edit()
-        .putString("last_time", "Netzwerkfehler")
-        .apply()
-	}
 
-  /**
-   * Führt eine Geräte-Vibration aus.
-   *
-   * Unterstützt:
-   * - Android < O (legacy API)
-   * - Android O+
-   * - Android S+ (VibratorManager)
-   *
-   * Verwendet ein fest definiertes Vibrationsmuster.
-   */
+    c.getSharedPreferences("pegel_cache", Context.MODE_PRIVATE)
+      .edit()
+      .putString("last_time", "Netzwerkfehler")
+      .apply()
+  }
+
+  /** Löst Vibrationsalarm aus */
   private fun vibrateDevice(ctx: Context) {
-    val vibrator: Vibrator? =
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        val vm = ctx.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager?
-        vm?.defaultVibrator
-      } else {
-        ctx.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator?
-      }
 
-    if (vibrator == null || !vibrator.hasVibrator()) {
-      Log.e("VIBRATION", "Kein Vibrator vorhanden!")
-      return
+    val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+      (ctx.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager).defaultVibrator
+    } else {
+      ctx.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
     }
 
     val pattern = longArrayOf(0, 500, 200, 700)
@@ -445,41 +363,41 @@ import java.util.Locale
     }
   }
 
-  /**
-   * Spielt den systemweiten Benachrichtigungston ab.
-   *
-   * Verwendet den aktuell vom Benutzer eingestellten
-   * Notification-Sound.
-   *
-   * Fehler beim Abspielen werden protokolliert.
-   */
+  /** Spielt den System-Benachrichtigungston ab */
   private fun playSystemNotificationSound(ctx: Context) {
+
     try {
+
       val uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
       RingtoneManager.getRingtone(ctx, uri).play()
+
     } catch (e: Exception) {
-      Log.e("LOGIC", "Konnte Systemton nicht abspielen", e)
+
+      Log.e("API/PegelLogic", "Konnte Systemton nicht abspielen", e)
+
     }
   }
 
   /**
-   * Konvertiert einen ISO-8601-Zeitstempel der API
-   * in die lokale Uhrzeit (Format HH:mm).
+   * Wandelt API-Zeitstempel in lokale Uhrzeit um.
    *
-   * Beispiel:
-   * 2026-02-12T13:45:00+00:00 → 14:45 (je nach Zeitzone)
-   *
-   * @param apiTime Zeitstempel der API
-   * @return Formatierte Uhrzeit oder Originalwert bei Fehler
+   * Format: HH:mm
    */
   private fun formatTime(apiTime: String?): String? {
+
     return try {
+
       val odt = OffsetDateTime.parse(apiTime)
       val zdt = odt.atZoneSameInstant(ZoneId.systemDefault())
-      val fmt = DateTimeFormatter.ofPattern("HH:mm", Locale.GERMANY)
-      zdt.format(fmt)
+
+      DateTimeFormatter
+        .ofPattern("HH:mm", Locale.GERMANY)
+        .format(zdt)
+
     } catch (e: Exception) {
-      apiTime // Fallback: Originalwert
+
+      apiTime
+
     }
   }
 }

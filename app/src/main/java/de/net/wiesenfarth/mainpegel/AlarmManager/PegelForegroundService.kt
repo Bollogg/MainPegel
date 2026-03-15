@@ -5,109 +5,159 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
+import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import de.net.wiesenfarth.mainpegel.API.PegelLogic
 
 /*******************************************************
- * Programm:  PegelForegroundService
+ * Klasse: PegelForegroundService
  *
  * Beschreibung:
- * Foreground-Service, der im Hintergrund die Pegel-
- * Überwachung durchführt.
+ * -----------------------------------------------------
+ * Dieser Service führt einen Pegel-Datenabruf im
+ * Vordergrund aus.
  *
- * Android (ab API 26) erlaubt keine dauerhaften
- * Hintergrunddienste mehr ohne Foreground-Modus.
- * Dieser Service:
+ * Hintergrund:
+ * Android erlaubt seit neueren Versionen keine
+ * längeren Hintergrundprozesse ohne Foreground-Service.
  *
- * • startet mit einer sichtbaren Benachrichtigung
- * • führt die Pegellogik (API-Call) im Hintergrund aus
- * • beendet sich anschließend automatisch
+ * Deshalb wird der API-Abruf über diesen Service
+ * gestartet, damit:
  *
- * Der Service wird vom AlarmReceiver gestartet.
+ * • das System den Prozess nicht beendet
+ * • Netzwerkoperationen zuverlässig laufen
+ * • Widgets und Hintergrundupdates stabil bleiben
  *
- * @Autor:     Bollog
- * @Datum:     2025-11-22
-*******************************************************/
+ * Ablauf:
+ * -----------------------------------------------------
+ * 1. Service startet
+ * 2. Foreground Notification wird angezeigt
+ * 3. PegelLogic.run() wird gestartet
+ * 4. Nach Abschluss → Service beendet sich selbst
+ *
+ * Eigenschaften:
+ * -----------------------------------------------------
+ * • läuft nur kurzzeitig
+ * • startet keinen Dauerprozess
+ * • wird nach API-Lauf automatisch beendet
+ *
+ * Verwendung:
+ * -----------------------------------------------------
+ * Wird typischerweise gestartet durch:
+ *
+ * - AlarmManager
+ * - Hintergrund-Scheduler
+ * - Widget-Update
+ *
+ * Autor: Bollogg
+ * Stand:  2026-03-15
+ *******************************************************/
 class PegelForegroundService : Service() {
-  /**
-  * Wird aufgerufen, wenn der Service gestartet wird.
-  * Startet sofort die Foreground-Notification und dann
-  * im Hintergrund einen Thread für die API-Logik.
-  */
-  override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-    // Pflicht für Android 8+ → sonst Ausnahme
 
-    startInForeground()
+    /**
+     * Wird aufgerufen, wenn der Service gestartet wird.
+     *
+     * Aufgaben:
+     * 1. Service in Foreground-Modus versetzen
+     * 2. PegelLogic.run() starten
+     * 3. Nach Abschluss Service stoppen
+     */
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
-    // API-Aufruf oder Pegelverarbeitung in einer eigenen Thread
-    Thread(Runnable { this.runTask() }).start()
+        // Service in Foreground starten (Pflicht für längere Tasks)
+        startInForeground()
 
-    // START_NOT_STICKY: Service startet nicht neu,
-    // falls System ihn beendet
-    return START_NOT_STICKY
-  }
+        Log.i("SERVICE", "Starte Pegel-Update im Vordergrund")
 
-  /**
-   * Startet den Dienst im "Foreground-Modus"
-   * mit einer permanent sichtbaren Notification.
-   */
-  private fun startInForeground() {
-    val CHANNEL_ID = "pegel_channel"
+        /**
+         * API-Logik ausführen.
+         *
+         * Der Callback wird aufgerufen, sobald
+         * der API-Lauf vollständig abgeschlossen ist.
+         */
+        PegelLogic.run(applicationContext) {
 
-    // Notwendig ab Android 8+ (API 26)
-	  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-		  val channel = NotificationChannel(
-			  CHANNEL_ID,
-			  "Pegel Überwachung",
-			  NotificationManager.IMPORTANCE_LOW
-		  )
-		  channel.description = "Überwacht regelmäßig die Pegeldaten"
+            Log.i(
+                "AlarmManager/PegelForegroundService",
+                "API-Lauf beendet, stoppe Service"
+            )
 
-		  val nm =
-			  getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+            // Service beenden
+            stopSelf()
+        }
 
-		  nm.createNotificationChannel(channel)
-	  }
-
-    val notification = NotificationCompat.Builder(this, CHANNEL_ID)
-        .setSmallIcon(R.drawable.ic_menu_info_details)
-        .setContentTitle("Pegel-Service aktiv")
-        .setContentText("Überwache Wasserstand…")
-        .setPriority(NotificationCompat.PRIORITY_LOW)
-        .build()
-
-    try {
-      startForeground(1, notification)
-    } catch (e: Exception) {
-      e.printStackTrace()
-    }
-  }
-
-  /**
-   * Führt die eigentliche Pegellogik aus (API, Auswertung usw.)
-   * und beendet den Dienst nach Abschluss.
-   */
-  private fun runTask() {
-    try {
-      // Dezentralisierte Pegellogik
-      //PegelLogic.run(this);
-      PegelLogic.run(getApplicationContext())
-      // Neuer Arlarm für den nächsten Durchlauf
-      PegelScheduler.schedule(getApplicationContext())
-    } catch (e: Exception) {
-      e.printStackTrace()
+        /**
+         * START_NOT_STICKY:
+         * Wenn der Service vom System beendet wird,
+         * wird er NICHT automatisch neu gestartet.
+         */
+        return START_NOT_STICKY
     }
 
-    // Service sauber beenden
-    stopSelf()
-  }
+    /**
+     * Startet den Service als Foreground-Service.
+     *
+     * Android verlangt hierfür eine sichtbare
+     * Notification für den Benutzer.
+     */
+    private fun startInForeground() {
 
-  /**
-   * Wird für Bound-Services benötigt – hier nicht genutzt.
-   */
-  override fun onBind(intent: Intent?): IBinder? {
-    return null
-  }
+        val channelId = "pegel_channel"
+
+        /**
+         * Notification Channel erstellen (Android 8+ Pflicht)
+         */
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+
+            val channel = NotificationChannel(
+                channelId,
+                "Pegel Überwachung",
+                NotificationManager.IMPORTANCE_LOW
+            )
+
+            val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+            nm.createNotificationChannel(channel)
+        }
+
+        /**
+         * Notification erstellen
+         *
+         * Wird angezeigt solange der Service läuft.
+         */
+        val notification = NotificationCompat.Builder(this, channelId)
+            .setSmallIcon(android.R.drawable.ic_menu_info_details)
+            .setContentTitle("Pegel-Service")
+            .setContentText("Aktualisiere Daten...")
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .build()
+
+        /**
+         * Foreground Service starten
+         *
+         * Ab Android 14 muss zusätzlich der
+         * Service-Typ angegeben werden.
+         */
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+
+            startForeground(
+                1,
+                notification,
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
+            )
+
+        } else {
+
+            startForeground(1, notification)
+
+        }
+    }
+
+    /**
+     * Bind ist nicht erforderlich.
+     * Der Service wird nur gestartet (startService).
+     */
+    override fun onBind(intent: Intent?): IBinder? = null
 }

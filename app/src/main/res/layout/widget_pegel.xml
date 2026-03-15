@@ -28,7 +28,7 @@
     <TextView
       android:id="@+id/widget_timestamp"
       android:text="--:--"
-      android:textSize="14sp"
+      android:textSize="10sp"
       android:textColor="#CCCCCC"
       android:gravity="center"
       android:layout_width="match_parent"
@@ -37,8 +37,7 @@
     <TextView
       android:id="@+id/widget_temp"
       android:text="-- °C"
-      android:textSize="14sp"
-      android:textStyle="bold"
+      android:textSize="13sp"
       android:textColor="#FFFFFF"
       android:gravity="center"
       android:layout_width="match_parent"
@@ -47,8 +46,7 @@
     <TextView
       android:id="@+id/widget_pegelwert"
       android:text="-- cm"
-      android:textSize="14sp"
-      android:textStyle="bold"
+      android:textSize="13sp"
       android:textColor="#FFFFFF"
       android:gravity="center"
       android:layout_width="match_parent"

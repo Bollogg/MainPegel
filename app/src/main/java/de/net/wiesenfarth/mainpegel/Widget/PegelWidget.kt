@@ -12,7 +12,7 @@ import android.os.Build
 import android.util.Log
 import android.util.SizeF
 import android.widget.RemoteViews
-import de.net.wiesenfarth.mainpegel.API.PegelLogic
+import androidx.core.content.ContextCompat
 import de.net.wiesenfarth.mainpegel.Graph.PegelBitmapGenerator
 import de.net.wiesenfarth.mainpegel.MainActivity
 import de.net.wiesenfarth.mainpegel.R
@@ -24,324 +24,301 @@ import java.lang.Float
  * Beschreibung:
  * AppWidgetProvider für das Pegel-AppWidget.
  *
- * Diese Klasse ist verantwortlich für:
- * - das Aktualisieren des Widgets bei Systemereignissen
- * - das Reagieren auf manuelle oder geplante Update-Requests
- * - das Ermitteln der Widget-Größe (modern & Fallback)
- * - das Rendern der Pegel-Grafik
- * - das Anzeigen der letzten Messwerte
- *
- * Das Widget kann auch dann aktualisiert werden,
- * wenn die App selbst nicht aktiv ist.
+ * Diese Klasse steuert das Verhalten des Widgets
+ * auf dem Android-Homescreen.
  *
  * Aufgaben:
- * - Widget-UI aufbauen (RemoteViews)
- * - Bitmap-Grafik erzeugen
- * - Klick auf Widget → App starten
- * - Update-Zyklen planen
+ * - Aktualisieren des Widgets bei Systemereignissen
+ * - Darstellen der Pegelgrafik
+ * - Anzeigen der letzten Messwerte
+ * - Reagieren auf Broadcast-Updates
+ * - Starten der App bei Klick auf das Widget
+ * - Ermitteln der Widgetgröße
+ *
+ * Das Widget funktioniert unabhängig von der App
+ * und kann auch aktualisiert werden, wenn die
+ * Haupt-App nicht geöffnet ist.
  *
  * Abhängigkeiten:
- * - PegelLogic (API / Datenabruf)
- * - PegelBitmapGenerator (Grafik)
- * - SharedPreferences ("pegel_cache", "settings")
+ * - PegelLogic (Datenabruf)
+ * - PegelBitmapGenerator (Diagramm)
+ * - SharedPreferences (Cache + Einstellungen)
  *
  * Autor:     Bollogg
- * Datum:     2025-11-17
+ * Datum:     2026-03-15
  *******************************************************/
 class PegelWidget : AppWidgetProvider() {
-	/**
- * Wird vom System aufgerufen, wenn ein Widget-Update nötig ist
- * (z.B. nach dem Hinzufügen des Widgets oder bei Intervallen).
- */
 
-	override fun onUpdate(context: Context, mgr: AppWidgetManager, appWidgetIds: IntArray) {
-    for (id in appWidgetIds) {
-      Log.i("WIDGET", "updateWidget() CALLER = onUpdate()")
-      updateWidget(context, mgr, id)
+    /**
+     * Wird vom System aufgerufen, wenn das Widget
+     * aktualisiert werden soll (z.B. beim Platzieren
+     * des Widgets oder bei einem Systemupdate).
+     */
+    override fun onUpdate(context: Context, mgr: AppWidgetManager, appWidgetIds: IntArray) {
+
+        // Mehrere Widgets gleichzeitig möglich
+        for (id in appWidgetIds) {
+            Log.i("WIDGET", "updateWidget() CALLER = onUpdate()")
+
+            updateWidget(context, mgr, id)
+        }
     }
 
-		// Optional: automatischen Update-Zyklus starten
-		// ToDo: testen scheduleNextUpdate(context);
-  }
+    /**
+     * Aktualisiert ein einzelnes Widget.
+     *
+     * Aufgaben:
+     * - Layout erstellen (RemoteViews)
+     * - Widgetgröße bestimmen
+     * - Grafik erzeugen
+     * - Werte anzeigen
+     * - Klickaktion setzen
+     */
+    private fun updateWidget(context: Context, mgr: AppWidgetManager, widgetId: Int) {
 
-	/**
-	* Zentrale Methode zum Aktualisieren eines einzelnen Widgets.
-	*
-	* @param context   App-Kontext
-	* @param mgr       AppWidgetManager
-	* @param widgetId  ID des zu aktualisierenden Widgets
-	*/
-  private fun updateWidget(context: Context, mgr: AppWidgetManager, widgetId: Int) {
-    Log.i("WIDGET", "⟳ updateWidget() für widgetId: " + widgetId)
+        Log.i("WIDGET", "⟳ updateWidget() für widgetId: $widgetId")
 
-    // WICHTIG → Pegel überprüfen, auch wenn App nicht läuft
-    // ToDo: Testen, ob PegelLogic.run(context) hier richtig ist.
-    // Evtl. in einen Hintergrunddienst oder WorkManager auslagern, falls es länger dauert.
-    // PegelLogic.run(context);
+        // Widget-Layout laden
+        val views = RemoteViews(context.packageName, R.layout.widget_pegel)
 
-    // RemoteViews-Instanz erzeugen
-		val views = RemoteViews(context.getPackageName(), R.layout.widget_pegel)
+        /**
+         * Ab Android 12 kann das System mehrere mögliche Widgetgrößen liefern.
+         * Hier wird die größte Größe ausgewählt, damit das Diagramm optimal
+         * dargestellt werden kann.
+         */
+        val viewMapping: MutableMap<SizeF?, RemoteViews?>? =
+            mgr.getAppWidgetOptions(widgetId).getParcelable(AppWidgetManager.OPTION_APPWIDGET_SIZES)
 
-		/**
-		* -----------------------------------------------
-		* Widget-Größe ermitteln
-		* -----------------------------------------------
-		*
-		* Ab API 31 (Android 12) kann das System mehrere
-		* mögliche Widget-Größen liefern.
-		* Es wird die größte verfügbare Größe gewählt,
-		* um die Grafik optimal zu rendern.
-		*/
-		val viewMapping: MutableMap<SizeF?, RemoteViews?>? =
-        mgr.getAppWidgetOptions(widgetId).getParcelable(AppWidgetManager.OPTION_APPWIDGET_SIZES)
-    var maxSize: SizeF? = null
+        var maxSize: SizeF? = null
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && viewMapping != null && !viewMapping.isEmpty()) {
-      // Die größte verfügbare Größe für die Bitmap-Generierung auswählen
-      maxSize = viewMapping.keys.stream()
-        .max(Comparator { size1: SizeF?, size2: SizeF? ->
-        Float.compare(
-          size1!!.getWidth() * size1.getHeight(),
-          size2!!.getWidth() * size2.getHeight()
-				)
-			})
-      .orElse(null)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && viewMapping != null && !viewMapping.isEmpty()) {
+
+            // Größte verfügbare Widgetgröße ermitteln
+            maxSize = viewMapping.keys.stream()
+                .max(Comparator { size1: SizeF?, size2: SizeF? ->
+                    Float.compare(
+                        size1!!.width * size1.height,
+                        size2!!.width * size2.height
+                    )
+                })
+                .orElse(null)
+        }
+
+        var widthPx: Int
+        var heightPx: Int
+
+        /**
+         * Falls moderne Größeninformationen verfügbar sind → verwenden
+         * sonst Fallback über alte Methode.
+         */
+        if (maxSize != null) {
+
+            widthPx = maxSize.width.toInt()
+            heightPx = maxSize.height.toInt()
+
+        } else {
+
+            // Fallback für ältere Android-Versionen
+            widthPx = getWidgetWidthInPx(context, mgr, widgetId)
+            heightPx = getWidgetHeightInPx(context, mgr, widgetId)
+
+        }
+
+        // Sicherheitsfallback bei ungültigen Größen
+        if (widthPx <= 0) widthPx = 300
+        if (heightPx <= 0) heightPx = 130
+
+        /**
+         * Pegelgrafik erzeugen
+         * (Diagramm wird als Bitmap gerendert)
+         */
+        val bmp = PegelBitmapGenerator.makePegelBitmap(context, widthPx, heightPx)
+
+        if (bmp != null) {
+
+            views.setImageViewBitmap(R.id.widgetChartImage, bmp)
+
+        } else {
+
+            // Fallback-Bild wenn keine Grafik verfügbar ist
+            views.setImageViewResource(R.id.widgetChartImage, R.mipmap.ic_launcher_aal_round)
+
+        }
+
+        /**
+         * Klick auf Widget → App starten
+         */
+        val launchIntent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+
+        val openAppPendingIntent = PendingIntent.getActivity(
+            context,
+            0,
+            launchIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        // Klickaktion setzen
+        views.setOnClickPendingIntent(R.id.widget_root, openAppPendingIntent)
+
+        /**
+         * Letzte Messwerte aus Cache laden
+         */
+        val cache = context.getSharedPreferences("pegel_cache", Context.MODE_PRIVATE)
+
+        val correntValue = cache.getInt("last_value", -1)
+        val correntTemp = cache.getFloat("last_temp", 0F)
+        val time: String = cache.getString("last_time", "--:--")!!
+
+        /**
+         * Farben für die Anzeige setzen
+         */
+        val colorBlue = ContextCompat.getColor(context, R.color.lineColor)
+        val colorRed = ContextCompat.getColor(context, R.color.tempLineColor)
+
+        // Pegelwert anzeigen
+        views.setTextColor(R.id.widget_pegelwert, colorBlue)
+        views.setTextViewText(R.id.widget_pegelwert, "Pegel: $correntValue cm")
+
+        // Wassertemperatur anzeigen
+        views.setTextColor(R.id.widget_temp, colorRed)
+        views.setTextViewText(R.id.widget_temp, "Wasser: $correntTemp °C")
+
+        // Zeitstempel anzeigen
+        views.setTextViewText(R.id.widget_timestamp, "Stand: $time Uhr")
+
+        // Widget aktualisieren
+        mgr.updateAppWidget(widgetId, views)
     }
 
-    var widthPx: Int
-    var heightPx: Int
+    /**
+     * Ermittelt die Widgetbreite in Pixeln
+     * (Fallback für ältere Android-Versionen)
+     */
+    private fun getWidgetWidthInPx(context: Context, mgr: AppWidgetManager, widgetId: Int): Int {
 
-    if (maxSize != null) {
-        widthPx = maxSize.getWidth().toInt()
-        heightPx = maxSize.getHeight().toInt()
-        Log.i("WIDGET", "Größe aus API 31+ (px) → " + widthPx + " x " + heightPx)
-    } else {
-	      // Fallback für ältere Android-Versionen
-        Log.w("WIDGET", "Fallback zur alten Größenberechnung wird verwendet.")
-        widthPx = getWidgetWidthInPx(context, mgr, widgetId)
-        heightPx = getWidgetHeightInPx(context, mgr, widgetId)
-    }
-		// Sicherheits-Fallbacks
-    if (widthPx <= 0) widthPx = 300
-    if (heightPx <= 0) heightPx = 130
+        val density = context.resources.displayMetrics.density
 
-    Log.i("WIDGET", "Gerenderte Bitmapgröße (px): " + widthPx + " x " + heightPx)
+        val isPortrait =
+            context.resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
 
-		/**
-		 * -----------------------------------------------
-		 * Grafik erzeugen
-		 * -----------------------------------------------
-		 */
-    val bmp = PegelBitmapGenerator.makePegelBitmap(context, widthPx, heightPx)
-    if (bmp != null) {
-      views.setImageViewBitmap(R.id.widgetChartImage, bmp)
-    } else {
-	    /**
-	    * -----------------------------------------------
-	    * Klick auf Widget → App starten
-	    * -----------------------------------------------
-	    */
-	    Log.e("WIDGET", "Bitmap konnte nicht erstellt werden!")
-      // Optional: Ein Fehler-Icon oder Platzhalter anzeigen
-      views.setImageViewResource(R.id.widgetChartImage, R.layout.widget_pegel)
+        val widthDp = if (isPortrait)
+            mgr.getAppWidgetOptions(widgetId).getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH)
+        else
+            mgr.getAppWidgetOptions(widgetId).getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH)
+
+        return (widthDp * density).toInt()
     }
 
-     // Tippen auf Widget → App öffnen
-    val launchIntent = Intent(context, MainActivity::class.java).apply {
-      flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+    /**
+     * Ermittelt die Widgethöhe in Pixeln
+     * (Fallback für ältere Android-Versionen)
+     */
+    private fun getWidgetHeightInPx(context: Context, mgr: AppWidgetManager, widgetId: Int): Int {
+
+        val density = context.resources.displayMetrics.density
+
+        val isPortrait =
+            context.resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+
+        val heightDp = if (isPortrait)
+            mgr.getAppWidgetOptions(widgetId).getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT)
+        else
+            mgr.getAppWidgetOptions(widgetId).getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT)
+
+        return (heightDp * density).toInt()
     }
 
-    val openAppPendingIntent = PendingIntent.getActivity(
-        context,
-        0,
-        launchIntent,
-        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-    )
+    /**
+     * Empfang von Broadcast-Nachrichten.
+     * Wird verwendet, wenn neue Pegeldaten
+     * verfügbar sind.
+     */
+    override fun onReceive(context: Context, intent: Intent) {
 
-    // Klick auf gesamtes Widget
-    views.setOnClickPendingIntent(
-        R.id.widget_root,
-        openAppPendingIntent
-    )
+        super.onReceive(context, intent)
 
-		/**
-		* -----------------------------------------------
-		* Pegeldaten aktualisieren & anzeigen
-		* -----------------------------------------------
-		*/
+        if (intent.action == ACTION_DATA_UPDATED) {
 
-    //ToDo: löschen PegelLogic.run(context) // API starten und Daten abholen
+            // Alle Widgets aktualisieren
+            updateAllWidgets(context)
 
-    val cache = context.getSharedPreferences("pegel_cache", Context.MODE_PRIVATE)
+            Log.i("Widget/PegelWidget", "onReceive: " + intent.action)
 
-    val correntValue = cache.getInt("last_value", -1)
-		val correntTemp  = cache.getFloat("last_temp", 0F)
-    val time: String = cache.getString("last_time", "--:--")!!
+        }
+    }
 
-    // Übergabe letzte Wasserhöhe
-    views.setTextViewText(
-      R.id.widget_pegelwert,
-      "Pegel: $correntValue cm"
-    )
+    /**
+     * Aktualisiert alle vorhandenen Widgets
+     */
+    private fun updateAllWidgets(context: Context) {
 
-		// Übergabe letzte Wassertemperatur
-		views.setTextViewText(
-			R.id.widget_temp,
-			"Wasser: $correntTemp °C"
-		)
+        val mgr = AppWidgetManager.getInstance(context)
 
-		//Übergabe letzte Messzeit
-    views.setTextViewText(
-      R.id.widget_timestamp,
-      "Stand: $time Uhr"
-    )
+        val ids = mgr.getAppWidgetIds(
+            ComponentName(context, PegelWidget::class.java)
+        )
 
-    // Das Widget-UI aktualisieren
-    mgr.updateAppWidget(widgetId, views)
-  }
+        for (id in ids) {
 
-	/**
-	* Ermittelt die Widget-Breite in Pixeln
-	* (Fallback für ältere Android-Versionen).
-	*/
-	private fun getWidgetWidthInPx(context: Context, mgr: AppWidgetManager, widgetId: Int): Int {
-    val density = context.getResources().getDisplayMetrics().density
-    // Verwenden von maxW für Landscape und minW für Portrait
-    val isPortrait = context.getResources()
-        .getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT
-    val widthDp = if (isPortrait)
-        mgr.getAppWidgetOptions(widgetId).getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH)
-    else
-        mgr.getAppWidgetOptions(widgetId).getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH)
-    return (widthDp * density).toInt()
-  }
+            updateWidget(context, mgr, id)
 
-	/**
-	* Ermittelt die Widget-Höhe in Pixeln
-	* (Fallback für ältere Android-Versionen).
-	*/
-	private fun getWidgetHeightInPx(context: Context, mgr: AppWidgetManager, widgetId: Int): Int {
-    val density = context.getResources().getDisplayMetrics().density
-    val isPortrait = context.getResources()
-        .getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT
-    val heightDp = if (isPortrait)
-        mgr.getAppWidgetOptions(widgetId).getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT)
-    else
-        mgr.getAppWidgetOptions(widgetId).getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT)
-    return (heightDp * density).toInt()
-  }
+        }
+    }
 
-  private fun ToDoupdateWidget(context: Context, mgr: AppWidgetManager, widgetId: Int) {
-	  Log.i("WIDGET", "⟳ onReceive() – action= updateWidget")
+    /**
+     * Plant ein zukünftiges Widget-Update
+     * über den Android AlarmManager.
+     *
+     * Das Intervall wird aus den Einstellungen geladen.
+     */
+    private fun scheduleNextUpdate(context: Context) {
 
-	  // WICHTIG → Pegel überprüfen, auch wenn App nicht läuft
-	  //ToDo: testen PegelLogic.run(context);
-	  val views = RemoteViews(context.getPackageName(), R.layout.widget_pegel)
+        val minutes = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+            .getInt("widget_interval", 30)
 
-	  // 🔥 Widget-Größe ermitteln
-	  val options = mgr.getAppWidgetOptions(widgetId)
+        val triggerAt = System.currentTimeMillis() + minutes * 60 * 1000
 
-	  val minW = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH)
-	  val maxW = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH)
-	  val minH = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT)
-	  val maxH = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT)
+        val i = Intent(context, PegelWidget::class.java).apply {
+            action = ACTION_UPDATE_REQUEST
+        }
 
-	  Log.i(
-	      "WIDGET",
-	      "Größe dp → minW=" + minW + " maxW=" + maxW + " minH=" + minH + " maxH=" + maxH
-	  )
+        val pi = PendingIntent.getBroadcast(
+            context,
+            0,
+            i,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+        )
 
-	  // px berechnen (dp → px)
-	  val density = context.getResources().getDisplayMetrics().density
-	  var widthPx = (maxW * density).toInt()
-	  var heightPx = (maxH * density).toInt()
+        val am = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-	  if (widthPx < 100) widthPx = 300 // falls System keine Daten liefert
+        /**
+         * Ab Android 12 benötigt man eine spezielle Berechtigung
+         * für exakte Alarme.
+         */
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !am.canScheduleExactAlarms()) {
 
-	  if (heightPx < 100) heightPx = 130
+            am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pi)
 
-	  Log.i("WIDGET", "Gerenderte Bitmapgröße px: " + widthPx + " x " + heightPx)
+        } else {
 
+            am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pi)
 
-	  // Graph aus Cache erzeugen
-	  val bmp = PegelBitmapGenerator.makePegelBitmap(context, widthPx, heightPx)
-	  views.setImageViewBitmap(R.id.widgetChartImage, bmp)
+        }
+    }
 
-	  mgr.updateAppWidget(widgetId, views)
-	  // danach Widget-UI aktualisieren
-	  //ToDo: löschen WidgetUpdater.updateWidgetViews(context, mgr, appWidgetIds);
-	  //ComponentName thisWidget = new ComponentName(context, PegelWidget.class);
-	  //int[] ids = mgr.getAppWidgetIds(thisWidget);
-	  //WidgetUpdater.updateWidgetViews(context, mgr, ids);
-  }
-	/**
-	* Empfängt eigene Broadcasts (z.B. geplante Updates).
-	*/
-  override fun onReceive(context: Context, intent: Intent) {
-    super.onReceive(context, intent)
+    /**
+     * Broadcast-Aktionen für das Widget
+     */
+    companion object {
 
-		when (intent.action) {
+        // Widget fordert ein neues Update an
+        const val ACTION_UPDATE_REQUEST =
+            "de.net.wiesenfarth.mainpegel.UPDATE_REQUEST"
 
-			ACTION_UPDATE_REQUEST -> {
-				Log.i("WIDGET", "🔄 Daten werden geladen")
-				PegelLogic.run(context)
-				scheduleNextUpdate(context)
-			}
-
-			ACTION_DATA_UPDATED -> {
-				Log.i("WIDGET", "🎨 Widget wird neu gerendert")
-				updateAllWidgets(context)
-			}
-		}
-  }
-	private fun updateAllWidgets(context: Context) {
-		val mgr = AppWidgetManager.getInstance(context)
-		val ids = mgr.getAppWidgetIds(
-			ComponentName(context, PegelWidget::class.java)
-		)
-
-		for (id in ids) {
-			updateWidget(context, mgr, id)
-		}
-	}
-
-
-	/**
- * Plant das nächste Widget-Update über den AlarmManager.
- * Das Intervall wird aus den App-Einstellungen gelesen.
- */
-	private fun scheduleNextUpdate(context: Context) {
-    val minutes = context
-      .getSharedPreferences("settings", Context.MODE_PRIVATE)
-      .getInt("widget_interval", 30) // 15/30/45/60
-
-    val triggerAt = System.currentTimeMillis() + minutes * 60 * 1000
-
-    val i = Intent(context, PegelWidget::class.java)
-		i.action = ACTION_UPDATE_REQUEST
-
-    val pi = PendingIntent.getBroadcast(
-      context,
-      0,
-      i,
-      PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
-    )
-
-    val am = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-
-    am.setExactAndAllowWhileIdle(
-      AlarmManager.RTC_WAKEUP,
-      triggerAt,
-      pi
-    )
-
-    Log.i("WIDGET", "⏰ Widget-Update geplant in " + minutes + " Min")
-  }
-
-  companion object {
-	  /** Eigene Action zum Aktualisieren des Widgets */
-	  const val ACTION_UPDATE_REQUEST = "de.net.wiesenfarth.mainpegel.UPDATE_REQUEST"
-	  const val ACTION_DATA_UPDATED  = "de.net.wiesenfarth.mainpegel.DATA_UPDATED"
-
-  }
+        // Neue Pegeldaten sind verfügbar
+        const val ACTION_DATA_UPDATED =
+            "de.net.wiesenfarth.mainpegel.DATA_UPDATED"
+    }
 }

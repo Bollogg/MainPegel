@@ -3,6 +3,7 @@
 
 # Built application files
 *.apk
+!MainPegel/app/release/app-release.apk
 *.ap_
 *.aab
 

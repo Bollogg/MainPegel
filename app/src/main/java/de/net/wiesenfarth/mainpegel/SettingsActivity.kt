@@ -199,7 +199,6 @@ class SettingsActivity : AppCompatActivity() {
         editor.putInt("interval_minutes", selectedInterval)
 
         // Schwellwert
-        //ToDo: löschen editor.putString("wave_threshold", waveThreshold.getText().toString());
         var input = waveThreshold!!.getText().toString().trim { it <= ' ' }
         if (input.isEmpty()) {
             input = "15" // default

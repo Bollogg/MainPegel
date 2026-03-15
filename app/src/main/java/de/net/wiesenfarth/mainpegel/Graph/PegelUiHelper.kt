@@ -173,13 +173,6 @@ object PegelUiHelper {
 
 	  // Konfiguration der linken Y-Achse
 		// Die rechte Achse ist deaktiviert (Single-Axis-Diagramm).
-		/* ToDo: löschen
-    val left = lineChart.getAxisLeft()
-    left.setTextColor(ContextCompat.getColor(ctx, R.color.textColor))
-    left.setAxisLineColor(ContextCompat.getColor(ctx, R.color.axisColor))
-    left.setGridColor(ContextCompat.getColor(ctx, R.color.gridColor))
-    lineChart.axisRight.isEnabled = false
-		*/
 		// LINKe Achse (Pegel)
 	  val left = lineChart.axisLeft
 	  left.setTextColor(ContextCompat.getColor(ctx, R.color.textColor))
@@ -211,19 +204,6 @@ object PegelUiHelper {
     val displayFormat = SimpleDateFormat("HH:mm", Locale.GERMANY)
 
     // Datenpunkte erzeugen
-/* ToDo: löschen
-    for (i in daten.indices) {
-      val p = daten.get(i)
-
-      try {
-        val d = apiFormat.parse(p.timestamp)
-        entries.add(Entry(i.toFloat(), p.value.toFloat()))
-        xLabels.add(displayFormat.format(d))
-      } catch (e: Exception) {
-        e.printStackTrace()
-      }
-    }
-*/
 	  for (i in daten.indices) {
 
 		  val p = daten[i]
@@ -260,11 +240,6 @@ object PegelUiHelper {
 	    ctx.getString(R.string.level_curve) + " (" + hours + "h)"
     )
 	  //Temperatur
-	  //ToDo: löschen
-	  //val tempEntries = ArrayList<Entry>()
-	  //val temp = cache.getFloat("temp_$i", -999f)
-
-
 	  dataSet.setLineWidth(2f)
     dataSet.setDrawCircles(false)
     dataSet.setDrawValues(false)

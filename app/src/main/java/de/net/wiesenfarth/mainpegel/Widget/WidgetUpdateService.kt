@@ -43,7 +43,6 @@ class WidgetUpdateService : Service() {
 	* Wird beim Start des Services aufgerufen.
 	* Führt das Widget-Update aus und beendet den Service danach sofort.
 	*/
-  //ToDo: prüfen ob noch gebraucht? sonst löschen
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
     Log.i("WIDGET", "WidgetUpdateService gestartet")
     updateWidget()

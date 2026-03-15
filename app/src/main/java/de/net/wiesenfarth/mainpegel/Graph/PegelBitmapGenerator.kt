@@ -168,8 +168,11 @@ object PegelBitmapGenerator {
 		val levelMax = levelValues.max().let {
 			if (it == levelValues.min()) it + 5f else it
 		}
+		
+		val levelMid = (levelMax + levelMin) / 2f
 
 		canvas.drawText("${levelMax.toInt()} cm", graphLeft - 10f, graphTop + 15f, textPaint)
+		canvas.drawText("${levelMid.toInt()} cm", graphLeft - 10f, (graphTop + graphBottom) / 2f + 7f, textPaint)
 		canvas.drawText("${levelMin.toInt()} cm", graphLeft - 10f, graphBottom, textPaint)
 
 		// --- Temperatur-Achse (rechts) ---
@@ -187,11 +190,15 @@ object PegelBitmapGenerator {
 			tempMax = tempValues.max().let {
 				if (it == tempValues.min()) it + 2f else it
 			}
+			
+			val tempMid = (tempMax + tempMin) / 2f
 
 			val maxLabel = String.format(Locale.GERMANY, "%.1f °C", tempMax)
+			val midLabel = String.format(Locale.GERMANY, "%.1f °C", tempMid)
 			val minLabel = String.format(Locale.GERMANY, "%.1f °C", tempMin)
 
 			canvas.drawText(maxLabel, graphRight + 10f, graphTop + 15f, textPaint)
+			canvas.drawText(midLabel, graphRight + 10f, (graphTop + graphBottom) / 2f + 7f, textPaint)
 			canvas.drawText(minLabel, graphRight + 10f, graphBottom, textPaint)
 		}
 
@@ -253,6 +260,13 @@ object PegelBitmapGenerator {
 			val x = graphLeft + stepX * i
 			val label = timeValues[i].substringBefore(":")
 
+			canvas.drawText(label, x, graphBottom + 45f, textPaint)
+		}
+		
+		// Sicherstellen, dass der LETZTE Zeitstempel immer ganz rechts angezeigt wird
+		if (timeValues.isNotEmpty() && (timeValues.size - 1) % labelStep != 0) {
+			val x = graphLeft + graphWidth
+			val label = timeValues.last().substringBefore(":")
 			canvas.drawText(label, x, graphBottom + 45f, textPaint)
 		}
 

@@ -1,5 +1,5 @@
 # MainPegel
-Liest den Pegelstand von der angegebenen Messstelle aus.
+Liest den Pegelstand und die Temperatur von der angegebenen Messstelle aus.
 Bei Überschreitung des Pegelstand um x cm wird ein Alarm ausgelöst
 
 <p align="center">
@@ -54,7 +54,7 @@ Es können folgende Einstellungen geändert werden.
 Anzeige des Pegels als Grafik und aktueller Pegelmesswert mit der Uhrzeit des zuletzt gemessenen Pegels  
 
 <p align="center">
-  <img src="images/MainPegelWidgets.png" width="400">
+  <img src="images/MainPegelWidget.png" width="400">
 </p>
 
 ## Pegeldaten

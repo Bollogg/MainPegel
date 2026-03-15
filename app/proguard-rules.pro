@@ -19,3 +19,10 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Behalte die Datenklassen für Retrofit/Gson, damit die Feldnamen nicht umbenannt werden
+-keepclassmembers class de.net.wiesenfarth.mainpegel.API.** { *; }
+-keep class de.net.wiesenfarth.mainpegel.API.** { *; }
+
+# Falls du @SerializedName nutzt, stelle sicher, dass die Annotationen erhalten bleiben
+-keepattributes Signature, *Annotation*, EnclosingMethod

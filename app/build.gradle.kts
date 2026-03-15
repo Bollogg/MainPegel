@@ -26,7 +26,7 @@ android {
         minSdk = 32
         targetSdk = 36
         versionCode = 20260315
-        versionName = "Keiler V2026.03.001"
+        versionName = "Keiler V2026.03.15"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

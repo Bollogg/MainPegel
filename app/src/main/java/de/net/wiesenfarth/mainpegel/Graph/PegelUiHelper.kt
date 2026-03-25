@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 import android.util.Log
 import android.util.Log.i
 import android.widget.TextView
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
@@ -17,6 +18,7 @@ import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import de.net.wiesenfarth.mainpegel.API.PegelResponse
 import de.net.wiesenfarth.mainpegel.API.TempResponse
 import de.net.wiesenfarth.mainpegel.R
+import de.net.wiesenfarth.mainpegel.Variable.getThemeColor
 import de.net.wiesenfarth.mainpegel.Widget.PegelWidget
 import de.net.wiesenfarth.mainpegel.Widget.PegelWidget.Companion.ACTION_DATA_UPDATED
 import java.text.SimpleDateFormat
@@ -175,25 +177,41 @@ object PegelUiHelper {
 		// Die rechte Achse ist deaktiviert (Single-Axis-Diagramm).
 		// LINKe Achse (Pegel)
 	  val left = lineChart.axisLeft
-	  left.setTextColor(ContextCompat.getColor(ctx, R.color.textColor))
-	  left.setAxisLineColor(ContextCompat.getColor(ctx, R.color.axisColor))
-	  left.setGridColor(ContextCompat.getColor(ctx, R.color.gridColor))
+	  left.setTextColor(
+		  ctx.getThemeColor(R.attr.graphText)
+		)
+	  left.setAxisLineColor(
+		  ctx.getThemeColor(R.attr.colorBackground)
+		)
+	  left.setGridColor(
+		  ctx.getThemeColor(R.attr.graphGrid)
+		)
 	  left.granularity = 1f
 	  left.isEnabled = true
 
 		// RECHTE Achse (Temperatur)
 	  val right = lineChart.axisRight
 	  right.isEnabled = true
-	  right.setTextColor(ContextCompat.getColor(ctx, R.color.textColor))
-	  right.setAxisLineColor(ContextCompat.getColor(ctx, R.color.axisColor))
-	  right.setGridColor(ContextCompat.getColor(ctx, R.color.gridColor))
+	  right.setTextColor(
+		  ctx.getThemeColor(R.attr.graphText)
+		)
+	  right.setAxisLineColor(
+		  ctx.getThemeColor(R.attr.colorBackground)
+		)
+	  right.setGridColor(
+		  ctx.getThemeColor(R.attr.graphGrid)
+		)
 	  right.granularity = 0.5f
 	  right.setDrawGridLines(false)
 
 		// Diagramm-Erscheinungsbild
-    lineChart.setBackgroundColor(ContextCompat.getColor(ctx, R.color.backgroundColor))
+	  lineChart.setBackgroundColor(
+		  ctx.getThemeColor(R.attr.graphBackground)
+	  )
     lineChart.setDrawGridBackground(false)
-    lineChart.getLegend().setTextColor(ContextCompat.getColor(ctx, R.color.legendTextColor))
+	  lineChart.getLegend().setTextColor(
+		  ctx.getThemeColor(R.attr.graphText)
+	  )
     lineChart.description.isEnabled = false
 
 		// Daten vorbereiten
@@ -245,9 +263,13 @@ object PegelUiHelper {
     dataSet.setDrawValues(false)
 
     // Farben aus Ressourcen (Tag/Nacht)
-    dataSet.setColor(ContextCompat.getColor(ctx, R.color.lineColor))
+    dataSet.setColor(
+	    ctx.getThemeColor(R.attr.graphLine)
+		)
     dataSet.setDrawFilled(true)
-    dataSet.setFillColor(ContextCompat.getColor(ctx, R.color.fillColor))
+    dataSet.setFillColor(
+	    ctx.getThemeColor(R.attr.graphFill)
+		)
 
 		// Temperatur-Dataset
 	  dataSet.axisDependency = YAxis.AxisDependency.LEFT
@@ -258,7 +280,13 @@ object PegelUiHelper {
 	  tempDataSet.lineWidth = 2f
 	  tempDataSet.setDrawCircles(false)
 	  tempDataSet.setDrawValues(false)
-	  tempDataSet.setColor(ContextCompat.getColor(ctx, R.color.tempLineColor))
+	  tempDataSet.setColor(
+		  ctx.getThemeColor(R.attr.graphTempLine)
+		)
+	  tempDataSet.setDrawFilled(true)
+	  tempDataSet.setFillColor(
+		  ctx.getThemeColor(R.attr.graphFillTemp)
+	  )
 
 	  // Linien setzen
 	  val lineData = LineData(dataSet, tempDataSet)
@@ -299,9 +327,15 @@ object PegelUiHelper {
 
 	  xAxis.setLabelRotationAngle(-45f)
 
-    xAxis.setTextColor(ContextCompat.getColor(ctx, R.color.textColor))
-    xAxis.setAxisLineColor(ContextCompat.getColor(ctx, R.color.axisColor))
-    xAxis.setGridColor(ContextCompat.getColor(ctx, R.color.gridColor))
+    xAxis.setTextColor(
+	    ctx.getThemeColor(R.attr.graphText)
+		)
+    xAxis.setAxisLineColor(
+	    ctx.getThemeColor(R.attr.graphAxis)
+		)
+    xAxis.setGridColor(
+	    ctx.getThemeColor(R.attr.graphGrid)
+		)
 
     // Zeitlabels verwenden
     xAxis.setValueFormatter(IndexAxisValueFormatter(xLabels))

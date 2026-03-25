@@ -1,3 +1,19 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
+  <!-- Graph -->
+  <attr name="colorBackground" format="color"/>
+  <attr name="graphBackground" format="color"/>
+  <attr name="graphLine" format="color"/>
+  <attr name="graphTempLine" format="color"/>
+  <attr name="graphGrid" format="color"/>
+  <attr name="graphAxis" format="color"/>
+  <attr name="graphText" format="color"/>
+  <attr name="graphFill" format="color"/>
+  <attr name="graphFillTemp" format="color"/>
+
+  <!-- UI -->
+  <attr name="colorToolbarText" format="color"/>
+  <attr name="toolBarBackground" format="color"/>
+
+  <!-- Widget -->
+  <attr name="widgetBackground" format="color"/>
 </resources>

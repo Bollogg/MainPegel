@@ -50,7 +50,7 @@ import de.net.wiesenfarth.mainpegel.Widget.PegelWidget
  *
  * @Website:   wiesenfarth-net.de
  * @Autor:     Bollogg
- * @Datum:     2026-03-15
+ * @Datum:     2026-03-25
  * @Version:   2026.03
  ********************************************************/
 class MainActivity : AppCompatActivity() {

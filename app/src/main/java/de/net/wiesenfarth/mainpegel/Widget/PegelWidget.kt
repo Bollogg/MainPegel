@@ -174,8 +174,8 @@ class PegelWidget : AppWidgetProvider() {
         /**
          * Farben für die Anzeige setzen
          */
-        val colorBlue = ContextCompat.getColor(context, R.color.lineColor)
-        val colorRed = ContextCompat.getColor(context, R.color.tempLineColor)
+        val colorBlue = ContextCompat.getColor(context, R.color.graph_line_light)
+        val colorRed = ContextCompat.getColor(context, R.color.graph_fill_temp)
 
         // Pegelwert anzeigen
         views.setTextColor(R.id.widget_pegelwert, colorBlue)

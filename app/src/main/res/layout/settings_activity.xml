@@ -12,10 +12,10 @@
     android:id="@+id/toolbar"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/textColor"
+    android:background="?attr/toolBarBackground"
     android:minHeight="?attr/actionBarSize"
     android:theme="?attr/actionBarTheme"
-    app:titleTextColor="@color/white" />
+    app:titleTextColor="?attr/colorToolbarText" />
 
     <!-- Pegelstände Ort -->
   <TextView
@@ -89,13 +89,12 @@
       android:textSize="16sp" />
 
     <Switch
-        android:id="@+id/switch_vibration"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:hapticFeedbackEnabled="true"
-        android:showText="true"
-        android:textOff="@string/off"
-        android:textOn="@string/on" />
+      android:id="@+id/switch_vibration"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:hapticFeedbackEnabled="true"
+      android:thumb="@drawable/switch_thumb"
+      android:track="@drawable/switch_track" />
   </LinearLayout>
 
   <!-- Piepton: Text + Switch in einer Zeile -->
@@ -113,12 +112,11 @@
       android:textSize="16sp" />
 
     <Switch
-        android:id="@+id/switch_beep"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:hapticFeedbackEnabled="true"
-        android:showText="true"
-        android:textOff="@string/off"
-        android:textOn="@string/on" />
+      android:id="@+id/switch_beep"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:hapticFeedbackEnabled="true"
+      android:thumb="@drawable/switch_thumb"
+      android:track="@drawable/switch_track" />
   </LinearLayout>
 </LinearLayout>

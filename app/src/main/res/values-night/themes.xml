@@ -3,5 +3,34 @@
   <style name="Base.Theme.MainPegel" parent="Theme.Material3.DayNight.NoActionBar">
     <!-- Customize your dark theme here. -->
     <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+
+    <!-- Basis -->
+    <item name="colorBackground">@color/black</item>
+    <item name="colorOnBackground">@color/white</item>
+
+    <!-- UI -->
+    <item name="colorPrimary">@color/toolbar_blue</item>
+    <item name="colorToolbarText">@color/toolbar_text_night</item>
+    <item name="toolBarBackground">@color/background_night</item>
+
+    <!-- Graph -->
+    <item name="graphBackground">@color/graph_background</item>
+    <item name="graphLine">@color/graph_line</item>
+    <item name="graphTempLine">@color/graph_temp_line</item>
+    <item name="graphGrid">@color/graph_grid</item>
+    <item name="graphAxis">@color/white</item>
+    <item name="graphText">@color/white</item>
+    <item name="graphFill">@color/graph_fill</item>
+    <item name="graphFillTemp">@color/graph_fill_temp</item>
+
+    <!-- Widget -->
+    <item name="widgetBackground">@color/widget_background</item>
+
   </style>
+
+  <style name="ToolbarPopupTheme" parent="ThemeOverlay.Material3">
+    <item name="android:textColor">?attr/colorToolbarText</item>
+    <item name="colorControlNormal">?attr/colorToolbarText</item>
+  </style>
+
 </resources>

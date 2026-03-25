@@ -306,8 +306,9 @@ object PegelLogic {
    */
   private fun handleNewPegel(ctx: Context, newValue: Int, time: String?) {
 
-    if (lastValue < 0) {
-      lastValue = newValue
+    if (newValue <= 0) {
+      // ToDo: löschen
+      // lastValue = newValue
       return
     }
 

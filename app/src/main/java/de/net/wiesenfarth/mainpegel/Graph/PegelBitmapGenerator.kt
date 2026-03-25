@@ -8,6 +8,7 @@ import android.graphics.Paint
 import android.util.Log
 import androidx.core.content.ContextCompat
 import de.net.wiesenfarth.mainpegel.R
+import de.net.wiesenfarth.mainpegel.Variable.getThemeColor
 import java.util.Locale
 /*******************************************************
  * Objekt:  PegelBitmapGenerator
@@ -47,7 +48,7 @@ import java.util.Locale
  *
  * Linien:
  *
- * • Pegelverlauf       → Farbe aus graph_line
+ * • Pegelverlauf       → Farbe aus graphLine
  * • Temperaturverlauf  → Rot
  *
  * Skalierung:
@@ -210,6 +211,7 @@ object PegelBitmapGenerator {
 
 		// --- Pegel-Linie ---
 		val levelPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+			//color = context.getThemeColor(R.attr.graphLine)
 			color = ContextCompat.getColor(context, R.color.graph_line)
 			strokeWidth = config.lineStroke
 			style = Paint.Style.STROKE

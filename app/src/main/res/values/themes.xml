@@ -1,8 +1,39 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
   <!-- Base application theme. -->
-  <style name="Base.Theme.MainPegel" parent="Theme.Material3.DayNight.NoActionBar" />
+  <style name="Base.Theme.MainPegel" parent="Theme.Material3.DayNight.NoActionBar" >
 
-  <style name="Theme.MainPegel.Oss" parent="Theme.Material3.DayNight" />
+  <!-- Basis -->
+    <item name="colorBackground">@color/background_light</item>
+    <item name="colorOnBackground">@color/text_primary_light</item>
+
+    <!-- UI -->
+    <item name="colorPrimary">@color/toolbar_blue</item>
+    <item name="colorSecondary">@color/button_purple</item>
+    <item name="colorToolbarText">@color/toolbar_text_day</item>
+    <item name="toolBarBackground">@color/background_day</item>
+
+    <!-- Graph -->
+    <item name="graphBackground">@color/graph_background_light</item>
+    <item name="graphLine">@color/graph_line_light</item>
+    <item name="graphTempLine">@color/graph_temp_line</item>
+    <item name="graphGrid">@color/graph_grid</item>
+    <item name="graphAxis">@color/graph_axis</item>
+    <item name="graphText">@color/graph_text</item>
+    <item name="graphFill">@color/graph_fill</item>
+    <item name="graphFillTemp">@color/graph_fill_temp</item>
+
+    <!-- Widget -->
+    <item name="widgetBackground">@color/widget_background</item>
+
+  </style>
+<style name="Theme.MainPegel.Oss" parent="Theme.Material3.DayNight" >
+
+  </style>
+
+  <style name="ToolbarPopupTheme" parent="ThemeOverlay.Material3">
+    <item name="android:textColor">?attr/colorToolbarText</item>
+    <item name="colorControlNormal">?attr/colorToolbarText</item>
+  </style>
 
   <style name="Theme.MainPegel" parent="Base.Theme.MainPegel" />
 </resources>

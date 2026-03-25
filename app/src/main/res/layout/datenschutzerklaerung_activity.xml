@@ -13,10 +13,10 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="16dp"
-    android:background="@color/textColor"
+    android:background="?attr/toolBarBackground"
     android:minHeight="?attr/actionBarSize"
     android:theme="?attr/actionBarTheme"
-    app:titleTextColor="@color/white" />
+    app:titleTextColor="?attr/colorToolbarText" />
 
   <LinearLayout
     android:layout_width="match_parent"

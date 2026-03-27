@@ -25,8 +25,8 @@ android {
         applicationId = "de.net.wiesenfarth.mainpegel"
         minSdk = 32
         targetSdk = 36
-        versionCode = 20260316
-        versionName = "Keiler V2026.03.16"
+        versionCode = 20260327
+        versionName = "V2026.03.27"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
       versionNameSuffix = "Keiler"
@@ -74,6 +74,7 @@ dependencies {
 	implementation(libs.androidx.navigation.ui.ktx)
 	val workVersion = "2.11.1"
   implementation("androidx.work:work-runtime-ktx:$workVersion")
+  implementation("com.google.android.material:material:1.11.0")
   implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
   implementation(libs.androidx.core.ktx)
   implementation(libs.androidx.appcompat)

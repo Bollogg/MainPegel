@@ -26,6 +26,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.view.OnApplyWindowInsetsListener
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import de.net.wiesenfarth.mainpegel.Variable.CONST
 import de.net.wiesenfarth.mainpegel.AlarmManager.NotificationHelper
 import de.net.wiesenfarth.mainpegel.AlarmManager.PegelScheduler
@@ -66,7 +67,6 @@ class MainActivity : AppCompatActivity() {
 
     // UI-Komponenten
     private lateinit var textViewPegelstand: TextView
-    private lateinit var buttonAktualisieren: Button
 
     // Diagramm (MPAndroidChart) zur Darstellung des Pegelverlaufs
     private lateinit var lineChart: com.github.mikephil.charting.charts.LineChart
@@ -153,29 +153,56 @@ class MainActivity : AppCompatActivity() {
 
         // UI-Elemente initialisieren
         textViewPegelstand = findViewById(R.id.textViewPegelstand)
-        buttonAktualisieren = findViewById(R.id.buttonAktualisieren)
         lineChart = findViewById(R.id.lineChart)
+
 
         // Pegeldaten aus Cache laden und anzeigen
         PegelUiHelper.ladePegelstand(this, textViewPegelstand, lineChart, prefs)
 
         /**
-         * Button für manuelles Aktualisieren der Pegeldaten
+         * Toolbar fuer direkten Zugriff auf:
+         * - Tabelle der Wasserstände
+         * - Manuelles Aktualisieren der Pegeldaten
+         * - Settings zum einstellen der APP
          */
-        buttonAktualisieren.setOnClickListener {
-            Log.i("MAIN", "Manuelles Update gestartet")
+        val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_nav)
 
-            // Startet API-Update
-            val started = de.net.wiesenfarth.mainpegel.API.PegelLogic.run(this)
+        bottomNav.setOnItemSelectedListener { item ->
+        when (item.itemId) {
 
-            // Falls Update bereits läuft
-            if (!started) {
-                Toast.makeText(this, "Update läuft bereits", Toast.LENGTH_SHORT).show()
+            R.id.nav_water -> {
+                // 👉 Water Screen
+                startActivity(Intent(this, WaterLevelActivity::class.java))
+                true
             }
 
-            // UI erneut laden
-            PegelUiHelper.ladePegelstand(this, textViewPegelstand, lineChart, prefs)
+            R.id.nav_update -> {
+                // 👉 Update Aktion
+                Log.i("MAIN", "Manuelles Update gestartet")
+
+                // Startet API-Update
+                val started = de.net.wiesenfarth.mainpegel.API.PegelLogic.run(this)
+
+                // Falls Update bereits läuft
+                if (!started) {
+                    Toast.makeText(this, "Update läuft bereits", Toast.LENGTH_SHORT).show()
+                }
+
+                // UI erneut laden
+                PegelUiHelper.ladePegelstand(this, textViewPegelstand, lineChart, prefs)
+                true
+            }
+
+            R.id.nav_settings -> {
+                // 👉 Settings Screen
+                val intent = Intent(this, SettingsActivity::class.java)
+                startActivity(intent)
+                true
+            }
+
+            else -> false
         }
+      }
     }
 
     /**

@@ -16,6 +16,7 @@
   <string name="attachment_title">Download incoming attachments</string>
   <string name="attachment_summary_on">Automatically download attachments for incoming emails</string>
   <string name="attachment_summary_off">Only download attachments when manually requested</string>
+  <string name="menu_water_table">Water level</string>
 
   <!-- Menu items -->
   <string name="menu_settings">Settings</string>
@@ -31,6 +32,7 @@
 
   <string name="water_level_location">Water level location:</string>
   <string name="reads_water_levels">Reads water levels:</string>
+  <string name="level_date_time">Date / Time</string>
   <string name="level_curve">Level curve</string>
   <string name="level_temperature">temperature</string>
 

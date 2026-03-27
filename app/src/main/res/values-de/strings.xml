@@ -21,6 +21,7 @@
   <string name="menu_info">Info</string>
   <string name="menu_oss_licenses">Lizenz Info</string>
   <string name="menu_privacy_policy">Datenschutzerklaerung</string>
+  <string name="menu_water_table">Wasserstand</string>
 
   <!-- Toast messages -->
   <string name="toast_settings">Einstellungen ausgewählt</string>
@@ -30,6 +31,7 @@
 
   <string name="water_level_location">Pegelstand Ort:</string>
   <string name="reads_water_levels">Pegelstände lesen:</string>
+  <string name="level_date_time">Datum / Zeit</string>
   <string name="level_curve">Pegelverlauf</string>
   <string name="level_temperature">Temperatur</string>
 

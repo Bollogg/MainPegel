@@ -6,6 +6,11 @@ Bei Überschreitung des Pegelstand um x cm wird ein Alarm ausgelöst
   <img src="images/MainPegelApp.png" width="200">
 </p>
 
+ROT:  Anzeige einer Pegelüberschreitung
+GELB: Tabelle der gelesenen Pegelstände
+BLAU: Button für die Aktualliesierung
+GRÜN: Einstellungen der APP
+
 ## Play Store
 
 <a href='https://play.google.com/store/apps/'>

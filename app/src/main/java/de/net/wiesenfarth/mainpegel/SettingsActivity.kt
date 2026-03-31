@@ -3,252 +3,200 @@ package de.net.wiesenfarth.mainpegel
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.InputFilter
-import android.text.InputFilter.LengthFilter
 import android.view.MenuItem
-import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Switch
 import androidx.activity.OnBackPressedCallback
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.appcompat.app.AppCompatActivity
 import de.net.wiesenfarth.mainpegel.AlarmManager.PegelScheduler
 import de.net.wiesenfarth.mainpegel.Variable.CONST
-/*******************************************************
- * Programm:  SettingsActivity
- *
- * Beschreibung:
- * Einstellungen der App wie Messstelle, Intervalle,
- * Alarmoptionen, Schwellwert und Graph-Darstellung.
- *
- * Autor:     Bollogg
- * Datum:     2025-11-17
- *******************************************************/
+
 class SettingsActivity : AppCompatActivity() {
-    // UI-Elemente
-    private var spinnerLocality: Spinner? = null
-    private var spinnerInterval: Spinner? = null
-    private var waveThreshold: EditText? = null
-    private var switchVibration: Switch? = null
-    private var switchBeep: Switch? = null
 
-    // Spinner für Stunden (Graph)
-    private var spinnerMeasure: Spinner? = null
+    private lateinit var spinnerLocality: Spinner
+    private lateinit var spinnerInterval: Spinner
+    private lateinit var spinnerMeasure: Spinner
+    private lateinit var waveThreshold: EditText
+    private lateinit var switchVibration: Switch
+    private lateinit var switchBeep: Switch
 
-    // Einstellungen (Persistent)
-    private var prefs: SharedPreferences? = null
+    private lateinit var prefs: SharedPreferences
 
-    // Anzeigenamen der Pegel-Messstellen
-    private val localityNames = arrayOf<String?>(
-        "Raunheim",
-        "Frankfurt Osthafen",
-        "Hanau Brücke DFH",
-        "Auheim Brücke DFH",
-        "Krotzenburg",
-        "Mainflingen",
-        "Kleinostheim WUK",
-        "Obernau",
-        "Kleinheubach",
-        "Faulbach",
-        "Wertheim",
-        "Steinbach",
-        "Würzburg",
-        "Astheim",
-        "Schweinfurt Neuer Hafen",
-        "Trunstadt",
-        "Bamberg",
-        "Riedenburg Upstream"
+    private val localityNames = arrayOf(
+        "Raunheim", "Frankfurt Osthafen", "Hanau Brücke DFH",
+        "Auheim Brücke DFH", "Krotzenburg", "Mainflingen",
+        "Kleinostheim WUK", "Obernau", "Kleinheubach",
+        "Faulbach", "Wertheim", "Steinbach", "Würzburg",
+        "Astheim", "Schweinfurt Neuer Hafen", "Trunstadt",
+        "Bamberg", "Riedenburg Upstream"
     )
 
-    // GUIDs der Pegel-Messstellen
-    private val localityValues = arrayOf<String?>(
-        CONST.RAUNHEIM,
-        CONST.FRANKFURT_OSTHAFEN,
-        CONST.HANAU_BRUECKE_DFH,
-        CONST.AUHEIM_BRUECKE_DFH,
-        CONST.KROTZENBURG,
-        CONST.MAINFLINGEN,
-        CONST.KLEINOSTHEIM_WUK,
-        CONST.OBERNAU,
-        CONST.KLEINHEUBACH,
-        CONST.FAULBACH,
-        CONST.WERTHEIM,
-        CONST.STEINBACH,
-        CONST.WUERZBURG,
-        CONST.ASTHEIM,
-        CONST.SCHWEINFURT_NEUER_HAFEN,
-        CONST.TRUNSTADT,
-        CONST.BAMBERG,
-        CONST.RIEDENBURG_UP
+    private val localityValues = arrayOf(
+        CONST.RAUNHEIM, CONST.FRANKFURT_OSTHAFEN, CONST.HANAU_BRUECKE_DFH,
+        CONST.AUHEIM_BRUECKE_DFH, CONST.KROTZENBURG, CONST.MAINFLINGEN,
+        CONST.KLEINOSTHEIM_WUK, CONST.OBERNAU, CONST.KLEINHEUBACH,
+        CONST.FAULBACH, CONST.WERTHEIM, CONST.STEINBACH, CONST.WUERZBURG,
+        CONST.ASTHEIM, CONST.SCHWEINFURT_NEUER_HAFEN, CONST.TRUNSTADT,
+        CONST.BAMBERG, CONST.RIEDENBURG_UP
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.settings_activity)
 
-        // --------------------------------------------------------
-        // Toolbar einrichten
-        // --------------------------------------------------------
-        val toolbar = findViewById<Toolbar?>(R.id.toolbar)
-        setSupportActionBar(toolbar)
+        setupToolbar()
+        initViews()
 
-        // KORRIGIERTE ZEILE:
-        supportActionBar!!.title = getString(R.string.menu_settings) // Modernere Kotlin-Syntax
-        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
-
-        // SharedPreferences laden
         prefs = getSharedPreferences("settings", MODE_PRIVATE)
 
-        // --------------------------------------------------------
-        // UI-Elemente verbinden
-        // --------------------------------------------------------
-        spinnerLocality = findViewById(R.id.spinner_locality);
-        spinnerInterval = findViewById(R.id.spinner_interval);
-        waveThreshold = findViewById(R.id.wave_threshold);
-        switchVibration = findViewById(R.id.switch_vibration);
-        switchBeep = findViewById(R.id.switch_beep);
-        spinnerMeasure = findViewById(R.id.spinner_Measure);
+        setupSpinners()
+        setupBackHandler()
 
+        loadSettings()
 
-        // Maximal 4 Ziffern (z. B. 9999)
-        waveThreshold!!.setFilters(
-            arrayOf<InputFilter>(
-                LengthFilter(CONST.WAVE_THERESHOLD_MAX)
-            )
-        )
+    }
 
-        // --------------------------------------------------------
-        // Spinner: Anzahl Stunden für Graph (1–29)
-        // --------------------------------------------------------
-        val hourLabels = arrayOfNulls<String>(29)
-        for (i in 0..28) {
-            hourLabels[i] = (i + 1).toString() + " Stunden"
+    private fun setupToolbar() {
+        val toolbar = findViewById<Toolbar>(R.id.toolbar)
+        setSupportActionBar(toolbar)
+
+        supportActionBar?.apply {
+            title = getString(R.string.menu_settings)
+            setDisplayHomeAsUpEnabled(true)
+        }
+    }
+
+    private fun initViews() {
+        spinnerLocality = findViewById(R.id.spinner_locality)
+        spinnerInterval = findViewById(R.id.spinner_interval)
+        spinnerMeasure = findViewById(R.id.spinner_Measure)
+
+        waveThreshold = findViewById(R.id.wave_threshold)
+        switchVibration = findViewById(R.id.switch_vibration)
+        switchBeep = findViewById(R.id.switch_beep)
+
+        waveThreshold.filters = arrayOf(InputFilter.LengthFilter(CONST.WAVE_THERESHOLD_MAX))
+    }
+
+    private fun setupSpinners() {
+
+        // Stunden
+        ArrayAdapter.createFromResource(
+            this,
+            R.array.hours_display,
+            android.R.layout.simple_spinner_item
+        ).also {
+            it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            spinnerMeasure.adapter = it
         }
 
-        val adapterHours = ArrayAdapter<String?>(
-            this,
-            android.R.layout.simple_spinner_item,
-            hourLabels
-        )
-        adapterHours.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinnerMeasure!!.setAdapter(adapterHours)
-
-        // --------------------------------------------------------
-        // Spinner: Pegelmessstelle
-        // --------------------------------------------------------
-        val adapterLocality = ArrayAdapter<String?>(
+        // Messstelle
+        spinnerLocality.adapter = ArrayAdapter(
             this,
             android.R.layout.simple_spinner_dropdown_item,
             localityNames
         )
-        spinnerLocality!!.setAdapter(adapterLocality)
 
-        // --------------------------------------------------------
-        // Spinner: Abrufintervall (Displaywerte → XML)
-        // --------------------------------------------------------
-        val adapterInterval = ArrayAdapter.createFromResource(
+        // Intervall
+        ArrayAdapter.createFromResource(
             this,
             R.array.interval_display,
             android.R.layout.simple_spinner_item
-        )
-        adapterInterval.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinnerInterval!!.setAdapter(adapterInterval)
+        ).also {
+            it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            spinnerInterval.adapter = it
+        }
+    }
 
-        // --------------------------------------------------------
-        // Zurück-Knopf (system) → Speichern + Schließen
-        // --------------------------------------------------------
-        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+    private fun setupBackHandler() {
+        val callback = object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 saveSettings()
                 finish()
             }
-        })
-
-        // Einstellungen laden
-        loadSettings()
+        }
+        onBackPressedDispatcher.addCallback(this, callback)
     }
-
-    // --------------------------------------------------------
-    // Toolbar-Pfeil zurück → Einstellungen speichern
-    // --------------------------------------------------------
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.getItemId() == android.R.id.home) {
+        return if (item.itemId == android.R.id.home) {
             saveSettings()
             finish()
-            return true
+            true
+        } else {
+            super.onOptionsItemSelected(item)
         }
-        return super.onOptionsItemSelected(item)
     }
 
-    // --------------------------------------------------------
-    // Einstellungen speichern
-    // --------------------------------------------------------
+    // ---------------- SAVE ----------------
+
     private fun saveSettings() {
-        val editor = prefs!!.edit()
+        val editor = prefs.edit()
 
-        // Pegelmessstelle speichern
-        val index = spinnerLocality!!.getSelectedItemPosition()
-        editor.putString("locality_guid", localityValues[index])
-        editor.putInt("locality_index", index)
+        // Messstelle
+        val localityIndex = spinnerLocality.selectedItemPosition
+        editor.putString("locality_guid", localityValues[localityIndex])
+        editor.putInt("locality_index", localityIndex)
 
-        // Abrufintervall (Display → Werte)
-        val values = getResources().getStringArray(R.array.interval_values)
-        val pos = spinnerInterval!!.getSelectedItemPosition()
-        val selectedInterval = values[pos]!!.toInt()
-        editor.putInt("interval_minutes", selectedInterval)
+        // Intervall
+        val intervalValues = resources.getStringArray(R.array.interval_values)
+        val interval = intervalValues[spinnerInterval.selectedItemPosition].toInt()
+        editor.putInt("interval_minutes", interval)
 
         // Schwellwert
-        var input = waveThreshold!!.getText().toString().trim { it <= ' ' }
-        if (input.isEmpty()) {
-            input = "15" // default
-        }
-        editor.putString("wave_threshold", input)
+        val threshold = waveThreshold.text.toString().ifEmpty { "15" }
+        editor.putString("wave_threshold", threshold)
 
-        // Alarmoptionen
-        editor.putBoolean("vibration", switchVibration!!.isChecked())
-        editor.putBoolean("beep", switchBeep!!.isChecked())
+        // Switches
+        editor.putBoolean("vibration", switchVibration.isChecked)
+        editor.putBoolean("beep", switchBeep.isChecked)
 
-        // Stunden für Graph (Index 0 = 1 Stunde)
-        editor.putInt("graph_hours", spinnerMeasure!!.getSelectedItemPosition() + 1)
+        // Stunden (WICHTIG: echte Werte speichern!)
+        val hourValues = resources.getStringArray(R.array.hours_values)
+        val selectedHours = hourValues[spinnerMeasure.selectedItemPosition].toInt()
+        editor.putInt("graph_hours", selectedHours)
 
         editor.apply()
 
-        // WorkManager / AlarmManager Intervall nicht automatisch aktualisiert.
-        PegelScheduler.schedule(getApplicationContext())
+        PegelScheduler.schedule(applicationContext)
     }
 
-    // --------------------------------------------------------
-    // Einstellungen laden
-    // --------------------------------------------------------
-    private fun loadSettings() {
-        // Messstelle
+    // ---------------- LOAD ----------------
 
-        val index = prefs!!.getInt("locality_index", 0)
-        spinnerLocality!!.setSelection(index)
+    private fun loadSettings() {
+
+        // Messstelle
+        val localityIndex = prefs.getInt("locality_index", 0)
+            .coerceIn(0, localityNames.lastIndex)
+        spinnerLocality.setSelection(localityIndex)
 
         // Intervall
-        val storedValue = prefs!!.getInt("interval_minutes", 15)
-        val values = getResources().getStringArray(R.array.interval_values)
+        val storedInterval = prefs.getInt("interval_minutes", 15)
+        val intervalValues = resources.getStringArray(R.array.interval_values)
 
-        var foundIndex = 0
-        for (i in values.indices) {
-            if (values[i]!!.toInt() == storedValue) {
-                foundIndex = i
-                break
-            }
-        }
-        spinnerInterval!!.setSelection(foundIndex)
+        val intervalIndex = intervalValues.indexOfFirst {
+            it.toInt() == storedInterval
+        }.takeIf { it >= 0 } ?: 0
+
+        spinnerInterval.setSelection(intervalIndex)
 
         // Schwellwert
-        waveThreshold!!.setText(prefs!!.getString("wave_threshold", "15"))
+        waveThreshold.setText(prefs.getString("wave_threshold", "15"))
 
-        // Alarmoptionen
-        switchVibration!!.setChecked(prefs!!.getBoolean("vibration", false))
-        switchBeep!!.setChecked(prefs!!.getBoolean("beep", false))
+        // Switches
+        switchVibration.isChecked = prefs.getBoolean("vibration", false)
+        switchBeep.isChecked = prefs.getBoolean("beep", false)
 
-        // Graph-Stunden
-        val storedHours = prefs!!.getInt("graph_hours", 6)
-        spinnerMeasure!!.setSelection(storedHours - 1)
+        // Stunden (robust!)
+        val storedHours = prefs.getInt("graph_hours", 6)
+        val hourValues = resources.getStringArray(R.array.hours_values)
+
+        val hourIndex = hourValues.indexOfFirst {
+            it.toInt() == storedHours
+        }.takeIf { it >= 0 } ?: 0
+
+        spinnerMeasure.setSelection(hourIndex)
     }
 }

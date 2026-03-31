@@ -34,7 +34,8 @@
   <string name="reads_water_levels">Reads water levels:</string>
   <string name="level_date_time">Date / Time</string>
   <string name="level_curve">Level curve</string>
-  <string name="level_temperature">temperature</string>
+  <string name="level_temperature">Temperature</string>
+  <string name="level_moon_phase">Moon phase</string>
 
   <string name="wave_detection">Wave detection threshold [cm]:</string>
   <string name="vibration_alarm">Vibration alarm</string>
@@ -44,38 +45,6 @@
   <string name="off">OFF</string>
 
   <string name="level_measur_houer">Measurement period in hours:</string>
-
-  <string-array name="hours_array">
-    <item>1 hours</item>
-    <item>2 hours</item>
-    <item>3 hours</item>
-    <item>4 hours</item>
-    <item>5 hours</item>
-    <item>6 hours</item>
-    <item>7 hours</item>
-    <item>8 hours</item>
-    <item>9 hours</item>
-    <item>10 hours</item>
-    <item>11 hours</item>
-    <item>12 hours</item>
-    <item>13 hours</item>
-    <item>14 hours</item>
-    <item>15 hours</item>
-    <item>16 hours</item>
-    <item>17 hours</item>
-    <item>18 hours</item>
-    <item>19 hours</item>
-    <item>20 hours</item>
-    <item>21 hours</item>
-    <item>22 hours</item>
-    <item>23 hours</item>
-    <item>24 hours</item>
-    <item>25 hours</item>
-    <item>26 hours</item>
-    <item>27 hours</item>
-    <item>28 hours</item>
-    <item>29 hours</item>
-  </string-array>
 
   <string name="level_is_loading">Level is loading...</string>
   <string name="to_update">Update</string>
@@ -87,7 +56,53 @@
   <string name="min_75">75 Minutes</string>
   <string name="min_90">90 Minutes</string>
 
+  <string name="hours_1">1 hour</string>
+  <string name="hours_2">2 hours</string>
+  <string name="hours_3">3 hours</string>
+  <string name="hours_4">4 hours</string>
+  <string name="hours_5">5 hours</string>
+  <string name="hours_6">6 hours</string>
+  <string name="hours_7">7 hours</string>
+  <string name="hours_8">8 hours</string>
+  <string name="hours_9">9 hours</string>
+  <string name="hours_10">10 hours</string>
+  <string name="hours_11">11 hours</string>
+  <string name="hours_12">12 hours</string>
+  <string name="hours_13">13 hours</string>
+  <string name="hours_14">14 hours</string>
+  <string name="hours_15">15 hours</string>
+  <string name="hours_16">16 hours</string>
+  <string name="hours_17">17 hours</string>
+  <string name="hours_18">18 hours</string>
+  <string name="hours_19">19 hours</string>
+  <string name="hours_20">20 hours</string>
+  <string name="hours_21">21 hours</string>
+  <string name="hours_22">22 hours</string>
+  <string name="hours_23">23 hours</string>
+  <string name="days_1">1 day</string>
+  <string name="days_2">2 days</string>
+  <string name="days_3">3 days</string>
+  <string name="days_4">4 days</string>
+  <string name="days_5">5 days</string>
+  <string name="days_6">6 days</string>
+  <string name="days_7">7 days</string>
+  <string name="weeks_1">1 week</string>
+  <string name="weeks_2">2 weeks</string>
+  <string name="weeks_3">3 weeks</string>
+  <string name="days_30">30 days</string>
+
   <string name="graph_no_data">graph no data!</string>
+
+  <!-- Mondphase -->
+  <string name="moon_0_new">🌑</string>
+  <string name="moon_1_waxing_crescent">🌒</string>
+  <string name="moon_2_first_quarter">🌓</string>
+  <string name="moon_3_waxing_gibbous">🌔</string>
+  <string name="moon_4_full">🌕</string>
+  <string name="moon_5_waning_gibbous">🌖</string>
+  <string name="moon_6_last_quarter">🌗</string>
+  <string name="moon_7_waning_crescent">🌘</string>
+
   <!-- Strings used for fragments for navigation -->
   <string name="first_fragment_label">First Fragment</string>
   <string name="second_fragment_label">Second Fragment</string>

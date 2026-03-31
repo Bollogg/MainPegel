@@ -49,4 +49,80 @@
     <item>BAMBERG</item>
     <item>RIEDENBURG_UP</item>
   </string-array>
+
+  <string-array name="hours_display">
+    <item>@string/hours_1</item>
+    <item>@string/hours_2</item>
+    <item>@string/hours_3</item>
+    <item>@string/hours_4</item>
+    <item>@string/hours_5</item>
+    <item>@string/hours_6</item>
+    <item>@string/hours_7</item>
+    <item>@string/hours_8</item>
+    <item>@string/hours_9</item>
+    <item>@string/hours_10</item>
+    <item>@string/hours_11</item>
+    <item>@string/hours_12</item>
+    <item>@string/hours_13</item>
+    <item>@string/hours_14</item>
+    <item>@string/hours_15</item>
+    <item>@string/hours_16</item>
+    <item>@string/hours_17</item>
+    <item>@string/hours_18</item>
+    <item>@string/hours_19</item>
+    <item>@string/hours_20</item>
+    <item>@string/hours_21</item>
+    <item>@string/hours_22</item>
+    <item>@string/hours_23</item>
+    <item>@string/days_1</item>
+    <item>@string/days_2</item>
+    <item>@string/days_3</item>
+    <item>@string/days_4</item>
+    <item>@string/days_5</item>
+    <item>@string/days_6</item>
+    <item>@string/days_7</item>
+    <item>@string/weeks_1</item>
+    <item>@string/weeks_2</item>
+    <item>@string/weeks_3</item>
+    <item>@string/days_30</item>
+  </string-array>
+
+  <!-- Tatsächliche Werte, die gespeichert werden -->
+  <string-array name="hours_values">
+    <item>1</item>
+    <item>2</item>
+    <item>3</item>
+    <item>4</item>
+    <item>5</item>
+    <item>6</item>
+    <item>7</item>
+    <item>8</item>
+    <item>9</item>
+    <item>10</item>
+    <item>11</item>
+    <item>12</item>
+    <item>13</item>
+    <item>14</item>
+    <item>15</item>
+    <item>16</item>
+    <item>17</item>
+    <item>18</item>
+    <item>19</item>
+    <item>20</item>
+    <item>21</item>
+    <item>22</item>
+    <item>23</item>
+    <item>24</item>
+    <item>48</item>
+    <item>72</item>
+    <item>96</item>
+    <item>120</item>
+    <item>144</item>
+    <item>168</item>
+    <item>192</item>
+    <item>384</item>
+    <item>576</item>
+    <item>768</item>
+  </string-array>
+
 </resources>

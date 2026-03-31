@@ -7,9 +7,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import de.net.wiesenfarth.mainpegel.DataBase.RowData
 import de.net.wiesenfarth.mainpegel.DataBase.WaterAdapter
+import de.net.wiesenfarth.mainpegel.MoonPhase.MoonPhase
+import java.text.SimpleDateFormat
 import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.Date
 import java.util.Locale
 
 /*******************************************************
@@ -151,11 +154,22 @@ class WaterLevelActivity : AppCompatActivity() {
 			// Temperatur (optional)
 			val temp = prefs.getFloat("temp_$i", Float.NaN)
 
-			list.add(
+			// Mondphase adapter
+			var moonPhaseTxt = "-"
+
+			val date = try {
+				val odt = OffsetDateTime.parse(timestamp)
+				Date.from(odt.toInstant())
+			} catch (e: Exception) {
+				null
+			}
+
+				list.add(
 				RowData(
-					time = dateTime,
+					time  = dateTime,
 					value = value,
-					temp = temp
+					temp  = temp,
+					moon  = moonPhaseTxt
 				)
 			)
 		}

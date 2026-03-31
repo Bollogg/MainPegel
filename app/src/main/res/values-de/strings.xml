@@ -34,6 +34,7 @@
   <string name="level_date_time">Datum / Zeit</string>
   <string name="level_curve">Pegelverlauf</string>
   <string name="level_temperature">Temperatur</string>
+  <string name="level_moon_phase">Mond Phase</string>
 
   <string name="wave_detection">Wellenerkennungsschwelle [cm]:</string>
   <string name="vibration_alarm">Vibrationsalarm</string>
@@ -43,38 +44,6 @@
   <string name="off">AUS</string>
 
   <string name="level_measur_houer">Messungszeitraum in Stunden:</string>
-
-  <string-array name="hours_array">
-    <item>1 Stunde</item>
-    <item>2 Stunden</item>
-    <item>3 Stunden</item>
-    <item>4 Stunden</item>
-    <item>5 Stunden</item>
-    <item>6 Stunden</item>
-    <item>7 Stunden</item>
-    <item>8 Stunden</item>
-    <item>9 Stunden</item>
-    <item>10 Stunden</item>
-    <item>11 Stunden</item>
-    <item>12 Stunden</item>
-    <item>13 Stunden</item>
-    <item>14 Stunden</item>
-    <item>15 Stunden</item>
-    <item>16 Stunden</item>
-    <item>17 Stunden</item>
-    <item>18 Stunden</item>
-    <item>19 Stunden</item>
-    <item>20 Stunden</item>
-    <item>21 Stunden</item>
-    <item>22 Stunden</item>
-    <item>23 Stunden</item>
-    <item>24 Stunden</item>
-    <item>25 Stunden</item>
-    <item>26 Stunden</item>
-    <item>27 Stunden</item>
-    <item>28 Stunden</item>
-    <item>29 Stunden</item>
-  </string-array>
 
   <string name="level_is_loading">Pegelstand wird geladen...</string>
   <string name="to_update">Aktualisieren</string>
@@ -86,5 +55,52 @@
   <string name="min_75">75 Minuten</string>
   <string name="min_90">90 Minuten</string>
 
+  <string name="hours_1">1 Stunde</string>
+  <string name="hours_3">3 Stunden</string>
+  <string name="hours_4">4 Stunden</string>
+  <string name="hours_5">5 Stunden</string>
+  <string name="hours_6">6 Stunden</string>
+  <string name="hours_7">7 Stunden</string>
+  <string name="hours_8">8 Stunden</string>
+  <string name="hours_2">2 Stunden</string>
+  <string name="hours_9">9 Stunden</string>
+  <string name="hours_10">10 Stunden</string>
+  <string name="hours_11">11 Stunden</string>
+  <string name="hours_12">12 Stunden</string>
+  <string name="hours_13">13 Stunden</string>
+  <string name="hours_14">14 Stunden</string>
+  <string name="hours_15">15 Stunden</string>
+  <string name="hours_16">16 Stunden</string>
+  <string name="hours_17">17 Stunden</string>
+  <string name="hours_18">18 Stunden</string>
+  <string name="hours_19">19 Stunden</string>
+  <string name="hours_20">20 Stunden</string>
+  <string name="hours_21">21 Stunden</string>
+  <string name="hours_22">22 Stunden</string>
+  <string name="hours_23">23 Stunden</string>
+  <string name="days_1">1 Tag</string>
+  <string name="days_2">2 Tage</string>
+  <string name="days_3">3 Tage</string>
+  <string name="days_4">4 Tage</string>
+  <string name="days_5">5 Tage</string>
+  <string name="days_6">6 Tage</string>
+  <string name="days_7">7 Tage</string>
+  <string name="weeks_1">1 Woche</string>
+  <string name="weeks_2">2 Wochen</string>
+  <string name="weeks_3">3 Wochen</string>
+  <string name="days_30">30 Tage</string>
+
   <string name="graph_no_data">Keine Daten!</string>
+
+  <!-- Mondphase -->
+  <string name="moon_0_new">🌑</string>
+  <string name="moon_1_waxing_crescent">🌒</string>
+  <string name="moon_2_first_quarter">🌓</string>
+  <string name="moon_3_waxing_gibbous">🌔</string>
+  <string name="moon_4_full">🌕</string>
+  <string name="moon_5_waning_gibbous">🌖</string>
+  <string name="moon_6_last_quarter">🌗</string>
+  <string name="moon_7_waning_crescent">🌘</string>
+
+
 </resources>

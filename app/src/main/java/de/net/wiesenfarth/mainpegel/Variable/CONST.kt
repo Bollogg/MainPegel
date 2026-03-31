@@ -81,4 +81,6 @@ object CONST {
   const val HOURS_27: Int = 27
   const val HOURS_28: Int = 28
   const val HOURS_29: Int = 29
+  const val HOURS_30: Int = 30
+  const val HOURS_MAX: Int = 744
 }

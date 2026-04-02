@@ -7,28 +7,25 @@ plugins {
     // RoomDatabase
     alias(libs.plugins.ksp)
     alias(libs.plugins.androidx.room)
-
-
 }
 
 android {
-    namespace = "de.net.wiesenfarth.mainpegel"
-    compileSdk {
-        version = release(36)
-    }
+  namespace = "de.net.wiesenfarth.mainpegel"
+
+  compileSdk = 36
     // Version-Name (versionName) in InfoActivity freigeben
     buildFeatures {
-        buildConfig = true
+      buildConfig = true
 	    viewBinding = true
     }
     defaultConfig {
-        applicationId = "de.net.wiesenfarth.mainpegel"
-        minSdk = 32
-        targetSdk = 36
-        versionCode = 20260329
-        versionName = "V2026.03.29"
+      applicationId = "de.net.wiesenfarth.mainpegel"
+      minSdk = 32
+      targetSdk = 36
+      versionCode = 20260401
+      versionName = "V2026.04.01"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+      testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
       versionNameSuffix = " Keiler"
     }
     // RoomDatabase V2.8.x
@@ -64,17 +61,14 @@ android {
             )
         }
     }
-
-    buildToolsVersion = "36.1.0"
 }
 
 dependencies {
 	implementation("androidx.preference:preference:1.2.1")
 	implementation(libs.androidx.navigation.fragment.ktx)
 	implementation(libs.androidx.navigation.ui.ktx)
-	val workVersion = "2.11.1"
-  implementation("androidx.work:work-runtime-ktx:$workVersion")
-  implementation("com.google.android.material:material:1.11.0")
+  implementation("androidx.work:work-runtime-ktx:2.11.2")
+  implementation("com.google.android.material:material:1.13.0")
   implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
   implementation(libs.androidx.core.ktx)
   implementation(libs.androidx.appcompat)
@@ -91,8 +85,8 @@ dependencies {
   // Converter für JSON (meistens Gson oder Moshi)
   implementation("com.squareup.retrofit2:converter-gson:3.0.0")
   implementation("com.squareup.okhttp3:logging-interceptor:5.3.2")
-	implementation("com.google.android.gms:play-services-oss-licenses:17.3.0")
-	implementation("com.google.code.gson:gson:2.10.1")
+	implementation("com.google.android.gms:play-services-oss-licenses:17.4.0")
+	implementation("com.google.code.gson:gson:2.13.2")
 }
 
 /* ===============================

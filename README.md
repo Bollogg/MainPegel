@@ -11,9 +11,18 @@ Bei Überschreitung des Pegelstand um x cm wird ein Alarm ausgelöst
 - BLAU: Button für die Aktualliesierung
 - GRÜN: Einstellungen der APP
 
+## Erweiterung ab V2026.5 Keiler 3
+
+<p align="center">
+  <img src="images/MainPegelApp_Erweiterung_V2026.5.png" width="200">
+</p>
+
+ Mondphase auf Main Activity eingefügt
+ - Werte von 0 bis 7
+ 
 ## Play Store
 
-<a href='https://play.google.com/store/apps/'>
+<a href='https://play.google.com/apps/internaltest/4701696025686197343'>
   <img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png' height='80px'/>
 </a>
 

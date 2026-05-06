@@ -19,12 +19,17 @@ Bei Überschreitung des Pegelstand um x cm wird ein Alarm ausgelöst
 
  Mondphase auf Main Activity eingefügt
  - Werte von 0 bis 7
- 
+
 ## Play Store
 
-<a href='https://play.google.com/apps/internaltest/4701696025686197343'>
+Teilnahme am Test:
+ - Auf Android teilnehmen
+<a href='https://play.google.com/store/apps/details?id=de.net.wiesenfarth.mainpegel'>
   <img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png' height='80px'/>
 </a>
+
+ - Im Web teilnehmen
+'https://play.google.com/apps/testing/de.net.wiesenfarth.mainpegel'
 
 ## Installation
 Wichtige Informationen!

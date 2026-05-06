@@ -1,93 +1,98 @@
+@file:Suppress("DEPRECATION")
 plugins {
-    //alias(libs.plugins.android.application)
-    //alias(libs.plugins.kotlin.android)
+  //alias(libs.plugins.android.application)
+  //alias(libs.plugins.kotlin.android)
 	id("com.android.application")
 	id("com.google.android.gms.oss-licenses-plugin")
 	id("org.jetbrains.kotlin.android")
-    // RoomDatabase
-    alias(libs.plugins.ksp)
-    alias(libs.plugins.androidx.room)
+  // RoomDatabase
+  alias(libs.plugins.ksp)
+  alias(libs.plugins.androidx.room)
 }
 
 android {
   namespace = "de.net.wiesenfarth.mainpegel"
 
   compileSdk = 36
-    // Version-Name (versionName) in InfoActivity freigeben
-    buildFeatures {
+  buildFeatures {
       buildConfig = true
-	    viewBinding = true
-    }
-    defaultConfig {
-      applicationId = "de.net.wiesenfarth.mainpegel"
-      minSdk = 32
-      targetSdk = 36
-      versionCode = 20260401
-      versionName = "V2026.04.01"
+      viewBinding = true
+  }
+  defaultConfig {
+    applicationId = "de.net.wiesenfarth.mainpegel"
+    minSdk = 32
+    targetSdk = 36
+    versionCode = 20260503
+    versionName = "V2026.05 "
 
-      testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-      versionNameSuffix = " Keiler"
-    }
-    // RoomDatabase V2.8.x
-    room {
-        schemaDirectory("$projectDir/schemas")
-    }
+    testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    versionNameSuffix = "Keiler 3"
+  }
+  // RoomDatabase
+  room {
+      schemaDirectory("$projectDir/schemas")
+  }
 
-    buildTypes {
-      release {
+  buildTypes {
+    release {
+      // Enables code-related app optimization.
+      isMinifyEnabled = true
 
-        // Enables code-related app optimization.
-        isMinifyEnabled = true
+      // Enables resource shrinking.
+      isShrinkResources = true
 
-        // Enables resource shrinking.
-        isShrinkResources = true
+      proguardFiles(
+        // Default file with automatically generated optimization rules.
+        getDefaultProguardFile("proguard-android-optimize.txt"),
+        "proguard-rules.pro"
+      )
+    }
+  }
+  compileOptions {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+  }
 
-        proguardFiles(
-	        // Default file with automatically generated optimization rules.
-          getDefaultProguardFile("proguard-android-optimize.txt"),
-          "proguard-rules.pro"
-        )
-      }
+  kotlin {
+    compilerOptions {
+      jvmTarget.set(
+        org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+      )
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-    
-    kotlin {
-        compilerOptions {
-            jvmTarget.set(
-                org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
-            )
-        }
-    }
+  }
 }
-
 dependencies {
-	implementation("androidx.preference:preference:1.2.1")
-	implementation(libs.androidx.navigation.fragment.ktx)
-	implementation(libs.androidx.navigation.ui.ktx)
-  implementation("androidx.work:work-runtime-ktx:2.11.2")
-  implementation("com.google.android.material:material:1.13.0")
-  implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+
+  implementation(libs.material)
+  implementation(libs.androidx.navigation.fragment.ktx)
+  implementation(libs.androidx.navigation.ui.ktx)
   implementation(libs.androidx.core.ktx)
   implementation(libs.androidx.appcompat)
-  implementation(libs.material)
   implementation(libs.androidx.activity)
   implementation(libs.androidx.constraintlayout)
-  testImplementation(libs.junit)
-  androidTestImplementation(libs.androidx.junit)
-  androidTestImplementation(libs.androidx.espresso.core)
-  // RoomDatabase
+
+  // Room
   implementation(libs.androidx.room.runtime)
-  // Retrofit für API-Abfragen
-  implementation("com.squareup.retrofit2:retrofit:3.0.0")
-  // Converter für JSON (meistens Gson oder Moshi)
-  implementation("com.squareup.retrofit2:converter-gson:3.0.0")
-  implementation("com.squareup.okhttp3:logging-interceptor:5.3.2")
-	implementation("com.google.android.gms:play-services-oss-licenses:17.4.0")
-	implementation("com.google.code.gson:gson:2.13.2")
-}
+  implementation(libs.androidx.room.ktx)
+  ksp(libs.androidx.room.compiler)
+
+  // Tests
+  testImplementation(libs.androidx.junit)
+  androidTestImplementation(libs.androidx.espresso.core)
+
+  implementation(libs.mpandroidchart)
+
+  implementation(libs.androidx.preference)
+  implementation(libs.androidx.work.ktx)
+
+  implementation(libs.retrofit)
+  implementation(libs.retrofit.converter.gson)
+  implementation(libs.okhttp.logging)
+
+  implementation(libs.oss.licenses)
+
+// optional
+  implementation(libs.gson)}
 
 /* ===============================
    Datenschutzerklärung Sync

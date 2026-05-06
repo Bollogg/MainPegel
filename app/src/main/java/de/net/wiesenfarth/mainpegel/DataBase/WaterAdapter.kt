@@ -7,10 +7,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import de.net.wiesenfarth.mainpegel.MoonPhase.MoonPhase
 import de.net.wiesenfarth.mainpegel.R
-import java.text.SimpleDateFormat
-import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 class WaterAdapter(private val list: List<RowData>) :
 	RecyclerView.Adapter<WaterAdapter.ViewHolder>() {
@@ -57,7 +54,8 @@ class WaterAdapter(private val list: List<RowData>) :
 
 		} catch (e: Exception) {
 			"--"
-		}		// 🌙 Mondphase (ISO direkt!)
+		}
+		// 🌙 Mondphase (ISO direkt!)
 		val moonText = try {
 			val phase = MoonPhase.getMoonPhase(isoDate)
 

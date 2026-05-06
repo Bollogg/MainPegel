@@ -146,4 +146,40 @@ object MoonPhase {
 			else -> R.string.moon_0_new
 		}
 	}
+
+	/*******************************************************
+	 * Funktion:   getMoonPhaseIcMoonRes
+	 *
+	 * Beschreibung:
+	 * -----------------------------------------------------
+	 * Liefert die passende drowable/ic_moon-ID zur
+	 * berechneten Mondphase.
+	 *
+	 * Verwendung:
+	 * -----------------------------------------------------
+	 * context.getString(
+	 *     MoonPhase.getMoonPhaseStringRes(phase)
+	 * )
+	 *
+	 * Vorteil:
+	 * -----------------------------------------------------
+	 * - Kein Context in dieser Klasse notwendig
+	 * - Saubere Trennung von Logik und UI
+	 *
+	 * @param phase Mondphase (0–7)
+	 * @return drowable/ic_moon - ID
+	 *******************************************************/
+	fun getMoonPhaseIcMoonRes(phase: Int): Int {
+		return when (phase) {
+			0 -> R.drawable.ic_moon_0_new
+			1 -> R.drawable.ic_moon_1_waxing_crescent
+			2 -> R.drawable.ic_moon_2_first_quarter
+			3 -> R.drawable.ic_moon_3_waxing_gibbous
+			4 -> R.drawable.ic_moon_4_full
+			5 -> R.drawable.ic_moon_5_waning_gibbous
+			6 -> R.drawable.ic_moon_6_last_quarter
+			7 -> R.drawable.ic_moon_7_waning_crescent
+			else -> R.drawable.ic_moon_0_new
+		}
+	}
 }

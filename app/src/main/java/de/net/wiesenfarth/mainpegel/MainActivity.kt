@@ -1,6 +1,5 @@
 package de.net.wiesenfarth.mainpegel
 
-import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import android.Manifest
 import android.app.AlarmManager
 import android.content.BroadcastReceiver
@@ -17,7 +16,7 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -26,15 +25,17 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.view.OnApplyWindowInsetsListener
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.android.gms.oss.licenses.v2.OssLicensesMenuActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import de.net.wiesenfarth.mainpegel.Variable.CONST
 import de.net.wiesenfarth.mainpegel.AlarmManager.NotificationHelper
 import de.net.wiesenfarth.mainpegel.AlarmManager.PegelScheduler
 import de.net.wiesenfarth.mainpegel.Graph.PegelUiHelper
 import de.net.wiesenfarth.mainpegel.Widget.PegelWidget
+import kotlin.jvm.java
 
 /*******************************************************
- * Programm:  MainPegel
+ * Programm: MainPegel
  *
  * Beschreibung:
  * Haupt-Activity der App.
@@ -67,7 +68,7 @@ class MainActivity : AppCompatActivity() {
 
     // UI-Komponenten
     private lateinit var textViewPegelstand: TextView
-
+    private lateinit var imageViewMoonPhase: ImageView
     // Diagramm (MPAndroidChart) zur Darstellung des Pegelverlaufs
     private lateinit var lineChart: com.github.mikephil.charting.charts.LineChart
 
@@ -84,6 +85,9 @@ class MainActivity : AppCompatActivity() {
 
         // Layout laden
         setContentView(R.layout.activity_main)
+
+        // Mondphase
+        imageViewMoonPhase = findViewById(R.id.imageViewMoonPhase)
 
         // Aktiviert modernes Edge-to-Edge Layout (Android 13+ Design)
         this.enableEdgeToEdge()
@@ -146,7 +150,7 @@ class MainActivity : AppCompatActivity() {
 
         /**
          * Scheduler starten
-         * Dieser sorgt für regelmäßige Hintergrundupdates
+         * dieser sorgt für regelmäßige Hintergrundupdates
          * der Pegeldaten.
          */
         PegelScheduler.schedule(this)
@@ -157,13 +161,19 @@ class MainActivity : AppCompatActivity() {
 
 
         // Pegeldaten aus Cache laden und anzeigen
-        PegelUiHelper.ladePegelstand(this, textViewPegelstand, lineChart, prefs)
+        PegelUiHelper.ladePegelstand(
+            this,
+            textViewPegelstand,
+            lineChart,
+            prefs,
+            imageViewMoonPhase
+        )
 
         /**
-         * Toolbar fuer direkten Zugriff auf:
+         * Toolbar für direkten Zugriff auf:
          * - Tabelle der Wasserstände
          * - Manuelles Aktualisieren der Pegeldaten
-         * - Settings zum einstellen der APP
+         * - Settings zum Einstellen der APP
          */
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_nav)
 
@@ -189,7 +199,13 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 // UI erneut laden
-                PegelUiHelper.ladePegelstand(this, textViewPegelstand, lineChart, prefs)
+                PegelUiHelper.ladePegelstand(
+                    this,
+                    textViewPegelstand,
+                    lineChart,
+                    prefs,
+                    imageViewMoonPhase
+                )
                 true
             }
 
@@ -235,7 +251,13 @@ class MainActivity : AppCompatActivity() {
         }
 
         // Cached Daten sofort anzeigen
-        PegelUiHelper.ladePegelstand(this, textViewPegelstand, lineChart, prefs)
+        PegelUiHelper.ladePegelstand(
+            this,
+            textViewPegelstand,
+            lineChart,
+            prefs,
+            imageViewMoonPhase
+        )
 
         // Debug-Ausgabe
         updateWithLocality(localityGuid, intervalMinutes)
@@ -245,7 +267,7 @@ class MainActivity : AppCompatActivity() {
 
     /**
      * Wird aufgerufen, wenn Activity in den Hintergrund geht.
-     * Receiver wird entfernt um Speicherlecks zu vermeiden.
+     * Receiver wird entfernt den Speicherlecks zu vermeiden.
      */
     override fun onPause() {
         super.onPause()
@@ -342,7 +364,8 @@ class MainActivity : AppCompatActivity() {
                     this@MainActivity,
                     textViewPegelstand,
                     lineChart,
-                    prefs
+                    prefs,
+                    imageViewMoonPhase
                 )
             }
         }

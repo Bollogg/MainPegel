@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.util.Log
 import android.util.Log.i
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
@@ -17,6 +18,7 @@ import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import de.net.wiesenfarth.mainpegel.API.PegelResponse
 import de.net.wiesenfarth.mainpegel.API.TempResponse
+import de.net.wiesenfarth.mainpegel.MoonPhase.MoonPhase
 import de.net.wiesenfarth.mainpegel.R
 import de.net.wiesenfarth.mainpegel.Variable.getThemeColor
 import de.net.wiesenfarth.mainpegel.Widget.PegelWidget
@@ -79,11 +81,13 @@ object PegelUiHelper {
 	 * @param chart    LineChart für den Verlauf
 	 * @param prefs    SharedPreferences (Benutzereinstellungen)
 	 */
+
 	fun ladePegelstand(
 		ctx: Context,
 		textView: TextView,
 		chart: LineChart,
-		prefs: SharedPreferences
+		prefs: SharedPreferences,
+		imageViewMoonPhase: ImageView   // Zugriff auf activity_main.xml --> ImageViewMoonPhase
 	)
   {
 	  // Rekonstruiert PegelResponse-Objekte aus dem Cache.
@@ -91,7 +95,7 @@ object PegelUiHelper {
 		// Hier wird daraus wieder eine geordnete Liste erzeugt.
 	  //PegelLogic.run(ctx)
 
-    val cache = ctx.getSharedPreferences("pegel_cache", Context.MODE_PRIVATE)
+	  val cache = ctx.getSharedPreferences("pegel_cache", Context.MODE_PRIVATE)
 
     val value = cache.getInt("last_value", -1)
 	  val temp = cache.getFloat("last_temp", -999f)
@@ -135,6 +139,10 @@ object PegelUiHelper {
     } else {
       textView.setText("Keine Daten")
     }
+		// Mondphase
+	  val isoTimeStamp = pegelList.last().timestamp
+	  val moon = MoonPhase.getMoonPhase(isoTimeStamp)
+	  imageViewMoonPhase.setImageResource(MoonPhase.getMoonPhaseIcMoonRes(moon))
 
 		// Diagramm aktualisieren
     val hours = prefs.getInt("graph_hours", 4)

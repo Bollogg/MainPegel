@@ -135,16 +135,24 @@ object PegelUiHelper {
 
 		// Textanzeige aktualisieren
     if (value >= 0) {
-	    textViewPegelstandAlt.setText("Pegel alt: $prevValue cm")
-	    textViewPegelstandNeu.setText("Pegel neu: $value cm")
-	    textViewWassertemperatur.setText("Wasser: $temp °C ")
-	    textViewZeitpunkt.setText("Messung: $time Uhr")
+	    textViewPegelstandAlt.text =
+		    ctx.getString(R.string.water_level_old, prevValue)
+	    textViewPegelstandNeu.text =
+		    ctx.getString(R.string.water_level_new, value)
+	    textViewWassertemperatur.text =
+		    ctx.getString(R.string.water_temp, temp)
+	    textViewZeitpunkt.text =
+		    ctx.getString(R.string.data_timestamp, time)
 
     } else {
-	    textViewPegelstandAlt.setText("Keine Daten")
-	    textViewPegelstandNeu.setText("Keine Daten")
-	    textViewWassertemperatur.setText("Keine Daten")
-	    textViewZeitpunkt.setText("Keine Daten")
+	    textViewPegelstandAlt.text =
+			    ctx.getString(R.string.no_data_available)
+	    textViewPegelstandNeu.text =
+		    ctx.getString(R.string.no_data_available)
+	    textViewWassertemperatur.text =
+		    ctx.getString(R.string.no_data_available)
+	    textViewZeitpunkt.text =
+		    ctx.getString(R.string.no_data_available)
     }
 		// Mondphase
 	  val isoTimeStamp = pegelList.last().timestamp

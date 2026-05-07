@@ -22,11 +22,11 @@ android {
     applicationId = "de.net.wiesenfarth.mainpegel"
     minSdk = 32
     targetSdk = 36
-    versionCode = 20260507
+    versionCode = 20260508
     versionName = "V2026.05 "
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    versionNameSuffix = "Keiler 4"
+    versionNameSuffix = "Keiler 5"
   }
   // RoomDatabase
   room {

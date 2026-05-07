@@ -36,6 +36,12 @@
   <string name="level_temperature">Temperatur</string>
   <string name="level_moon_phase">Mond Phase</string>
 
+  <string name="water_level_new">Pegel neu: %1$d cm</string>
+  <string name="water_level_old">Pegel alt: %1$d cm</string>
+  <string name="water_temp">Wasser : %1$.1f °C</string>
+  <string name="data_timestamp">Messung : %1$s Uhr</string>
+  <string name="no_data_available">Keine Daten vorhanden</string>
+
   <string name="wave_detection">Wellenerkennungsschwelle [cm]:</string>
   <string name="vibration_alarm">Vibrationsalarm</string>
   <string name="beep">Benachritigungsalarm</string>

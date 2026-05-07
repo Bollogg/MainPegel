@@ -4,11 +4,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.util.Log
-import android.util.Log.i
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.content.ContentProviderCompat.requireContext
-import androidx.core.content.ContextCompat
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.YAxis
@@ -124,7 +121,7 @@ object PegelUiHelper {
     }
 
 	  if (pegelList.size < 2) {
-		  textViewPegelstandNeu.text = "Zu wenig Pegeldaten"
+		  textViewPegelstandNeu.text = ctx.getString(R.string.little_level_data)
 		  chart.clear()
 		  return
 	  }
@@ -252,15 +249,17 @@ object PegelUiHelper {
 		  try {
 			  val d = apiFormat.parse(p.timestamp)
 
-			  // Pegel
-			  entries.add(Entry(i.toFloat(), p.value.toFloat()))
-			  xLabels.add(displayFormat.format(d))
+			  if (d != null) {
+				  // Pegel
+				  entries.add(Entry(i.toFloat(), p.value.toFloat()))
+				  xLabels.add(displayFormat.format(d))
 
-			  // Temperatur aus Cache holen
-			  val temp = cache.getFloat("temp_$i", Float.NaN)
+				  // Temperatur aus Cache holen
+				  val temp = cache.getFloat("temp_$i", Float.NaN)
 
-			  if (!temp.isNaN()) {
-				  tempEntries.add(Entry(i.toFloat(), temp))
+				  if (!temp.isNaN()) {
+					  tempEntries.add(Entry(i.toFloat(), temp))
+				  }
 			  }
 
 		  } catch (e: Exception) {

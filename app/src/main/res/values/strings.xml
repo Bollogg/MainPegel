@@ -42,6 +42,7 @@
   <string name="water_temp">Water : %1$.1f °C</string>
   <string name="data_timestamp">Timestamp : %1$s a Clock</string>
   <string name="no_data_available">No data available</string>
+  <string name="little_level_data">Too little level data</string>
 
   <string name="wave_detection">Wave detection threshold [cm]:</string>
   <string name="vibration_alarm">Vibration alarm</string>

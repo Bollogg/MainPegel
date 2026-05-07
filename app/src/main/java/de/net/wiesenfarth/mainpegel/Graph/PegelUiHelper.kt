@@ -57,7 +57,7 @@ import kotlin.math.min
  * Die UI liest daher ggf. noch alte Cache-Werte.
  *
  * Autor:     Bollogg
- * Datum:     2026-01-30
+ * Datum:     2026-05-07
  *******************************************************/
 object PegelUiHelper {
 	/**
@@ -77,14 +77,20 @@ object PegelUiHelper {
 	 * sondern arbeitet mit den aktuell gespeicherten Cache-Daten.
 	 *
 	 * @param ctx      Context (Activity oder Fragment)
-	 * @param textView TextView zur Anzeige der Messwerte
+	 * @param textViewPegelstandAlt TextView zur Anzeige des alten Messwertes
+	 * @param textViewPegelstandNeu TextView zur Anzeige des aktuellen Messwertes
+	 * @param textViewWassertemperatur TextView zur Anzeige der Temperatur
+	 * @param textViewZeitpunkt TextView zur Anzeige des letzer Auslesezeit
 	 * @param chart    LineChart für den Verlauf
 	 * @param prefs    SharedPreferences (Benutzereinstellungen)
 	 */
 
 	fun ladePegelstand(
 		ctx: Context,
-		textView: TextView,
+		textViewPegelstandAlt: TextView,
+		textViewPegelstandNeu: TextView,
+		textViewWassertemperatur: TextView,
+		textViewZeitpunkt: TextView,
 		chart: LineChart,
 		prefs: SharedPreferences,
 		imageViewMoonPhase: ImageView   // Zugriff auf activity_main.xml --> ImageViewMoonPhase
@@ -118,7 +124,7 @@ object PegelUiHelper {
     }
 
 	  if (pegelList.size < 2) {
-		  textView.text = "Zu wenig Pegeldaten"
+		  textViewPegelstandNeu.text = "Zu wenig Pegeldaten"
 		  chart.clear()
 		  return
 	  }
@@ -129,15 +135,16 @@ object PegelUiHelper {
 
 		// Textanzeige aktualisieren
     if (value >= 0) {
-	    textView.text = """
-			Pegel alt: $prevValue cm
-			Pegel neu: $value cm
-			Wasser: $temp °C 
-			Aktuelle Messung: $time Uhr
-			""".trimIndent()
+	    textViewPegelstandAlt.setText("Pegel alt: $prevValue cm")
+	    textViewPegelstandNeu.setText("Pegel neu: $value cm")
+	    textViewWassertemperatur.setText("Wasser: $temp °C ")
+	    textViewZeitpunkt.setText("Messung: $time Uhr")
 
     } else {
-      textView.setText("Keine Daten")
+	    textViewPegelstandAlt.setText("Keine Daten")
+	    textViewPegelstandNeu.setText("Keine Daten")
+	    textViewWassertemperatur.setText("Keine Daten")
+	    textViewZeitpunkt.setText("Keine Daten")
     }
 		// Mondphase
 	  val isoTimeStamp = pegelList.last().timestamp

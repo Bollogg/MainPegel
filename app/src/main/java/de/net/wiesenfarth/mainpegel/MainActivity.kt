@@ -67,7 +67,10 @@ class MainActivity : AppCompatActivity() {
     private var intervalMinutes = 0
 
     // UI-Komponenten
-    private lateinit var textViewPegelstand: TextView
+    private lateinit var textViewPegelstandNeu: TextView
+    private lateinit var textViewPegelstandAlt: TextView
+    private lateinit var textViewWassertemperatur: TextView
+    private lateinit var textViewZeitpunkt: TextView
     private lateinit var imageViewMoonPhase: ImageView
     // Diagramm (MPAndroidChart) zur Darstellung des Pegelverlaufs
     private lateinit var lineChart: com.github.mikephil.charting.charts.LineChart
@@ -156,14 +159,21 @@ class MainActivity : AppCompatActivity() {
         PegelScheduler.schedule(this)
 
         // UI-Elemente initialisieren
-        textViewPegelstand = findViewById(R.id.textViewPegelstand)
+        textViewPegelstandNeu = findViewById(R.id.textViewPegelstandNeu)
+        textViewPegelstandAlt = findViewById(R.id.textViewPegelstandAlt)
+        textViewWassertemperatur = findViewById(R.id.textViewWassertemperatur)
+        textViewZeitpunkt = findViewById(R.id.textViewZeitpunkt)
+
         lineChart = findViewById(R.id.lineChart)
 
 
         // Pegeldaten aus Cache laden und anzeigen
         PegelUiHelper.ladePegelstand(
             this,
-            textViewPegelstand,
+            textViewPegelstandAlt,
+            textViewPegelstandNeu,
+            textViewWassertemperatur,
+            textViewZeitpunkt,
             lineChart,
             prefs,
             imageViewMoonPhase
@@ -201,7 +211,10 @@ class MainActivity : AppCompatActivity() {
                 // UI erneut laden
                 PegelUiHelper.ladePegelstand(
                     this,
-                    textViewPegelstand,
+                    textViewPegelstandAlt,
+                    textViewPegelstandNeu,
+                    textViewWassertemperatur,
+                    textViewZeitpunkt,
                     lineChart,
                     prefs,
                     imageViewMoonPhase
@@ -253,7 +266,10 @@ class MainActivity : AppCompatActivity() {
         // Cached Daten sofort anzeigen
         PegelUiHelper.ladePegelstand(
             this,
-            textViewPegelstand,
+            textViewPegelstandAlt,
+            textViewPegelstandNeu,
+            textViewWassertemperatur,
+            textViewZeitpunkt,
             lineChart,
             prefs,
             imageViewMoonPhase
@@ -362,7 +378,10 @@ class MainActivity : AppCompatActivity() {
                 // UI aktualisieren
                 PegelUiHelper.ladePegelstand(
                     this@MainActivity,
-                    textViewPegelstand,
+                    textViewPegelstandAlt,
+                    textViewPegelstandNeu,
+                    textViewWassertemperatur,
+                    textViewZeitpunkt,
                     lineChart,
                     prefs,
                     imageViewMoonPhase

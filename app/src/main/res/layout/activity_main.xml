@@ -53,21 +53,127 @@
           android:layout_gravity="center"
           android:orientation="horizontal">
 
-            <TextView
-              android:id="@+id/textViewPegelstand"
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:layout_weight="1"
-              android:fontFamily="sans-serif-condensed-light"
-              android:text="@string/level_is_loading"
-              android:textSize="18sp"
-              android:textStyle="bold" />
+            <!-- Linke Seite -->
+            <LinearLayout
+              android:layout_width="0dp"
+              android:layout_height="match_parent"
+              android:layout_weight="2"
+              android:orientation="vertical">
+
+                <!-- Pegelstand aktuell -->
+                <LinearLayout
+                  android:layout_width="match_parent"
+                  android:layout_height="0dp"
+                  android:layout_weight="1"
+                  android:gravity="center_vertical"
+                  android:orientation="horizontal">
+
+                    <ImageView
+                      android:layout_width="28dp"
+                      android:layout_height="28dp"
+                      android:layout_marginStart="8dp"
+                      android:layout_marginEnd="8dp"
+                      android:background="@drawable/bg_icon_round_blue"
+                      android:padding="4dp"
+                      android:tint="?attr/colorBackground"
+                      app:srcCompat="@drawable/ic_water_level" />
+
+                    <TextView
+                      android:id="@+id/textViewPegelstandNeu"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="@string/level_is_loading"
+                      android:textSize="16sp"
+                      android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- Pegelstand alt -->
+                <LinearLayout
+                  android:layout_width="match_parent"
+                  android:layout_height="0dp"
+                  android:layout_weight="1"
+                  android:gravity="center_vertical"
+                  android:orientation="horizontal">
+
+                    <ImageView
+                      android:layout_width="28dp"
+                      android:layout_height="28dp"
+                      android:layout_marginStart="8dp"
+                      android:layout_marginEnd="8dp"
+                      android:background="@drawable/bg_icon_round_blue"
+                      android:padding="4dp"
+                      android:tint="?attr/colorBackground"
+                      app:srcCompat="@drawable/ic_water_level_history" />
+                    <TextView
+                      android:id="@+id/textViewPegelstandAlt"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="Pegelstand alt: -- cm"
+                      android:textSize="16sp"
+                      android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- Temperatur -->
+                <LinearLayout
+                  android:layout_width="match_parent"
+                  android:layout_height="0dp"
+                  android:layout_weight="1"
+                  android:gravity="center_vertical"
+                  android:orientation="horizontal">
+
+                    <ImageView
+                      android:layout_width="28dp"
+                      android:layout_height="28dp"
+                      android:layout_marginStart="8dp"
+                      android:layout_marginEnd="8dp"
+                      android:background="@drawable/bg_icon_round_red"
+                      android:padding="4dp"
+                      android:tint="?attr/colorBackground"
+                      app:srcCompat="@drawable/ic_temperature" />
+
+                    <TextView
+                      android:id="@+id/textViewWassertemperatur"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="Wassertemperatur: -- °C"
+                      android:textSize="16sp"
+                      android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- Zeitpunkt -->
+                <LinearLayout
+                  android:layout_width="match_parent"
+                  android:layout_height="0dp"
+                  android:layout_weight="1"
+                  android:gravity="center_vertical"
+                  android:orientation="horizontal">
+
+                    <ImageView
+                      android:layout_width="28dp"
+                      android:layout_height="28dp"
+                      android:layout_marginStart="8dp"
+                      android:layout_marginEnd="8dp"
+                      android:background="@drawable/bg_icon_round_blue"
+                      android:padding="4dp"
+                      android:tint="?attr/colorBackground"
+                      app:srcCompat="@drawable/ic_time" />
+
+                    <TextView
+                      android:id="@+id/textViewZeitpunkt"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="Letzte Daten: --"
+                      android:textSize="16sp"
+                      android:textStyle="bold" />
+                </LinearLayout>
+
+            </LinearLayout>
 
             <ImageView
               android:id="@+id/imageViewMoonPhase"
               android:layout_width="wrap_content"
               android:layout_height="match_parent"
-              android:layout_weight="2"
+              android:layout_weight="1"
               android:background="@color/midnight_blue"
               android:foregroundGravity="center"
               app:srcCompat="@drawable/ic_moon_1_waxing_crescent" />

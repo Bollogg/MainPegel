@@ -108,7 +108,7 @@ object PegelUiHelper {
 
 		// Pegelverlauf aus Cache rekonstruieren
 	  val pegelList = mutableListOf<PegelResponse>()
-	  // Temperaturverlauf aus Cache rekonstruieren
+	  //ToDo: Temperaturverlauf aus Cache rekonstruieren
 	  val tempList = mutableListOf<TempResponse>()
 
 	  for (i in 0..<count) {

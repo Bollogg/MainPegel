@@ -11,7 +11,7 @@ Bei Überschreitung des Pegelstand um x cm wird ein Alarm ausgelöst
 - BLAU: Button für die Aktualliesierung
 - GRÜN: Einstellungen der APP
 
-## Erweiterung ab V2026.5 Keiler 3
+## Erweiterung ab V2026.5 Keiler 6
 
 <p align="center">
   <img src="images/MainPegelApp_Erweiterung_V2026.5.png" width="200">

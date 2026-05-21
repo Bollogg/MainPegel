@@ -8,15 +8,28 @@
   android:padding="16dp">
 
   <!-- Toolbar -->
-  <androidx.appcompat.widget.Toolbar
-    android:id="@+id/toolbar"
+  <!-- Toolbar als Material Card -->
+  <com.google.android.material.card.MaterialCardView
+    android:id="@+id/toolbarCard"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="16dp"
-    android:background="?attr/toolBarBackground"
-    android:minHeight="?attr/actionBarSize"
-    android:theme="?attr/actionBarTheme"
-    app:titleTextColor="?attr/colorToolbarText" />
+    app:cardCornerRadius="16dp"
+    app:cardElevation="6dp"
+    app:cardBackgroundColor="?attr/toolBarBackground"
+    app:strokeColor="?attr/colorToolbarShadow"
+    app:strokeWidth="1dp">
+
+    <androidx.appcompat.widget.Toolbar
+      android:id="@+id/toolbar"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:background="@android:color/transparent"
+      android:minHeight="?attr/actionBarSize"
+      android:theme="?attr/actionBarTheme"
+      app:titleTextColor="?attr/colorToolbarText" />
+
+  </com.google.android.material.card.MaterialCardView>
 
   <!-- Hintergrundbild -->
   <ImageView
@@ -26,37 +39,50 @@
     android:scaleType="centerCrop"
     android:src="@mipmap/ic_launcher_aal_foreground" />
 
-  <!-- Inhalte -->
-  <LinearLayout
+  <!-- Inhalte als Material Card -->
+  <com.google.android.material.card.MaterialCardView
+    android:id="@+id/contentCard"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="16dp"
-    android:orientation="vertical">
+    android:layout_marginTop="16dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="6dp"
+    app:cardBackgroundColor="?attr/colorSurface"
+    app:strokeColor="?attr/colorToolbarShadow"
+    app:strokeWidth="1dp">
 
-    <TextView
-      android:id="@+id/txtVersionName"
-      android:layout_width="wrap_content"
+    <LinearLayout
+      android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:layout_marginBottom="8dp"
-      android:text="Version:  OeTTINGER"
-      android:textSize="20dp"
-      android:textStyle="bold" />
+      android:orientation="vertical"
+      android:padding="16dp">
 
-    <TextView
+      <TextView
+        android:id="@+id/txtVersionName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:text="Version: OeTTINGER"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+      <TextView
         android:id="@+id/txtApiInfo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="API: https://www.pegelonline.wsv.de \n"
-        android:textSize="20dp"
+        android:text="API: https://www.pegelonline.wsv.de"
+        android:textSize="20sp"
         android:autoLink="web"
-        android:linksClickable="true"/>
+        android:linksClickable="true"
+        android:layout_marginBottom="8dp" />
 
-    <TextView
-      android:id="@+id/txtEMail"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:text="mail: MainPegel@wiesenfarth-net.de"
-      android:textSize="20dp" />
+      <TextView
+        android:id="@+id/txtEMail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="mail: MainPegel@wiesenfarth-net.de"
+        android:textSize="20sp" />
 
-  </LinearLayout>
+    </LinearLayout>
+  </com.google.android.material.card.MaterialCardView>  <!-- Inhalte -->
 </LinearLayout>

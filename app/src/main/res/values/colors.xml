@@ -26,6 +26,8 @@
   <color name="background_night">#444444</color>-->
   <color name="toolbar_text_day">#FF000000</color>-->
   <color name="toolbar_text_night">#FFFFFFFF</color>-->
+  <color name="toolbar_shadow_day">#22000000</color>-->
+  <color name="toolbar_shadow_night">#44FFFFFF</color>-->
 
   <!-- Graph -->
   <color name="graph_line_light">#500000FF</color>       <!-- Blau -->

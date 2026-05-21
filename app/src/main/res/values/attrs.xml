@@ -12,6 +12,7 @@
 
   <!-- UI -->
   <attr name="colorToolbarText" format="color"/>
+  <attr name="colorToolbarShadow" format="color"/>
   <attr name="toolBarBackground" format="color"/>
 
   <!-- Widget -->

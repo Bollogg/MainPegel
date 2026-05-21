@@ -6,10 +6,17 @@ Bei Überschreitung des Pegelstand um x cm wird ein Alarm ausgelöst
   <img src="images/MainPegelApp.png" width="200">
 </p>
 
+## Erweiterung ab V2026.03.27
+
+<p align="center">
+  <img src="images/MainPegelApp_Erweiterung_V2026.3.png" width="200">
+</p>
+
 - ROT:  Anzeige einer Pegelüberschreitung
 - GELB: Tabelle der gelesenen Pegelstände
 - BLAU: Button für die Aktualliesierung
 - GRÜN: Einstellungen der APP
+
 
 ## Erweiterung ab V2026.5 Keiler 6
 

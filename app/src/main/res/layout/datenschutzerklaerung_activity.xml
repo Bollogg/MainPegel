@@ -7,16 +7,29 @@
   android:orientation="vertical"
   android:padding="16dp">
 
-<!-- Toolbar -->
-  <androidx.appcompat.widget.Toolbar
-    android:id="@+id/toolbar"
+  <!-- Toolbar als Material Card -->
+  <com.google.android.material.card.MaterialCardView
+    android:id="@+id/toolbarCard"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="16dp"
-    android:background="?attr/toolBarBackground"
-    android:minHeight="?attr/actionBarSize"
-    android:theme="?attr/actionBarTheme"
-    app:titleTextColor="?attr/colorToolbarText" />
+    app:cardCornerRadius="16dp"
+    app:cardElevation="6dp"
+    app:cardBackgroundColor="?attr/toolBarBackground"
+    app:strokeColor="?attr/colorToolbarShadow"
+    app:strokeWidth="1dp">
+
+    <androidx.appcompat.widget.Toolbar
+      android:id="@+id/toolbar"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:background="@android:color/transparent"
+      android:minHeight="?attr/actionBarSize"
+      android:theme="?attr/actionBarTheme"
+      app:logo="@mipmap/ic_launcher_aal_round"
+      app:titleTextColor="?attr/colorToolbarText" />
+
+  </com.google.android.material.card.MaterialCardView>
 
   <LinearLayout
     android:layout_width="match_parent"

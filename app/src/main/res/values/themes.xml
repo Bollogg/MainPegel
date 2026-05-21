@@ -10,6 +10,7 @@
     <item name="colorPrimary">@color/toolbar_blue</item>
     <item name="colorSecondary">@color/button_purple</item>
     <item name="colorToolbarText">@color/toolbar_text_day</item>
+    <item name="colorToolbarShadow">@color/toolbar_shadow_day</item>
     <item name="toolBarBackground">@color/background_day</item>
 
     <!-- Graph -->

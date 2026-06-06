@@ -13,7 +13,7 @@ plugins {
 android {
   namespace = "de.net.wiesenfarth.mainpegel"
 
-  compileSdk = 36
+  compileSdk = 37
   buildFeatures {
       buildConfig = true
       viewBinding = true
@@ -21,12 +21,12 @@ android {
   defaultConfig {
     applicationId = "de.net.wiesenfarth.mainpegel"
     minSdk = 32
-    targetSdk = 36
-    versionCode = 20260521
-    versionName = "V2026.05 "
+    targetSdk = 37
+    versionCode = 20260606
+    versionName = "V2026.06 "
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    versionNameSuffix = "Keiler Helles"
+    versionNameSuffix = "Keiler Dunkles"
   }
   // RoomDatabase
   room {

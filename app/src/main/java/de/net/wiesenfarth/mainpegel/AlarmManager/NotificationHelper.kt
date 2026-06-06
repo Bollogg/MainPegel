@@ -4,7 +4,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.media.AudioAttributes
-import android.media.RingtoneManager
+//ToDo import android.media.RingtoneManager
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import de.net.wiesenfarth.mainpegel.R
@@ -59,15 +59,16 @@ object NotificationHelper {
 	      )
 
 	    // ✔ Standard-Benachrichtigungston des Geräts
-      val defaultSound =
-				RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-
+	    //ToDo: Sound löschen!!!!
+      //val defaultSound =
+			//	RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+			/*
       val attrs = AudioAttributes.Builder()
           .setUsage(AudioAttributes.USAGE_NOTIFICATION)
           .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
           .build()
-
-      ch.setSound(defaultSound, attrs)
+			*/
+      //ch.setSound(defaultSound, attrs)
 
 	    // ✔ Vibration aktivieren
       ch.enableVibration(true)

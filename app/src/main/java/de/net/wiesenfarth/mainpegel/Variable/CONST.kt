@@ -18,6 +18,12 @@ object CONST {
   const val APP_VERSION_CODE: Int = 20251204
 
   // ----------------------------------------------------
+  // Pegel Speicher und Einstellungen
+  // ----------------------------------------------------
+  const val PREF_CACHE = "pegel_cache"
+  const val PREF_SETTINGS = "settings"
+
+  // ----------------------------------------------------
   // GUIDs der Pegelmessstellen (fest definierte IDs)
   // ----------------------------------------------------
   const val RAUNHEIM: String = "db1684c1-7ffc-4e8a-b8cf-8240a0d03519"

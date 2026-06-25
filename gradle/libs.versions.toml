@@ -17,7 +17,7 @@ mpandroidchart = "v3.1.0"
 preference = "1.2.1"
 work = "2.11.2"
 retrofit = "3.0.0"
-okhttp = "5.3.2"
+okhttp = "5.4.0"
 ossLicenses = "17.5.1"
 gson = "2.14.0"
 

@@ -18,6 +18,7 @@ import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import java.util.concurrent.atomic.AtomicInteger
 
 /*******************************************************
  * Objekt:      PegelLogic
@@ -70,7 +71,7 @@ object PegelLogic {
    * Wird benötigt, um Pegelanstieg zu berechnen.
    * -1 bedeutet: noch kein Wert vorhanden.
    */
-  private var lastValue = -1
+  private var lastValue = AtomicInteger(-1)
 
   /**
    * Schutz gegen parallele API-Aufrufe.
@@ -97,9 +98,9 @@ object PegelLogic {
   fun run(context: Context, onFinished: (() -> Unit)? = null): Boolean {
 
     // Letzten bekannten Pegelwert aus Cache laden
-    if (lastValue < 0) {
-      val cache = context.getSharedPreferences("pegel_cache", Context.MODE_PRIVATE)
-      lastValue = cache.getInt("last_value", -1)
+    if (lastValue.get() < 0) {
+      val cache = context.getSharedPreferences(CONST.PREF_CACHE, Context.MODE_PRIVATE)
+      lastValue.set( cache.getInt("last_value", -1))
     }
 
     // Abbrechen wenn bereits ein Abruf läuft
@@ -115,7 +116,7 @@ object PegelLogic {
     Log.i("API/PegelLogic", "PegelLogic.run() gestartet")
 
     // Einstellungen laden
-    val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+    val prefs = context.getSharedPreferences(CONST.PREF_SETTINGS, Context.MODE_PRIVATE)
     val localityGuid: String = prefs.getString("locality_guid", CONST.WUERZBURG)!!
     val hours = prefs.getInt("graph_hours", 4)
 
@@ -227,7 +228,7 @@ object PegelLogic {
     // Pegelanstieg prüfen
     handleNewPegel(context, lastWater.value, formattedTime)
 
-    val cache = context.getSharedPreferences("pegel_cache", Context.MODE_PRIVATE)
+    val cache = context.getSharedPreferences(CONST.PREF_CACHE, Context.MODE_PRIVATE)
     val e = cache.edit()
 
     // Letzten Pegelwert speichern
@@ -308,13 +309,13 @@ object PegelLogic {
 
     if (newValue <= 0) {
       // ToDo: löschen
-      // lastValue = newValue
+      // lastValue.set( newValue )
       return
     }
 
-    val delta = newValue - lastValue
+    val delta = newValue - lastValue.get()
 
-    val prefs = ctx.getSharedPreferences("settings", Context.MODE_PRIVATE)
+    val prefs = ctx.getSharedPreferences(CONST.PREF_SETTINGS, Context.MODE_PRIVATE)
 
     val threshold = prefs.getString("wave_threshold", "15")?.toIntOrNull() ?: 15
 
@@ -327,14 +328,14 @@ object PegelLogic {
         time ?: "--"
       )
 
-      if (prefs.getBoolean("vibrate_alarm", true))
+      if (prefs.getBoolean("vibration", true))
         vibrateDevice(ctx)
 
-      if (prefs.getBoolean("sound_alarm", true))
+      if (prefs.getBoolean("beep", true))
         playSystemNotificationSound(ctx)
     }
 
-    lastValue = newValue
+    lastValue.set(newValue)
   }
 
   /** Speichert Fehlerstatus im Cache */

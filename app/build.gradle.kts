@@ -22,8 +22,8 @@ android {
     applicationId = "de.net.wiesenfarth.mainpegel"
     minSdk = 32
     targetSdk = 37
-    versionCode = 20260606
-    versionName = "V2026.06 "
+    versionCode = 20260625
+    versionName = "V2026.06 Patch 1"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     versionNameSuffix = "Keiler Dunkles"

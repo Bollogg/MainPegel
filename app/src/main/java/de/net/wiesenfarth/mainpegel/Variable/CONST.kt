@@ -11,11 +11,6 @@ package de.net.wiesenfarth.mainpegel.Variable
  * Datum:     2025-11-17
  *******************************************************/
 object CONST {
-	// ----------------------------------------------------
-  // Versions Code
-  // ----------------------------------------------------
-  const val APP_VERSION_NAME: String = "Oettinger V2025.12.04"
-  const val APP_VERSION_CODE: Int = 20251204
 
   // ----------------------------------------------------
   // Pegel Speicher und Einstellungen

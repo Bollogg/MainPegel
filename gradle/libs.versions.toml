@@ -1,20 +1,20 @@
 [versions]
 # Android Gradle Plugin / Kotlin
-agp = "9.3.0"
+agp = "9.3.2"
 kotlin = "2.3.10"
 ksp = "2.3.10"
 
 # AndroidX
 coreKtx = "1.19.0"
-appcompat = "1.7.1"
+appcompat = "1.8.0"
 activity = "1.13.0"
-constraintlayout = "2.2.1"
+constraintlayout = "2.2.2"
 material = "1.14.0"
 
 # RoomDatabase
 room = "2.8.4"
-navigationFragmentKtx = "2.9.8"
-navigationUiKtx = "2.9.8"
+navigationFragmentKtx = "2.10.0"
+navigationUiKtx = "2.10.0"
 mpandroidchart = "v3.1.0"
 
 # Preferences
@@ -25,7 +25,7 @@ work = "2.11.2"
 
 # Networking
 retrofit = "3.0.0"
-okhttp = "5.4.0"
+okhttp = "5.5.0"
 
 # Google
 ossLicenses = "17.5.1"

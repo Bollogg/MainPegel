@@ -22,10 +22,10 @@ android {
     minSdk = 32
     targetSdk = 37
     versionCode = 20260717
-    versionName = "V2026.07 "
+    versionName = "V2026.07"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    versionNameSuffix = "Keiler Dunkles"
+    versionNameSuffix = " Keiler Dunkles"
   }
   // RoomDatabase
   room {

@@ -1,25 +1,41 @@
 [versions]
+# Android Gradle Plugin / Kotlin
 agp = "9.3.0"
-kotlin = "2.4.10"
+kotlin = "2.3.10"
+ksp = "2.3.10"
+
+# AndroidX
 coreKtx = "1.19.0"
-junitVersion = "1.3.0"
-espressoCore = "3.7.0"
 appcompat = "1.7.1"
-material = "1.14.0"
 activity = "1.13.0"
 constraintlayout = "2.2.1"
+material = "1.14.0"
+
 # RoomDatabase
 room = "2.8.4"
-ksp = "2.3.2"
 navigationFragmentKtx = "2.9.8"
 navigationUiKtx = "2.9.8"
 mpandroidchart = "v3.1.0"
+
+# Preferences
 preference = "1.2.1"
+
+# WorkManager
 work = "2.11.2"
+
+# Networking
 retrofit = "3.0.0"
 okhttp = "5.4.0"
+
+# Google
 ossLicenses = "17.5.1"
+
+# JSON
 gson = "2.14.0"
+
+# Tests
+junitVersion = "1.3.0"
+espressoCore = "3.7.0"
 
 
 [libraries]

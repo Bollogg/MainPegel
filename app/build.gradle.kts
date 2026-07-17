@@ -4,7 +4,6 @@ plugins {
   //alias(libs.plugins.kotlin.android)
 	id("com.android.application")
 	id("com.google.android.gms.oss-licenses-plugin")
-	id("org.jetbrains.kotlin.android")
   // RoomDatabase
   alias(libs.plugins.ksp)
   alias(libs.plugins.androidx.room)

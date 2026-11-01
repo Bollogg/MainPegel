@@ -1,8 +1,9 @@
 [versions]
 # Android Gradle Plugin / Kotlin
-agp = "9.4.1"
-kotlin = "2.3.10"
-ksp = "2.3.10"
+agp = "9.5.0"
+
+kotlin = "2.4.21"
+ksp = "2.3.13"
 
 # AndroidX
 coreKtx = "1.19.1"
@@ -25,13 +26,13 @@ work = "2.12.0"
 
 # Networking
 retrofit = "3.0.0"
-okhttp = "5.5.0"
+okhttp = "5.5.1"
 
 # Google
-ossLicenses = "17.5.2"
+ossLicenses = "17.5.3"
 
 # JSON
-gson = "2.14.0"
+gson = "2.15.0"
 
 # Tests
 junitVersion = "1.3.0"
